@@ -1,0 +1,6 @@
+package com.alipay.business.common.service.facade.request;
+
+import com.alipay.business.common.service.facade.baseresult.BusinessBaseRequest;
+
+public class QueryTransactionHistoryRequest extends BusinessBaseRequest {
+}
