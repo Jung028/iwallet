@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
     <properties>
         <ialicore.common.service.facade.version>1.0-SNAPSHOT</ialicore.common.service.facade.version>
-        <usercenter.common.service.facade.version>1.0.0.20260117-SNAPSHOT</usercenter.common.service.facade.version>
-        <accountcenter.common.service.facade.version>1.0.0.20260215-SNAPSHOT</accountcenter.common.service.facade.version>
+        <usercenter.common.service.facade.version>1.0.0.20260118-SNAPSHOT</usercenter.common.service.facade.version>
+        <accountcenter.common.service.facade.version>1.0.0.20260216-SNAPSHOT</accountcenter.common.service.facade.version>
     </properties>
 
     <dependencyManagement>

@@ -8,8 +8,8 @@
         <!-- JDBC connection -->
         <jdbcConnection
                 driverClass="org.postgresql.Driver"
-                connectionURL="jdbc:postgresql://localhost:5433/business"
-                userId="postgres"
+                connectionURL="jdbc:postgresql://localhost:5432/wallet"
+                userId="adam"
                 password="1234" />
 
         <!-- Java Model (DO) generation -->
