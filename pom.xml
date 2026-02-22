@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
     <properties>
         <ialicore.common.service.facade.version>1.0-SNAPSHOT</ialicore.common.service.facade.version>
-        <usercenter.common.service.facade.version>1.0.0.20260118-SNAPSHOT</usercenter.common.service.facade.version>
-        <accountcenter.common.service.facade.version>1.0.0.20260216-SNAPSHOT</accountcenter.common.service.facade.version>
+        <usercenter.common.service.facade.version>1.0.0.20260118.1-SNAPSHOT</usercenter.common.service.facade.version>
+        <accountcenter.common.service.facade.version>1.0.0.20260218.2-SNAPSHOT</accountcenter.common.service.facade.version>
     </properties>
 
     <dependencyManagement>
@@ -51,6 +51,13 @@
                 <scope>test</scope>
             </dependency>
             <!-- MyBatis -->
+
+            <dependency>
+                <groupId>com.alipay.sofa.common</groupId>
+                <artifactId>sofa-common-tools</artifactId>
+                <version>2.1.1</version>
+                <scope>compile</scope>
+            </dependency>
 
             <!-- PostgreSQL JDBC -->
             <dependency>

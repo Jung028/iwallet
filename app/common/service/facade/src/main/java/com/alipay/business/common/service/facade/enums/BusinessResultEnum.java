@@ -1,6 +1,6 @@
 package com.alipay.business.common.service.facade.enums;
 
-public enum SlipResultEnum implements IpayCommonResultCode{
+public enum BusinessResultEnum implements IpayCommonResultCode{
     EXECUTE_SUCCESS("0200", ResultCodeLevel.INFO, ResultCodeType.SUCCESS, "Execution successful"),
     SYSTEM_EXCEPTION("0500", ResultCodeLevel.ERROR, ResultCodeType.SYS_ERROR, "System exception occurred"),
     PARAM_ILLEGAL("0400", ResultCodeLevel.WARN, ResultCodeType.BIZ_ERROR, "Illegal parameter");
@@ -11,7 +11,7 @@ public enum SlipResultEnum implements IpayCommonResultCode{
     private String errorType;
     private String errorLevel;
 
-    SlipResultEnum(String code, String errorLevel, String errorType, String description) {
+    BusinessResultEnum(String code, String errorLevel, String errorType, String description) {
         this.code = code;
         this.errorLevel = errorLevel;
         this.errorType = errorType;

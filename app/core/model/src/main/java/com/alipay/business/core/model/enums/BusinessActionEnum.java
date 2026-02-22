@@ -6,7 +6,8 @@ public enum BusinessActionEnum {
     TRANSFER("TRANSFER", "transfer amount to anther account"),
     QUERY_TRANSACTION_DETAILS("QUERY_TRANSACTION_DETAILS", "Query transaction details"),
     QUERY_TRANSACTION_HISTORY("QUERY_TRANSACTION_HISTORY", "Query transaction history"),
-    QUERY_BALANCE("QUERY_BALANCE", "Query account balance");
+    QUERY_BALANCE("QUERY_BALANCE", "Query account balance"),
+    TRANSFER_CONFIRM_OVER_LIMIT("TRANSFER_CONFIRM_OVER_LIMIT","Transfer confirm over limit");
 
     private String code;
     private String description;

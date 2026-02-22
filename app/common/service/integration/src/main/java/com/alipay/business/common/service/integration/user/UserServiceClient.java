@@ -1,0 +1,32 @@
+package com.alipay.business.common.service.integration.user;
+
+import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
+import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
+import com.alipay.usercenter.common.service.facade.request.OTPRequest;
+import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
+import com.alipay.usercenter.common.service.facade.request.VerifyOtpRequest;
+import com.alipay.usercenter.common.service.facade.result.OTPResult;
+
+public interface UserServiceClient {
+
+    /**
+     * query user info
+     * @param request
+     * @return
+     */
+    UserBizResult<UserInfoItem> queryUserInfo(QueryUserInfoRequest request);
+
+    /**
+     * send OTP
+     * @param request
+     * @return
+     */
+    UserBizResult<OTPResult> sendOTP(OTPRequest request);
+
+    /**
+     * verify OTP
+     * @param request
+     * @return
+     */
+    UserBizResult<String> verifyOTP(VerifyOtpRequest request);
+}

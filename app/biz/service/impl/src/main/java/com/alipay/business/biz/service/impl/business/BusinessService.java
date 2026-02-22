@@ -1,10 +1,7 @@
 package com.alipay.business.biz.service.impl.business;
 
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
-import com.alipay.business.common.service.facade.request.QueryBalanceRequest;
-import com.alipay.business.common.service.facade.request.QueryTransactionDetailsRequest;
-import com.alipay.business.common.service.facade.request.QueryTransactionHistoryRequest;
-import com.alipay.business.common.service.facade.request.TransferRequest;
+import com.alipay.business.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.result.QueryBalanceResult;
 import com.alipay.business.common.service.facade.result.QueryTransactionDetailsResult;
 import com.alipay.business.common.service.facade.result.QueryTransactionHistoryResult;
@@ -17,6 +14,14 @@ public interface BusinessService {
      * @return
      */
     BusinessBizResult<String> transfer(TransferRequest request, String userId);
+
+    /**
+     * confirm otp for transfer over limit
+     * @param request
+     * @param userId
+     * @return
+     */
+    BusinessBizResult<String> transferConfirm(TransferConfirmRequest request, String userId);
 
     /**
      * query transaction details
@@ -38,4 +43,5 @@ public interface BusinessService {
      * @return
      */
     BusinessBizResult<QueryBalanceResult> queryBalance(QueryBalanceRequest request);
+
 }

@@ -19,10 +19,6 @@ public class TransferRequest extends BusinessBaseRequest {
      * transfer amount
      */
     private Money amount;
-    /**
-     * transfer currency
-     */
-    private CurrencyUnit currency;
 
     /**
      * unique request id
@@ -81,22 +77,6 @@ public class TransferRequest extends BusinessBaseRequest {
      */
     public void setAmount(Money amount) {
         this.amount = amount;
-    }
-
-    /**
-     * get transfer currency
-     * @return
-     */
-    public CurrencyUnit getCurrency() {
-        return currency;
-    }
-
-    /**
-     * set transfer currency
-     * @param currency
-     */
-    public void setCurrency(CurrencyUnit currency) {
-        this.currency = currency;
     }
 
     /**
