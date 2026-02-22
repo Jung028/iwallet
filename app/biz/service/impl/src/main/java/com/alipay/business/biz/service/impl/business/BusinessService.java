@@ -2,9 +2,10 @@ package com.alipay.business.biz.service.impl.business;
 
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.request.*;
+import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
+import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
+import com.alipay.business.common.service.facade.result.BusinessTransactionHistoryResult;
 import com.alipay.business.common.service.facade.result.QueryBalanceResult;
-import com.alipay.business.common.service.facade.result.QueryTransactionDetailsResult;
-import com.alipay.business.common.service.facade.result.QueryTransactionHistoryResult;
 
 public interface BusinessService {
 
@@ -28,20 +29,20 @@ public interface BusinessService {
      * @param request
      * @return
      */
-    BusinessBizResult<QueryTransactionDetailsResult> queryTransactionDetails(QueryTransactionDetailsRequest request);
+    BusinessBizResult<BusinessTransactionDetailsResult> queryTransactionDetails(BusinessTransactionRecordRequest request);
 
     /**
      * query transaction history
      * @param request
      * @return
      */
-    BusinessBizResult<QueryTransactionHistoryResult> queryTransactionHistory(QueryTransactionHistoryRequest request);
+    BusinessBizResult<BusinessTransactionHistoryResult> queryTransactionHistory(BusinessTransactionHistoryRequest request);
 
     /**
      * query balance
      * @param request
      * @return
      */
-    BusinessBizResult<QueryBalanceResult> queryBalance(QueryBalanceRequest request);
+    BusinessBizResult<BusinessBalanceResult> queryBalance(BusinessBalanceRequest request);
 
 }

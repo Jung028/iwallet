@@ -3,19 +3,20 @@ package com.alipay.business.biz.service.impl.business.impl;
 import com.alipay.alipay_plus.common.service.facade.baseresult.AccountBizResult;
 import com.alipay.alipay_plus.common.service.facade.enums.TransactionStatusEnum;
 import com.alipay.alipay_plus.common.service.facade.item.AccountInfoItem;
+import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
-import com.alipay.alipay_plus.common.service.facade.request.InsertTransactionRecordRequest;
-import com.alipay.alipay_plus.common.service.facade.request.QueryAccountInfoRequest;
-import com.alipay.alipay_plus.common.service.facade.request.UpdateTransactionRecordRequest;
+import com.alipay.alipay_plus.common.service.facade.request.*;
 import com.alipay.business.biz.service.impl.checker.BusinessRequestChecker;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.facade.money.MoneyUtil;
 import com.alipay.business.common.service.facade.request.*;
-import com.alipay.business.common.service.facade.result.QueryBalanceResult;
-import com.alipay.business.common.service.facade.result.QueryTransactionDetailsResult;
-import com.alipay.business.common.service.facade.result.QueryTransactionHistoryResult;
+import com.alipay.business.common.service.facade.request.TransferRequest;
+import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
+import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
+import com.alipay.business.common.service.facade.result.BusinessTransactionHistoryResult;
+import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
 import com.alipay.business.core.model.event.EcTransactionEvent;
@@ -36,6 +37,7 @@ import javax.money.CurrencyUnit;
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Business service impl
@@ -213,68 +215,85 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
 
 
     @Override
-    public BusinessBizResult<QueryTransactionDetailsResult> queryTransactionDetails(QueryTransactionDetailsRequest request) {
+    public BusinessBizResult<BusinessTransactionDetailsResult> queryTransactionDetails(BusinessTransactionRecordRequest request) {
         return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_TRANSACTION_DETAILS,
                 new BusinessBizCallback<>() {
                     @Override
-                    protected BusinessBizResult<QueryTransactionDetailsResult> createDefaultResponse() {
+                    protected BusinessBizResult<BusinessTransactionDetailsResult> createDefaultResponse() {
                         return new BusinessBizResult<>();
                     }
 
                     @Override
-                    protected void checkParams(QueryTransactionDetailsRequest request) {
-
+                    protected void checkParams(BusinessTransactionRecordRequest request) {
+                        BusinessRequestChecker.checkQueryTransactionDetailsRequest(request);
                     }
 
                     @Override
-                    protected void process(QueryTransactionDetailsRequest request, BusinessBizResult<QueryTransactionDetailsResult> response) {
-
+                    protected void process(BusinessTransactionRecordRequest request,
+                                           BusinessBizResult<BusinessTransactionDetailsResult> result) {
+                        QueryTransactionRecordRequest queryTransactionRecordRequest = new QueryTransactionRecordRequest();
+                        queryTransactionRecordRequest.setAccountId(request.getAccountId());
+                        queryTransactionRecordRequest.setTxnId(request.getTxnId());
+                        AccountBizResult<TransactionRecordItem> accountBizResult = accountServiceClient.queryTransactionRecord(queryTransactionRecordRequest);
+                        result.setResult(ItemConverter.convertToTxnDetails(accountBizResult));
                     }
                 });
 
     }
 
+
     @Override
-    public BusinessBizResult<QueryTransactionHistoryResult> queryTransactionHistory(QueryTransactionHistoryRequest request) {
+    public BusinessBizResult<BusinessTransactionHistoryResult> queryTransactionHistory(BusinessTransactionHistoryRequest request) {
         return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_TRANSACTION_HISTORY,
                 new BusinessBizCallback<>() {
                     @Override
-                    protected BusinessBizResult<QueryTransactionHistoryResult> createDefaultResponse() {
+                    protected BusinessBizResult<BusinessTransactionHistoryResult> createDefaultResponse() {
                         return new BusinessBizResult<>();
                     }
 
                     @Override
-                    protected void checkParams(QueryTransactionHistoryRequest request) {
+                    protected void checkParams(BusinessTransactionHistoryRequest request) {
                         BusinessRequestChecker.checkQueryTransactionHistoryRequest(request);
                     }
 
                     @Override
-                    protected void process(QueryTransactionHistoryRequest request,
-                                           BusinessBizResult<QueryTransactionHistoryResult> response) {
-
+                    protected void process(BusinessTransactionHistoryRequest request,
+                                           BusinessBizResult<BusinessTransactionHistoryResult> response) {
+                        QueryTransactionHistoryRequest queryTransactionHistoryRequest = new QueryTransactionHistoryRequest();
+                        queryTransactionHistoryRequest.setAccountId(request.getAccountId());
+                        queryTransactionHistoryRequest.setTxnId(request.getTxnId());
+                        // query transaction history
+                        AccountBizResult<List<TransactionHistoryItem>> result = accountServiceClient
+                                .queryTransactionHistory(queryTransactionHistoryRequest);
+                        //convert to normal before return
+                        result.setResult(ItemConverter.convertToTxnHistory(result));
                     }
                 });
     }
 
     @Override
-    public BusinessBizResult<QueryBalanceResult> queryBalance(QueryBalanceRequest request) {
-        return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_BALANCE, new BusinessBizCallback<>() {
+    public BusinessBizResult<BusinessBalanceResult> queryBalance(BusinessBalanceRequest request) {
+        return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_BALANCE,
+                new BusinessBizCallback<>() {
 
-            @Override
-            protected BusinessBizResult<QueryBalanceResult> createDefaultResponse() {
-                return null;
-            }
+                    @Override
+                    protected BusinessBizResult<BusinessBalanceResult> createDefaultResponse() {
+                        return new BusinessBizResult<>();
+                    }
 
-            @Override
-            protected void checkParams(QueryBalanceRequest request) {
+                    @Override
+                    protected void checkParams(BusinessBalanceRequest request) {
+                        BusinessRequestChecker.checkQueryBalanceRequest(request);
+                    }
 
-            }
-
-            @Override
-            protected void process(QueryBalanceRequest request, BusinessBizResult<QueryBalanceResult> response) {
-
-            }
-        });
+                    @Override
+                    protected void process(BusinessBalanceRequest request, BusinessBizResult<BusinessBalanceResult> result) {
+                        QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
+                        queryAccountInfoRequest.setAccountId(request.getAccountId());
+                        AccountBizResult<AccountInfoItem> accountInfo = accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
+                        result.setResult(ItemConverter.convertToBalanceResult(accountInfo));
+                    }
+                });
     }
 
 }

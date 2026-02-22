@@ -7,6 +7,8 @@ import com.alipay.business.core.model.exception.BusinessException;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.util.Assert;
 
+import java.util.List;
+
 public class AssertUtil {
 
     public static void notNull(final Object object, final BusinessResultEnum businessResultEnum, final String resultMsg) {
@@ -28,6 +30,15 @@ public class AssertUtil {
     }
 
     public static void notBlank(String txnId, String code, String txnIdCannotBeBlank) {
+    }
+
+    public static void notEmpty(List<Object> result, String code, String s) {
+        check(new AssertTemplate() {
+            @Override
+            public void doAssert() {
+                Assert.notNull(result, code);
+            }
+        }, BusinessResultEnum.valueOf(code), s);
     }
 
     public static interface AssertTemplate {

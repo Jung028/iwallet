@@ -40,6 +40,12 @@
             <version>1.0.0.20260118.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.adam</groupId>
+            <artifactId>account_center-common-service-facade</artifactId>
+            <version>1.0.0.20260218.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
