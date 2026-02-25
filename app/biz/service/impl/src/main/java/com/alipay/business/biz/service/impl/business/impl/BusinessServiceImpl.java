@@ -2,6 +2,7 @@ package com.alipay.business.biz.service.impl.business.impl;
 
 import com.alipay.alipay_plus.common.service.facade.baseresult.AccountBizResult;
 import com.alipay.alipay_plus.common.service.facade.enums.TransactionStatusEnum;
+import com.alipay.alipay_plus.common.service.facade.event.EcTransactionEvent;
 import com.alipay.alipay_plus.common.service.facade.item.AccountInfoItem;
 import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
@@ -19,7 +20,6 @@ import com.alipay.business.common.service.facade.result.BusinessTransactionHisto
 import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
-import com.alipay.business.core.model.event.EcTransactionEvent;
 import com.alipay.business.core.model.exception.BusinessException;
 import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
@@ -37,6 +37,7 @@ import javax.money.CurrencyUnit;
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -124,17 +125,18 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                         } else {
                             insertTransactionRecordRequest.setStatus(TransactionStatusEnum.PENDING);
                             AccountBizResult<String> transactionRecord = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
+                            BigDecimal amount = new BigDecimal(requestAmount.getNumber().doubleValue());
                             if (transactionRecord != null && transactionRecord.isSuccess()) {
                                 // publish EC_TRANSACTION event code for transfer service to listen
                                 EcTransactionEvent event = new EcTransactionEvent(
                                         insertTransactionRecordRequest.getTxnId(),
+                                        insertTransactionRecordRequest.getPayeeAccountNo(),
                                         insertTransactionRecordRequest.getPayerAccountNo(),
-                                        insertTransactionRecordRequest.getAmount(),
-                                        TransactionStatusEnum.PENDING.getCode()
+                                        amount
                                 );
 
                                 // Use accountId as key → guarantees ordering per account
-                                kafkaTemplate.send("EC_TRANSACTION", event.getPayeeAccountId(), event);
+                                kafkaTemplate.send("EC_TRANSACTION", String.valueOf(event.getAmount()), event);
                             }
                         }
                     }
@@ -195,18 +197,21 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                             updateTransactionRecordRequest.setStatus(TransactionStatusEnum.PENDING.getCode());
                             AccountBizResult<TransactionRecordItem> transactionRecord = accountServiceClient
                                     .updateTransactionRecord(updateTransactionRecordRequest);
-                            MonetaryAmount requestAmount = MoneyUtil.toMonetaryAmount(request.getTransferAmount().getAmount(), request.getTransferCurrency());
+                            // convert money to big decimal
+                            BigDecimal amount = BigDecimal.valueOf(request.getTransferAmount().getAmount().doubleValue())
+                                    .setScale(2, RoundingMode.HALF_UP);
+
                             if (transactionRecord != null && transactionRecord.isSuccess()) {
                                 // publish EC_TRANSACTION event code for transfer service to listen
                                 EcTransactionEvent event = new EcTransactionEvent(
                                         updateTransactionRecordRequest.getTxnId(),
+                                        transactionRecord.getResult().getPayeeAccountId(),
                                         transactionRecord.getResult().getPayerAccountId(),
-                                        requestAmount,
-                                        TransactionStatusEnum.PENDING.getCode()
+                                        amount
                                 );
 
                                 // Use accountId as key → guarantees ordering per account
-                                kafkaTemplate.send("EC_TRANSACTION", event.getPayeeAccountId(), event);
+                                kafkaTemplate.send("EC_TRANSACTION", event.getPayeeAccountNo(), event);
                             }
                         }
                     }
@@ -292,6 +297,34 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                         queryAccountInfoRequest.setAccountId(request.getAccountId());
                         AccountBizResult<AccountInfoItem> accountInfo = accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
                         result.setResult(ItemConverter.convertToBalanceResult(accountInfo));
+                    }
+                });
+    }
+
+    @Override
+    public BusinessBizResult<String> updateIdempotencyKey(UpdateIdempotencyKeysRequest request) {
+        return businessServiceTemplate.execute(request, BusinessActionEnum.UPDATE_IDEMPOTENCY_KEYS,
+                new BusinessBizCallback<>() {
+
+
+                    @Override
+                    protected BusinessBizResult<String> createDefaultResponse() {
+                        return new BusinessBizResult<>();
+                    }
+
+                    @Override
+                    protected void checkParams(UpdateIdempotencyKeysRequest request) {
+                        BusinessRequestChecker.checkUpdateIdempotencyKeysRequest(request);
+                    }
+
+                    @Override
+                    protected void process(UpdateIdempotencyKeysRequest request, BusinessBizResult<String> response) {
+                        // update idempotency keys status to Error or finished after account center finish debit and credit accounts
+
+                        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.updateIdempotencyKeys(request.getUniqueRequestId(), request.getStatus().getCode());
+                        if(idempotencyKeys != null) {
+                            // result failed
+                        }
                     }
                 });
     }

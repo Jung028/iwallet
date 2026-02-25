@@ -7,14 +7,14 @@ public class EcTransactionEvent {
 
     private String transactionId;
     private String payeeAccountId;
-    private MonetaryAmount amount;
-    private String status;
+    private String payerAccountId;
+    private BigDecimal amount;
 
-    public EcTransactionEvent(String transactionId, String payeeAccountId, MonetaryAmount amount, String status) {
+    public EcTransactionEvent(String transactionId, String payeeAccountId, String payerAccountId, BigDecimal amount) {
         this.transactionId = transactionId;
         this.payeeAccountId = payeeAccountId;
+        this.payerAccountId = payerAccountId;
         this.amount = amount;
-        this.status = status;
     }
 
     public String getTransactionId() {
@@ -33,20 +33,20 @@ public class EcTransactionEvent {
         this.payeeAccountId = payeeAccountId;
     }
 
-    public MonetaryAmount getAmount() {
+    public String getPayerAccountId() {
+        return payerAccountId;
+    }
+
+    public void setPayerAccountId(String payerAccountId) {
+        this.payerAccountId = payerAccountId;
+    }
+
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(MonetaryAmount amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }
 

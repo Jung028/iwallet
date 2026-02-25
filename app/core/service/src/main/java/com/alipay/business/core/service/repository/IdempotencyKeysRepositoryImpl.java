@@ -23,6 +23,12 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
     }
 
     @Override
+    public IdempotencyKeys updateIdempotencyKeys(String uniqueRequestId, String status) {
+        IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.updateIdempotencyKeys(uniqueRequestId, status);
+        return modelConverter.convertToModel(idempotencyKeysDO);
+    }
+
+    @Override
     public void insertIdempotencyKey(String uniqueRequestId, String payerAccountNo) {
         IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.insertIdempotencyKey(uniqueRequestId, payerAccountNo);
         modelConverter.convertToModel(idempotencyKeysDO);

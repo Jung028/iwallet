@@ -6,12 +6,9 @@ import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
 import com.alipay.alipay_plus.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
-import com.alipay.business.common.service.facade.result.BusinessTransactionHistoryResult;
 import com.alipay.business.common.service.integration.AbstractServiceClient;
-import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.util.AssertUtil;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class AccountServiceClientImpl extends AbstractServiceClient implements AccountServiceClient {
@@ -24,22 +21,6 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
 
         // set cross invoke
         AccountBizResult<String> result = accountService.createAccount(request);
-        AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
-        AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
-        AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL.getCode(), ", result is not success");
-        return result;
-    }
-
-    @Override
-    public AccountBizResult<String> transfer(TransferRequest request) {
-        AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL.getCode(),  "Transfer request cannot be null");
-        AssertUtil.notBlank(request.getToAccountNo(), BusinessResultCode.PARAM_ILLEGAL.getCode(), "to account no cannot be blank");
-        AssertUtil.notBlank(request.getAmount(),  BusinessResultCode.PARAM_ILLEGAL.getCode(), "amount cannot be blank");
-        AssertUtil.notBlank(request.getCurrency(),  BusinessResultCode.PARAM_ILLEGAL.getCode(), "currency cannot be blank");
-        AssertUtil.notBlank(request.getFromAccountNo(),  BusinessResultCode.PARAM_ILLEGAL.getCode(), "from account no cannot be blank");
-
-        // set cross invoke
-        AccountBizResult<String> result = accountService.transfer(request);
         AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
         AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
         AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL.getCode(), ", result is not success");

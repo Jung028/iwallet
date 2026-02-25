@@ -22,4 +22,8 @@ public class BusinessRequestChecker {
 
     public static void checkQueryBalanceRequest(BusinessBalanceRequest request) {
     }
+
+    public static void checkUpdateIdempotencyKeysRequest(UpdateIdempotencyKeysRequest request) {
+
+    }
 }

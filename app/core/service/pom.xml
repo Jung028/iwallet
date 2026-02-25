@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.adam</groupId>
             <artifactId>business-common-service-facade</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${business.common.service.facade.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

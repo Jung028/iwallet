@@ -12,8 +12,6 @@ public interface AccountServiceClient {
 
     AccountBizResult<String> createAccount(CreateAccountRequest request);
 
-    AccountBizResult<String> transfer(TransferRequest request);
-
     AccountBizResult<AccountInfoItem> queryAccountInfo(QueryAccountInfoRequest request);
 
     AccountBizResult<TransactionRecordItem> queryTransactionRecord(QueryTransactionRecordRequest request);

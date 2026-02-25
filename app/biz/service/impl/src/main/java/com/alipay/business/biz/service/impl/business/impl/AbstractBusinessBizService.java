@@ -1,12 +1,10 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
-import com.alipay.business.biz.service.impl.business.BusinessService;
 import com.alipay.business.biz.service.impl.template.BusinessServiceTemplate;
+import com.alipay.business.common.service.facade.api.BusinessService;
 import com.alipay.business.common.service.integration.account.AccountServiceClient;
 import com.alipay.business.common.service.integration.user.UserServiceClient;
 import com.alipay.business.core.service.IdempotencyKeysRepository;
-import com.alipay.sofa.runtime.api.annotation.SofaReference;
-import com.alipay.usercenter.common.service.facade.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractBusinessBizService implements BusinessService {

@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>business-common-service-facade</artifactId>
+    <version>${business.common.service.facade.version}</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
