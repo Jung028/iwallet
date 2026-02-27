@@ -81,4 +81,7 @@ public class LogUtil {
             logger.info(logBuilder.toString());
         }
     }
+
+    public static void info(Logger logger, BusinessResultCode businessResultCode, String s) {
+    }
 }

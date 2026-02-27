@@ -2,8 +2,8 @@ package com.alipay.business.core.model.converter;
 
 
 import com.alipay.alipay_plus.common.dal.auto.dataobject.IdempotencyKeysDO;
+import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
-import com.alipay.business.core.model.enums.IdempotencyKeysStatusEnum;
 
 /**
  * @author jung

@@ -17,14 +17,20 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
     protected ModelConverter modelConverter;
 
     @Override
-    public IdempotencyKeys queryIdempotencyKeys(String userId) {
-        IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.queryIdempotencyKeys(userId);
+    public IdempotencyKeys queryIdempotencyKeysByUniqueRequestId(String uniqueRequestId) {
+        IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.queryIdempotencyKeysByUniqueRequestId(uniqueRequestId);
         return modelConverter.convertToModel(idempotencyKeysDO);
     }
 
     @Override
-    public IdempotencyKeys updateIdempotencyKeys(String uniqueRequestId, String status) {
-        IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.updateIdempotencyKeys(uniqueRequestId, status);
+    public IdempotencyKeys queryIdempotencyKeysByTxnId(String txnId) {
+        IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.queryIdempotencyKeysByTxnId(txnId);
+        return modelConverter.convertToModel(idempotencyKeysDO);
+    }
+
+    @Override
+    public IdempotencyKeys updateIdempotencyKeys(String txnId, String status, int retryCount) {
+        IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.updateIdempotencyKeys(txnId, status, retryCount);
         return modelConverter.convertToModel(idempotencyKeysDO);
     }
 

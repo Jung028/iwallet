@@ -1,10 +1,9 @@
 package com.alipay.business.common.service.facade.api;
 
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
+import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.request.*;
-import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
-import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
-import com.alipay.business.common.service.facade.result.BusinessTransactionHistoryResult;
+import com.alipay.business.common.service.facade.result.*;
 
 public interface BusinessService {
 
@@ -49,5 +48,13 @@ public interface BusinessService {
      * @param request
      * @return
      */
-    BusinessBizResult<String> updateIdempotencyKey(UpdateIdempotencyKeysRequest request);
+    BusinessBizResult<UpdateIdempotencyKeysResult> updateIdempotencyKeys(UpdateIdempotencyKeysRequest request);
+
+    /**
+     * query idempotency keys
+     * @param request
+     * @return
+     */
+    BusinessBizResult<IdempotencyKeysItem> queryIdempotencyKeys(QueryIdempotencyKeysRequest request);
+
 }

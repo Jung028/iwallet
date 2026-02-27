@@ -1,6 +1,6 @@
 package com.alipay.business.core.model.domain;
 
-import com.alipay.business.core.model.enums.IdempotencyKeysStatusEnum;
+import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
 
 import java.util.Date;
 

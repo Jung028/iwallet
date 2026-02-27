@@ -4,13 +4,18 @@ import com.alipay.alipay_plus.common.service.facade.baseresult.AccountBizResult;
 import com.alipay.alipay_plus.common.service.facade.item.AccountInfoItem;
 import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
+import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
 import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
+import com.alipay.business.core.model.domain.IdempotencyKeys;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * reason for this converter is to prevent account item from being exposed to user center
+ */
 public class ItemConverter {
     public static List<TransactionHistoryItem> convertToTxnHistory(AccountBizResult<List<TransactionHistoryItem>> result) {
         if  (result == null || result.getResult().isEmpty()) {
@@ -69,5 +74,14 @@ public class ItemConverter {
         result.setGmtModified(accountInfo.getResult().getGmtModified());
         result.setDesc(accountInfo.getResult().getDesc());
         return result;
+    }
+
+    public static IdempotencyKeysItem convertToIdempotencyKeys(IdempotencyKeys idempotencyKeys) {
+        IdempotencyKeysItem idempotencyKeyItem = new IdempotencyKeysItem();
+        idempotencyKeyItem.setUserId(idempotencyKeys.getUserId());
+        idempotencyKeyItem.setTxnId(idempotencyKeys.getTxnId());
+        idempotencyKeyItem.setStatus(idempotencyKeys.getStatus().getCode());
+        idempotencyKeyItem.setRetryCount(idempotencyKeyItem.getRetryCount());
+        return idempotencyKeyItem;
     }
 }

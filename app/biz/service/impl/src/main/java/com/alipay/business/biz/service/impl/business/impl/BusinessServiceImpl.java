@@ -11,12 +11,11 @@ import com.alipay.business.biz.service.impl.checker.BusinessRequestChecker;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
+import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.money.MoneyUtil;
 import com.alipay.business.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.request.TransferRequest;
-import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
-import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
-import com.alipay.business.common.service.facade.result.BusinessTransactionHistoryResult;
+import com.alipay.business.common.service.facade.result.*;
 import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
@@ -27,6 +26,7 @@ import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
 import com.alipay.usercenter.common.service.facade.request.OTPRequest;
 import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
 import com.alipay.usercenter.common.service.facade.request.VerifyOtpRequest;
+import io.jsonwebtoken.lang.Assert;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +76,9 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                             response.setResult(existing.getResponseSnapshot());
                             return;
                         }
+
+                        // check payer != payee
+                        AssertUtil.isTrue(request.getPayeeAccountNo().equals(request.getPayerAccountNo()), BusinessResultCode.PARAM_ILLEGAL.getCode(), "Cannot send to same account");
 
                         // query account info from account
                         QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
@@ -149,7 +152,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
             idempotencyKeysRepository.insertIdempotencyKey(request.getUniqueRequestId(), request.getPayerAccountNo());
         } catch (DuplicateKeyException e) {
             // if the record is valid, return duplicate request result
-            IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.queryIdempotencyKeys(request.getUniqueRequestId());
+            IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.queryIdempotencyKeysByUniqueRequestId(request.getUniqueRequestId());
             if (idempotencyKeys == null) {
                 throw new IllegalStateException("Idempotency record missing");
             }
@@ -301,14 +304,15 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                 });
     }
 
+
     @Override
-    public BusinessBizResult<String> updateIdempotencyKey(UpdateIdempotencyKeysRequest request) {
+    public BusinessBizResult<UpdateIdempotencyKeysResult> updateIdempotencyKeys(UpdateIdempotencyKeysRequest request) {
         return businessServiceTemplate.execute(request, BusinessActionEnum.UPDATE_IDEMPOTENCY_KEYS,
                 new BusinessBizCallback<>() {
 
 
                     @Override
-                    protected BusinessBizResult<String> createDefaultResponse() {
+                    protected BusinessBizResult<UpdateIdempotencyKeysResult> createDefaultResponse() {
                         return new BusinessBizResult<>();
                     }
 
@@ -318,16 +322,46 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                     }
 
                     @Override
-                    protected void process(UpdateIdempotencyKeysRequest request, BusinessBizResult<String> response) {
+                    protected void process(UpdateIdempotencyKeysRequest request, BusinessBizResult<UpdateIdempotencyKeysResult> response) {
                         // update idempotency keys status to Error or finished after account center finish debit and credit accounts
-
-                        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.updateIdempotencyKeys(request.getUniqueRequestId(), request.getStatus().getCode());
-                        if(idempotencyKeys != null) {
-                            // result failed
+                        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.updateIdempotencyKeys(request.getTxnId(), request.getStatus().getCode(), request.getRetryCount());
+                        if(idempotencyKeys != null && idempotencyKeys.getErrorCode() != null) {
+                            UpdateIdempotencyKeysResult result = new UpdateIdempotencyKeysResult();
+                            result.setTxnId(idempotencyKeys.getTxnId());
+                            result.setStatus(idempotencyKeys.getStatus().getCode());
+                            response.setResult(result);
                         }
                     }
                 });
     }
+
+    @Override
+    public BusinessBizResult<IdempotencyKeysItem> queryIdempotencyKeys(QueryIdempotencyKeysRequest request) {
+        return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_IDEMPOTENCY_KEYS,
+                new BusinessBizCallback<>() {
+
+                    @Override
+                    protected BusinessBizResult<IdempotencyKeysItem> createDefaultResponse() {
+                        return new BusinessBizResult<>();
+                    }
+
+                    @Override
+                    protected void checkParams(QueryIdempotencyKeysRequest request) {
+                        BusinessRequestChecker.checkQueryIdempotencyKeysRequest(request);
+                    }
+
+                    @Override
+                    protected void process(QueryIdempotencyKeysRequest request, BusinessBizResult<IdempotencyKeysItem> response) {
+                        // update idempotency keys status to Error or finished after account center finish debit and credit accounts
+                        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.queryIdempotencyKeysByTxnId(request.getTxnId());
+                        if(idempotencyKeys != null) {
+                            //convert to idempotency Keys item,
+                            response.setResult(ItemConverter.convertToIdempotencyKeys(idempotencyKeys));
+                        }
+                    }
+                });
+    }
+
 
 }
 

@@ -24,6 +24,11 @@ public class BusinessRequestChecker {
     }
 
     public static void checkUpdateIdempotencyKeysRequest(UpdateIdempotencyKeysRequest request) {
+        // make sure that the request to update the status should only be within
+
+    }
+
+    public static void checkQueryIdempotencyKeysRequest(QueryIdempotencyKeysRequest request) {
 
     }
 }

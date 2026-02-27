@@ -1,8 +1,14 @@
 package com.alipay.business.common.service.facade.enums;
 
 public enum IdempotencyKeysStatusEnum {
-    DEBIT_CREDIT_UPDATE_FAILED("DEBIT_CREDIT_UPDATE_FAILED", "Either the debit or credit failed");
+    DEBIT_CREDIT_UPDATE_FAILED("DEBIT_CREDIT_UPDATE_FAILED", "Either the debit or credit failed"),
+    INIT("INIT", "transaction is in INIT state"),
+    PENDING("PENDING", "transaction is in pending state"),
+    SUCCESS("SUCCESS", "idempotency check is success" ),
+    FAILED("FAILED", "failed to insert idempotent record"),
+    PROCESSING("PROCESSING", "idempotency check is processing")
 
+    ;
     private String code;
     private String desc;
 
