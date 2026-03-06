@@ -2,16 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.alipay.alipay_plus.common.dal.auto.custom.IdempotencyKeysDAO">
+<mapper namespace="com.alipay.business.common.dal.auto.custom.IdempotencyKeysDAO">
 
     <!-- Custom query: select only age and paymentId -->
-    <select id="queryIdempotencyKeys" resultType="com.alipay.alipay_plus.common.dal.auto.dataobject.IdempotencyKeysDO">
+    <select id="queryIdempotencyKeys" resultType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
         SELECT idempotency_key, gmt_create
         FROM idempotency_keys
         WHERE userId = #{userId}
     </select>
 
-    <select id="insertOrRetrieveIdempotencyKey" resultType="com.alipay.alipay_plus.common.dal.auto.dataobject.IdempotencyKeysDO">
+    <select id="insertOrRetrieveIdempotencyKey" resultType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
         INSERT INTO idempotency_keys (idempotency_key, payer_account_no, status, created_at)
         VALUES (${unique_request_id}, ${payer_account_no}, 'PENDING', NOW())
     </select>

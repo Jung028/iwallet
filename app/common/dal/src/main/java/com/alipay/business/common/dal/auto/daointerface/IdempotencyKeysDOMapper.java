@@ -1,7 +1,7 @@
-package com.alipay.alipay_plus.common.dal.auto.daointerface;
+package com.alipay.business.common.dal.auto.daointerface;
 
-import com.alipay.alipay_plus.common.dal.auto.dataobject.IdempotencyKeysDO;
-import com.alipay.alipay_plus.common.dal.auto.dataobject.IdempotencyKeysDOExample;
+import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
+import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDOExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

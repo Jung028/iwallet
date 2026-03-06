@@ -8,9 +8,7 @@ import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
 import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
 import com.alipay.business.common.service.facade.result.BusinessTransactionHistoryResult;
 import com.alipay.business.common.service.facade.result.UpdateIdempotencyKeysResult;
-import com.alipay.sofa.runtime.api.annotation.SofaReference;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.ibatis.annotations.Update;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
@@ -18,7 +16,6 @@ import org.springframework.security.core.Authentication;
 @RequestMapping("/business/basic")
 public class BusinessBasicController {
 
-    @SofaReference
     private BusinessService businessService;
 
     @PostMapping("/transfer.json")
@@ -34,7 +31,7 @@ public class BusinessBasicController {
         return businessService.transfer(request, userId);
     }
 
-    @PostMapping("/transfer/transferConfirm.json")
+    @PostMapping("/transferConfirm.json")
     public BusinessBizResult<String> transferConfirm(
             @RequestBody TransferConfirmRequest request,
             HttpServletRequest httpServletRequest) {
@@ -47,7 +44,7 @@ public class BusinessBasicController {
         return businessService.transferConfirm(request, userId);
     }
 
-    @PostMapping("/transfer/queryTransactionDetails.json")
+    @PostMapping("/queryTransactionDetails.json")
     public BusinessBizResult<BusinessTransactionDetailsResult> queryTransactionDetails(
             @RequestBody BusinessTransactionRecordRequest request,
             HttpServletRequest httpServletRequest) {
@@ -60,7 +57,7 @@ public class BusinessBasicController {
         return businessService.queryTransactionDetails(request);
     }
 
-    @PostMapping("/transfer/queryTransactionHistory.json")
+    @PostMapping("/queryTransactionHistory.json")
     public BusinessBizResult<BusinessTransactionHistoryResult> queryTransactionHistory(
             @RequestBody BusinessTransactionHistoryRequest request,
             HttpServletRequest httpServletRequest) {
@@ -73,7 +70,7 @@ public class BusinessBasicController {
         return businessService.queryTransactionHistory(request);
     }
 
-    @PostMapping("/transfer/queryBalance.json")
+    @PostMapping("/queryBalance.json")
     public BusinessBizResult<BusinessBalanceResult> queryBalance(
             @RequestBody BusinessBalanceRequest request,
             HttpServletRequest httpServletRequest) {
@@ -86,7 +83,7 @@ public class BusinessBasicController {
         return businessService.queryBalance(request);
     }
 
-    @PostMapping("/transfer/updateIdempotencyKeys.json")
+    @PostMapping("/updateIdempotencyKeys.json")
     public BusinessBizResult<UpdateIdempotencyKeysResult> updateIdempotencyKeys(
             @RequestBody UpdateIdempotencyKeysRequest request,
             HttpServletRequest httpServletRequest) {
@@ -99,7 +96,7 @@ public class BusinessBasicController {
         return businessService.updateIdempotencyKeys(request);
     }
 
-    @PostMapping("/transfer/queryIdempotencyKeys.json")
+    @PostMapping("/queryIdempotencyKeys.json")
     public BusinessBizResult<IdempotencyKeysItem> queryIdempotencyKeys(
             @RequestBody QueryIdempotencyKeysRequest request,
             HttpServletRequest httpServletRequest) {

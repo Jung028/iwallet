@@ -8,6 +8,21 @@
     <artifactId>business-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <modules>
+        <module>app/bootstrap</module>
+        <module>app/test</module>
+        <module>app/web</module>
+        <module>app/biz/shared</module>
+        <module>app/common/dal</module>
+        <module>app/common/util</module>
+        <module>app/common/service/facade</module>
+        <module>app/common/service/integration</module>
+        <module>app/biz/service/impl</module>
+        <module>app/core/model</module>
+        <module>app/core/service</module>
+    </modules>
+
     <properties>
         <ialicore.common.service.facade.version>1.0-SNAPSHOT</ialicore.common.service.facade.version>
         <usercenter.common.service.facade.version>1.0.0.20260306-SNAPSHOT</usercenter.common.service.facade.version>
@@ -15,7 +30,12 @@
         <business.common.service.facade.version>1.0.0.20260225-SNAPSHOT</business.common.service.facade.version>
 
     </properties>
-
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.2</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -27,24 +47,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>3.3.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.mysql</groupId>
-                <artifactId>mysql-connector-j</artifactId>
-                <version>8.1.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <version>3.3.2</version>
-                <scope>test</scope>
-            </dependency>
             <!-- MyBatis -->
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
@@ -54,12 +56,6 @@
             </dependency>
             <!-- MyBatis -->
 
-            <dependency>
-                <groupId>com.alipay.sofa.common</groupId>
-                <artifactId>sofa-common-tools</artifactId>
-                <version>2.1.1</version>
-                <scope>compile</scope>
-            </dependency>
 
             <!-- PostgreSQL JDBC -->
             <dependency>
@@ -80,25 +76,6 @@
 
 
 
-    <modules>
-        <module>app/bootstrap</module>
-        <module>app/test</module>
-        <module>app/web</module>
-        <module>app/biz/shared</module>
-        <module>app/common/dal</module>
-        <module>app/common/util</module>
-        <module>app/common/service/facade</module>
-        <module>app/common/service/integration</module>
-        <module>app/biz/service/impl</module>
-        <module>app/core/model</module>
-        <module>app/core/service</module>
-    </modules>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.2</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
 
 
 

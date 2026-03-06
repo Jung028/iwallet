@@ -1,7 +1,7 @@
 package com.alipay.business.core.service.repository;
 
-import com.alipay.alipay_plus.common.dal.auto.custom.IdempotencyKeysDAO;
-import com.alipay.alipay_plus.common.dal.auto.dataobject.IdempotencyKeysDO;
+import com.alipay.business.common.dal.auto.custom.IdempotencyKeysDAO;
+import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
 import com.alipay.business.core.model.converter.ModelConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.service.IdempotencyKeysRepository;

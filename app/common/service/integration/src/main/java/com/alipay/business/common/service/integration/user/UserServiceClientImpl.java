@@ -1,7 +1,8 @@
 package com.alipay.business.common.service.integration.user;
 
+import com.alipay.business.common.service.facade.enums.BusinessResultEnum;
 import com.alipay.business.common.service.integration.AbstractServiceClient;
-import com.alipay.sofa.common.utils.AssertUtil;
+import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
 import com.alipay.usercenter.common.service.facade.enums.OTPSceneEnum;
 import com.alipay.usercenter.common.service.facade.enums.UserResultCode;
@@ -20,15 +21,15 @@ public class UserServiceClientImpl extends AbstractServiceClient implements User
      */
     @Override
     public UserBizResult<UserInfoItem> queryUserInfo(QueryUserInfoRequest request) {
-        AssertUtil.notNull(request, UserResultCode.PARAM_ILLEGAL.getCode() + ", verify otp request is null");
-        AssertUtil.hasText(request.getUserId(), UserResultCode.PARAM_ILLEGAL.getCode() + ", userId cannot be blank");
-        AssertUtil.hasText(request.getPhoneNo(), UserResultCode.PARAM_ILLEGAL.getCode() + ", phoneNo cannot be blank");
+        AssertUtil.notNull(request, BusinessResultEnum.PARAM_ILLEGAL.getCode(), ", verify otp request is null");
+        AssertUtil.notBlank(request.getUserId(), BusinessResultEnum.PARAM_ILLEGAL.getCode(),", userId cannot be blank");
+        AssertUtil.notBlank(request.getPhoneNo(), BusinessResultEnum.PARAM_ILLEGAL.getCode(),", phoneNo cannot be blank");
 
         // TODO: setCrossInvoke for different region database, pass in paymentId, region
         UserBizResult<UserInfoItem> result = userService.queryUserInfo(request);
-        AssertUtil.notNull(result, UserResultCode.PARAM_ILLEGAL.getCode() + ", result is null");
-        AssertUtil.notNull(result.getResult(), UserResultCode.PARAM_ILLEGAL.getCode() + ", result is null");
-        AssertUtil.isTrue(result.isSuccess(), UserResultCode.PARAM_ILLEGAL.getCode() + ", result is not success");
+        AssertUtil.notNull(result, UserResultCode.PARAM_ILLEGAL.getCode(),", result is null");
+        AssertUtil.notNull(result.getResult(), UserResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
+        AssertUtil.isTrue(result.isSuccess(), UserResultCode.PARAM_ILLEGAL.getCode(), ", result is not success");
         return result;
     }
 
@@ -39,16 +40,16 @@ public class UserServiceClientImpl extends AbstractServiceClient implements User
      */
     @Override
     public UserBizResult<OTPResult> sendOTP(OTPRequest request) {
-        AssertUtil.notNull(request, UserResultCode.PARAM_ILLEGAL.getCode() + ", verify otp request is null");
-        AssertUtil.hasText(String.valueOf(request.getOtpScene()), UserResultCode.PARAM_ILLEGAL.getCode() + ", otpScene cannot be blank");
-        AssertUtil.isTrue(OTPSceneEnum.exists(request.getOtpScene().getScene()), UserResultCode.PARAM_ILLEGAL + ", otp scene code not valid");
-        AssertUtil.hasText(request.getPhoneNo(), UserResultCode.PARAM_ILLEGAL.getCode() + ", phoneNo cannot be blank");
+        AssertUtil.notNull(request, UserResultCode.PARAM_ILLEGAL.getCode(), ", verify otp request is null");
+        AssertUtil.notBlank(String.valueOf(request.getOtpScene()), UserResultCode.PARAM_ILLEGAL.getCode(), ", otpScene cannot be blank");
+        AssertUtil.isTrue(OTPSceneEnum.exists(request.getOtpScene().getScene()), UserResultCode.PARAM_ILLEGAL.getCode(), ", otp scene code not valid");
+        AssertUtil.notBlank(request.getPhoneNo(), UserResultCode.PARAM_ILLEGAL.getCode(), ", phoneNo cannot be blank");
 
         // TODO: setCrossInvoke for different region database, pass in paymentId, region
         UserBizResult<OTPResult> result = userService.sendOTP(request);
-        AssertUtil.notNull(result, UserResultCode.PARAM_ILLEGAL.getCode() + ", result is null");
-        AssertUtil.notNull(result.getResult(), UserResultCode.PARAM_ILLEGAL.getCode() + ", result is null");
-        AssertUtil.isTrue(result.isSuccess(), UserResultCode.PARAM_ILLEGAL.getCode() + ", result is not success");
+        AssertUtil.notNull(result, UserResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
+        AssertUtil.notNull(result.getResult(), UserResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
+        AssertUtil.isTrue(result.isSuccess(), UserResultCode.PARAM_ILLEGAL.getCode(), ", result is not success");
         return result;
     }
 
@@ -59,15 +60,15 @@ public class UserServiceClientImpl extends AbstractServiceClient implements User
      */
     @Override
     public UserBizResult<String> verifyOTP(VerifyOtpRequest request) {
-        AssertUtil.notNull(request, UserResultCode.PARAM_ILLEGAL.getCode() + ", verify otp request is null");
-        AssertUtil.hasText(request.getOtp(), UserResultCode.PARAM_ILLEGAL.getCode() + ", otp cannot be blank");
-        AssertUtil.hasText(request.getChallengeId(), UserResultCode.PARAM_ILLEGAL.getCode() + ", challengeId cannot be blank");
+        AssertUtil.notNull(request, UserResultCode.PARAM_ILLEGAL.getCode(), ", verify otp request is null");
+        AssertUtil.notBlank(request.getOtp(), UserResultCode.PARAM_ILLEGAL.getCode(), ", otp cannot be blank");
+        AssertUtil.notBlank(request.getChallengeId(), UserResultCode.PARAM_ILLEGAL.getCode(), ", challengeId cannot be blank");
 
         // TODO: setCrossInvoke for different region database, pass in paymentId, region
         UserBizResult<String> result = userService.verifyOTP(request);
-        AssertUtil.notNull(result, UserResultCode.PARAM_ILLEGAL.getCode() + ", result is null");
-        AssertUtil.notNull(result.getResult(), UserResultCode.PARAM_ILLEGAL.getCode() + ", result is null");
-        AssertUtil.isTrue(result.isSuccess(), UserResultCode.PARAM_ILLEGAL.getCode() + ", result is not success");
+        AssertUtil.notNull(result, UserResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
+        AssertUtil.notNull(result.getResult(), UserResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
+        AssertUtil.isTrue(result.isSuccess(), UserResultCode.PARAM_ILLEGAL.getCode(), ", result is not success");
         return result;
     }
 }

@@ -1,6 +1,6 @@
-package com.alipay.alipay_plus.common.dal.auto.custom;
+package com.alipay.business.common.dal.auto.custom;
 
-import com.alipay.alipay_plus.common.dal.auto.dataobject.IdempotencyKeysDO;
+import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
 
 public interface IdempotencyKeysDAO {
 

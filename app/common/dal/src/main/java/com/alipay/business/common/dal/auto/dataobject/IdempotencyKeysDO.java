@@ -1,4 +1,4 @@
-package com.alipay.alipay_plus.common.dal.auto.dataobject;
+package com.alipay.business.common.dal.auto.dataobject;
 
 import java.util.Date;
 

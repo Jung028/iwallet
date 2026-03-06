@@ -4,6 +4,8 @@ import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.facade.enums.BusinessResultEnum;
 import com.alipay.business.core.model.exception.BaseSlipException;
 import com.alipay.business.core.model.exception.BusinessException;
+import com.alipay.usercenter.common.service.facade.enums.UserResultEnum;
+import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.util.Assert;
 
