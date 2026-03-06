@@ -11,7 +11,7 @@
     <properties>
         <ialicore.common.service.facade.version>1.0-SNAPSHOT</ialicore.common.service.facade.version>
         <usercenter.common.service.facade.version>1.0.0.20260306-SNAPSHOT</usercenter.common.service.facade.version>
-        <accountcenter.common.service.facade.version>1.0.0.20260216-SNAPSHOT</accountcenter.common.service.facade.version>
+        <accountcenter.common.service.facade.version>1.0.0.20260218.2-SNAPSHOT</accountcenter.common.service.facade.version>
         <business.common.service.facade.version>1.0.0.20260225-SNAPSHOT</business.common.service.facade.version>
 
     </properties>
