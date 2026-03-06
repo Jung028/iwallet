@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
@@ -43,6 +44,7 @@ import java.util.List;
 /**
  * Business service impl
  */
+@Service
 public class BusinessServiceImpl extends AbstractBusinessBizService {
 
     private static final Logger logger = LoggerFactory.getLogger(BusinessServiceImpl.class);

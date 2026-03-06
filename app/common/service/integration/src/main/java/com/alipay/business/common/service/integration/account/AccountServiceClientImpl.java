@@ -8,9 +8,11 @@ import com.alipay.alipay_plus.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.integration.AbstractServiceClient;
 import com.alipay.business.core.model.util.AssertUtil;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class AccountServiceClientImpl extends AbstractServiceClient implements AccountServiceClient {
 
 

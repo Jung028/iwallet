@@ -9,6 +9,7 @@ import com.alipay.business.common.service.facade.result.BusinessTransactionDetai
 import com.alipay.business.common.service.facade.result.BusinessTransactionHistoryResult;
 import com.alipay.business.common.service.facade.result.UpdateIdempotencyKeysResult;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import org.springframework.security.core.Authentication;
 @RequestMapping("/business/basic")
 public class BusinessBasicController {
 
+    @Autowired
     private BusinessService businessService;
 
     @PostMapping("/transfer.json")
