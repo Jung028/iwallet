@@ -19,7 +19,7 @@
 
         <!-- Mapper XML generation -->
         <sqlMapGenerator
-                targetPackage="sqlmap.idigitalrisk.auto"
+                targetPackage="sqlmap.iwallet.auto"
                 targetProject="src/main/resources"/>
 
         <!-- Mapper interface generation -->
