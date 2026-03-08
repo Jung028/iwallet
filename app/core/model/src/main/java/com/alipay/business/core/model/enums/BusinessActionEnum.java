@@ -12,7 +12,7 @@ public enum BusinessActionEnum {
     QUERY_IDEMPOTENCY_KEYS("QUERY_IDEMPOTENCY_KEYS","query idempotency keys" );
 
     private String code;
-    private String description;
+    private String desc;
 
     public String getCode() {
         return code;
@@ -22,12 +22,12 @@ public enum BusinessActionEnum {
         this.code = code;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDesc() {
+        return desc;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     BusinessActionEnum(String code, String description) {

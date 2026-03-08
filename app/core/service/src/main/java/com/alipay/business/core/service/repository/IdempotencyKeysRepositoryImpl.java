@@ -5,15 +5,20 @@ import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
 import com.alipay.business.core.model.converter.ModelConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.service.IdempotencyKeysRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author jung
  * @date 2026-02-14 14:08:00
  */
+@Repository
 public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository {
 
+    @Autowired
     protected IdempotencyKeysDAO idempotencyKeysDAO;
 
+    @Autowired
     protected ModelConverter modelConverter;
 
     @Override
@@ -35,8 +40,13 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
     }
 
     @Override
-    public void insertIdempotencyKey(String uniqueRequestId, String payerAccountNo) {
-        IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.insertIdempotencyKey(uniqueRequestId, payerAccountNo);
-        modelConverter.convertToModel(idempotencyKeysDO);
+    public void insertIdempotencyKey(IdempotencyKeys idempotencyKeys) {
+        try {
+            IdempotencyKeysDO idempotencyKeysDO = modelConverter.convertToDO(idempotencyKeys);
+            idempotencyKeysDAO.insertIdempotencyKey(idempotencyKeysDO);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("insert IdempotencyKeys error!", e);
+        }
     }
 }

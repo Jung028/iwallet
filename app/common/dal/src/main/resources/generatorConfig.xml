@@ -14,7 +14,7 @@
 
         <!-- Java Model (DO) generation -->
         <javaModelGenerator
-                targetPackage="com.alipay.alipay_plus.common.dal.auto.dataobject"
+                targetPackage="com.alipay.business.common.dal.auto.dataobject"
                 targetProject="src/main/java"/>
 
         <!-- Mapper XML generation -->
@@ -25,7 +25,7 @@
         <!-- Mapper interface generation -->
         <javaClientGenerator
                 type="XMLMAPPER"
-                targetPackage="com.alipay.alipay_plus.common.dal.auto.daointerface"
+                targetPackage="com.alipay.business.common.dal.auto.daointerface"
                 targetProject="src/main/java"/>
 
         <!-- Table(s) to generate -->

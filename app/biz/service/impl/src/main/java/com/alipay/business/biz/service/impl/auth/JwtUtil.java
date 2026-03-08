@@ -1,77 +1,92 @@
 package com.alipay.business.biz.service.impl.auth;
 
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+@Component
 public class JwtUtil {
 
     /**
-     * public key
-     */
-    private final PublicKey publicKey;
-
-    /**
      * load public key
-     * @throws Exception
-     */
-    public JwtUtil() throws Exception {
-        String filePath = "/public_key.pem";
-        this.publicKey = loadPublicKey(filePath);
-    }
-
-    /**
-     *
-     * @param filepath
+     * @param filePath
      * @return
-     * @throws Exception
      */
-    private static PublicKey loadPublicKey(String filepath) throws Exception {
-        String key = new String(Files.readAllBytes(Paths.get(filepath)))
-                .replace("-----BEGIN PUBLIC KEY-----", "")
-                .replace("-----END PUBLIC KEY-----", "")
-                .replaceAll("\\s", "");
-
-        byte[] keyBytes = Base64.getDecoder().decode(key);
-        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
+    public static PublicKey loadPublicKey(String filePath) {
+        try (InputStream is = JwtUtil.class.getResourceAsStream(filePath)) {
+            if (is == null) {
+                throw new RuntimeException("Public key not found: " + filePath);
+            }
+            byte[] keyBytes = is.readAllBytes();
+            String keyPem = new String(keyBytes)
+                    .replace("-----BEGIN PUBLIC KEY-----", "")
+                    .replace("-----END PUBLIC KEY-----", "")
+                    .replaceAll("\\s", "");
+            byte[] decoded = Base64.getDecoder().decode(keyPem);
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            return kf.generatePublic(spec);
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
-     * validate token
+     * extract token
+     * @param request
+     * @return
+     */
+    public String extractToken(HttpServletRequest request) {
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        return null;
+    }
+
+    /**
+     * validate
      * @param token
      * @return
      */
-    public boolean validateToken(String token) {
+    public boolean validate(String token) {
         try {
             Jwts.parser()
-                    .setSigningKey(publicKey)
+                    .setSigningKey(loadPublicKey("/public_key.pem"))
                     .build()
-                    .parseClaimsJws(token); // throws if invalid
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
 
     /**
-     * get user id from jwt token
+     * parse
      * @param token
      * @return
      */
-    public String extractUserId(String token) {
+    public JwtClaims parse(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(publicKey)
+                .setSigningKey(loadPublicKey("/public_key.pem"))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
+
+        JwtClaims jwtClaims = new JwtClaims();
+        jwtClaims.setSubject(claims.getSubject());
+        return jwtClaims;
     }
 }

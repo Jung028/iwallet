@@ -73,7 +73,7 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
     }
 
     @Override
-    public AccountBizResult<String> insertTransactionRecord(InsertTransactionRecordRequest request) {
+    public AccountBizResult<TransactionRecordItem> insertTransactionRecord(InsertTransactionRecordRequest request) {
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL.getCode(), "Insert transaction record request cannot be null");
         AssertUtil.notBlank(request.getTxnId(), BusinessResultCode.PARAM_ILLEGAL.getCode(), "transaction id cannot be blank");
         AssertUtil.notBlank(request.getPayeeAccountNo(), BusinessResultCode.PARAM_ILLEGAL.getCode(), "payee account no cannot be blank");
@@ -82,7 +82,7 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
         AssertUtil.notBlank(request.getStatus().getCode(), BusinessResultCode.PARAM_ILLEGAL.getCode(), "status cannot be blank");
 
         // set cross invoke
-        AccountBizResult<String> result = accountService.insertTransactionRecord(request);
+        AccountBizResult<TransactionRecordItem> result = accountService.insertTransactionRecord(request);
         AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
         AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL.getCode(), ", result is null");
         AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL.getCode(), ", result is not success");

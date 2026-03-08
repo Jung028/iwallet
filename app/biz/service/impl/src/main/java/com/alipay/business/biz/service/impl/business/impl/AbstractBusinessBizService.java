@@ -9,12 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractBusinessBizService implements BusinessService {
 
-
+    @Autowired
     protected BusinessServiceTemplate businessServiceTemplate;
 
     @Autowired
     protected AccountServiceClient accountServiceClient;
 
+    @Autowired
     protected IdempotencyKeysRepository idempotencyKeysRepository;
 
     protected UserServiceClient userServiceClient;

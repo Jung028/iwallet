@@ -18,7 +18,7 @@ public interface AccountServiceClient {
 
     AccountBizResult<List<TransactionHistoryItem>> queryTransactionHistory(QueryTransactionHistoryRequest request);
 
-    AccountBizResult<String> insertTransactionRecord(InsertTransactionRecordRequest request);
+    AccountBizResult<TransactionRecordItem> insertTransactionRecord(InsertTransactionRecordRequest request);
 
     AccountBizResult<TransactionRecordItem> updateTransactionRecord(UpdateTransactionRecordRequest request);
 }

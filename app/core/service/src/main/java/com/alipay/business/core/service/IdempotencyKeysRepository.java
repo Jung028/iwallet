@@ -1,7 +1,10 @@
 package com.alipay.business.core.service;
 
+import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface IdempotencyKeysRepository {
     IdempotencyKeys queryIdempotencyKeysByUniqueRequestId(String uniqueRequestId);
 
@@ -9,5 +12,5 @@ public interface IdempotencyKeysRepository {
 
     IdempotencyKeys updateIdempotencyKeys(String txnId, String status, int retryCount);
 
-    void insertIdempotencyKey(String uniqueRequestId, String payerAccountNo);
+    void insertIdempotencyKey(IdempotencyKeys idempotencyKeys);
 }

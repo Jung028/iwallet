@@ -8,9 +8,11 @@ import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
 import com.alipay.alipay_plus.common.service.facade.request.*;
 import com.alipay.business.biz.service.impl.checker.BusinessRequestChecker;
+import com.alipay.business.biz.service.impl.helper.ResponseBuilder;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
+import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.money.MoneyUtil;
 import com.alipay.business.common.service.facade.request.*;
@@ -27,6 +29,7 @@ import com.alipay.usercenter.common.service.facade.request.OTPRequest;
 import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
 import com.alipay.usercenter.common.service.facade.request.VerifyOtpRequest;
 import io.jsonwebtoken.lang.Assert;
+import okhttp3.Response;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +42,10 @@ import javax.money.Monetary;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 import java.util.List;
+
+import static com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum.PENDING;
 
 /**
  * Business service impl
@@ -71,7 +77,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                     @Override
                     protected void process(TransferRequest request, BusinessBizResult<String> response) {
 
-                        IdempotencyKeys existing = checkOrInsertIdempotencyKey(request);
+                        IdempotencyKeys existing = checkOrInsertIdempotencyKey(request, userId);
 
                         if (existing != null) {
                             // Replay stored response
@@ -123,49 +129,67 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                             // set status to OTP_OVER_LIMIT
                             insertTransactionRecordRequest.setStatus(TransactionStatusEnum.OTP_OVER_LIMIT);
                             //insert new record in transaction, status OTP_AMOUNT_OVER_LIMIT
-                            AccountBizResult<String> result = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
+                            AccountBizResult<TransactionRecordItem> result = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
                             if (result != null && result.getResult() != null) {
-                                response.setResult(result.getResult());
+                                ResponseBuilder.success(response, null, BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
                             }
                         } else {
                             insertTransactionRecordRequest.setStatus(TransactionStatusEnum.PENDING);
-                            AccountBizResult<String> transactionRecord = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
+                            AccountBizResult<TransactionRecordItem> transactionRecord = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
+
                             BigDecimal amount = new BigDecimal(requestAmount.getNumber().doubleValue());
                             if (transactionRecord != null && transactionRecord.isSuccess()) {
-                                // publish EC_TRANSACTION event code for transfer service to listen
-                                EcTransactionEvent event = new EcTransactionEvent(
-                                        insertTransactionRecordRequest.getTxnId(),
-                                        insertTransactionRecordRequest.getPayeeAccountNo(),
-                                        insertTransactionRecordRequest.getPayerAccountNo(),
-                                        amount
-                                );
 
-                                // Use accountId as key → guarantees ordering per account
-                                kafkaTemplate.send("EC_TRANSACTION", String.valueOf(event.getAmount()), event);
+                                // after success insert new transaction record, then update the idempotency keys with the transaction id,
+                                // update to PENDING for account center to check
+                                IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.updateIdempotencyKeys(transactionRecord.getResult().getTxnId(),
+                                        IdempotencyKeysStatusEnum.PENDING.getCode(), 0);
+
+                                // check idempotency keys success
+                                if (idempotencyKeys != null) {
+                                    // publish EC_TRANSACTION event code for transfer service to listen
+                                    EcTransactionEvent event = new EcTransactionEvent(
+                                            insertTransactionRecordRequest.getTxnId(),
+                                            insertTransactionRecordRequest.getPayeeAccountNo(),
+                                            insertTransactionRecordRequest.getPayerAccountNo(),
+                                            amount
+                                    );
+
+                                    // Use accountId as key → guarantees ordering per account
+                                    kafkaTemplate.send("EC_TRANSACTION", String.valueOf(event.getAmount()), event);
+                                    ResponseBuilder.success(response, null, BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
+                                } else {
+                                    ResponseBuilder.fail(response, BusinessActionEnum.TRANSFER.getCode(), "Update idempotency keys failed");
+                                }
                             }
                         }
                     }
                 });
     }
 
-    private IdempotencyKeys checkOrInsertIdempotencyKey(TransferRequest request) {
+    private IdempotencyKeys checkOrInsertIdempotencyKey(TransferRequest request, String userId) {
         // insert or return idempotent record,
         try {
-            idempotencyKeysRepository.insertIdempotencyKey(request.getUniqueRequestId(), request.getPayerAccountNo());
+            IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
+            idempotencyKeys.setIdempotencyKey(request.getUniqueRequestId());
+            idempotencyKeys.setUserId(Long.valueOf(userId));
+            idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.INIT);
+            idempotencyKeys.setCreatedAt(new Date());
+            idempotencyKeys.setUpdatedAt(new Date());
+            System.out.println(userId);
+            idempotencyKeysRepository.insertIdempotencyKey(idempotencyKeys);
         } catch (DuplicateKeyException e) {
             // if the record is valid, return duplicate request result
             IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.queryIdempotencyKeysByUniqueRequestId(request.getUniqueRequestId());
             if (idempotencyKeys == null) {
                 throw new IllegalStateException("Idempotency record missing");
             }
-            switch (idempotencyKeys.getStatus()) {
-                case PENDING:
-                    throw new BusinessException(BusinessResultCode.REPEATED_SUBMIT, "Request is processing");
-                case SUCCESS, FAILED:
-                    return idempotencyKeys;
-                default:
-                    throw new IllegalStateException("Unknown status");
-            }
+            return switch (idempotencyKeys.getStatus()) {
+                case PENDING ->
+                        throw new BusinessException(BusinessResultCode.REPEATED_SUBMIT, "Request is processing");
+                case SUCCESS, FAILED -> idempotencyKeys;
+                default -> throw new IllegalStateException("Unknown status");
+            };
         }
         return null;
     }

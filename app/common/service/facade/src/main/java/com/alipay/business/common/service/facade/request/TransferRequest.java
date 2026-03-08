@@ -3,8 +3,6 @@ package com.alipay.business.common.service.facade.request;
 import com.alipay.business.common.service.facade.baseresult.BusinessBaseRequest;
 import com.alipay.business.common.service.facade.money.Money;
 
-import javax.money.CurrencyUnit;
-
 public class TransferRequest extends BusinessBaseRequest {
 
     /**

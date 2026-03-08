@@ -1,16 +1,20 @@
 package com.alipay.business.common.dal.auto.custom;
 
 import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
+@Mapper
 public interface IdempotencyKeysDAO {
 
-    IdempotencyKeysDO queryIdempotencyKeysByUniqueRequestId(String uniqueRequestId);
+    IdempotencyKeysDO queryIdempotencyKeysByUniqueRequestId(@Param("uniqueRequestId") String uniqueRequestId);
 
-    IdempotencyKeysDO queryIdempotencyKeysByTxnId(String txnId);
-    // SQL should check if PENDING only can update
-    IdempotencyKeysDO updateIdempotencyKeys(String txnId, String status, int retryCount);
+    IdempotencyKeysDO queryIdempotencyKeysByTxnId(@Param("txnId") String txnId);
 
-    IdempotencyKeysDO insertIdempotencyKey(String uniqueRequestId, String payerAccountNo);
+    IdempotencyKeysDO updateIdempotencyKeys(@Param("txnId") String txnId,
+                                            @Param("status") String status,
+                                            @Param("retryCount") int retryCount);
 
+    void insertIdempotencyKey(IdempotencyKeysDO idempotencyKeysDO);
 
 }
