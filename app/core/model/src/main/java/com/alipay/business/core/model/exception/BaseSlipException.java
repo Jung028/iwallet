@@ -5,8 +5,8 @@ import com.alipay.business.common.service.facade.enums.BusinessResultEnum;
 
 public class BaseSlipException extends RuntimeException {
 
-    public BaseSlipException(BusinessResultEnum businessResultEnum) {
-        super(businessResultEnum.getResultMsg());
+    public BaseSlipException(BusinessResultCode BusinessResultCode) {
+        super(BusinessResultCode.getCode());
 
     }
 
@@ -16,5 +16,9 @@ public class BaseSlipException extends RuntimeException {
 
     public BaseSlipException(BusinessResultCode businessResultCode, String resultMsg) {
         super(businessResultCode.getDescription() + ":" + resultMsg);
+    }
+
+    public BaseSlipException(BusinessResultEnum businessResultEnum) {
+        super(businessResultEnum.getResultMsg());
     }
 }

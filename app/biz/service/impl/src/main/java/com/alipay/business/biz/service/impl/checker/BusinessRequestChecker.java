@@ -7,7 +7,7 @@ import com.alipay.business.core.model.util.AssertUtil;
 public class BusinessRequestChecker {
 
     public static void checkQueryTransactionHistoryRequest(BusinessTransactionHistoryRequest request) {
-        AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL.getCode(), "request is null");
+        AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "request is null");
     }
 
     public static void checkTransferRequest(TransferRequest request) {

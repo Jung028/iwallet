@@ -20,8 +20,9 @@ public enum BusinessResultCode {
 
     RISK_SCENE_NOT_EXIST(ResultCodeLevel.WARN, ResultCodeType.BIZ_ERROR, BusinessBizType.RISK_SCENE, "01", "Risk Scene Not Exist"),
     ACCOUNT_NOT_FOUND(ResultCodeLevel.WARN, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "02", "Account Not Found"),
-    INVALID_REQUEST(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "03", "Invalid Request");
-
+    INVALID_REQUEST(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "03", "Invalid Request"),
+    PASSWORD_INCORRECT(ResultCodeLevel.WARN, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "04", "Password Incorrect" ),
+    ILLEGAL_STATUS(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "05", "Transaction Status is illegal");
 
     private final String code;
 

@@ -18,6 +18,7 @@ public abstract class AbstractBusinessBizService implements BusinessService {
     @Autowired
     protected IdempotencyKeysRepository idempotencyKeysRepository;
 
+    @Autowired
     protected UserServiceClient userServiceClient;
 
     public void setBusinessServiceTemplate(BusinessServiceTemplate businessServiceTemplate) {

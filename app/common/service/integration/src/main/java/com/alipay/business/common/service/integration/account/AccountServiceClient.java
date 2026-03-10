@@ -5,9 +5,11 @@ import com.alipay.alipay_plus.common.service.facade.item.AccountInfoItem;
 import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
 import com.alipay.alipay_plus.common.service.facade.request.*;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface AccountServiceClient {
 
     AccountBizResult<String> createAccount(CreateAccountRequest request);
@@ -21,4 +23,6 @@ public interface AccountServiceClient {
     AccountBizResult<TransactionRecordItem> insertTransactionRecord(InsertTransactionRecordRequest request);
 
     AccountBizResult<TransactionRecordItem> updateTransactionRecord(UpdateTransactionRecordRequest request);
+
+    AccountBizResult<String> publishTransfer(PublishTransferRequest request);
 }

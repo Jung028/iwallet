@@ -18,18 +18,15 @@ import com.alipay.business.common.service.facade.money.MoneyUtil;
 import com.alipay.business.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.request.TransferRequest;
 import com.alipay.business.common.service.facade.result.*;
+import com.alipay.business.common.util.password.BusinessPasswordUtil;
 import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
 import com.alipay.business.core.model.exception.BusinessException;
 import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
-import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
-import com.alipay.usercenter.common.service.facade.request.OTPRequest;
-import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
-import com.alipay.usercenter.common.service.facade.request.VerifyOtpRequest;
-import io.jsonwebtoken.lang.Assert;
-import okhttp3.Response;
+import com.alipay.usercenter.common.service.facade.enums.UserResultCode;
+import com.alipay.usercenter.common.service.facade.request.VerifyUserAuthRequest;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +42,6 @@ import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 
-import static com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum.PENDING;
-
 /**
  * Business service impl
  */
@@ -54,8 +49,6 @@ import static com.alipay.business.common.service.facade.enums.IdempotencyKeysSta
 public class BusinessServiceImpl extends AbstractBusinessBizService {
 
     private static final Logger logger = LoggerFactory.getLogger(BusinessServiceImpl.class);
-
-    private KafkaTemplate<String, Object> kafkaTemplate;
 
     private static final MonetaryAmount LIMIT =
             Money.of(new BigDecimal("200.00"), "MYR");
@@ -86,7 +79,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                         }
 
                         // check payer != payee
-                        AssertUtil.isTrue(request.getPayeeAccountNo().equals(request.getPayerAccountNo()), BusinessResultCode.PARAM_ILLEGAL.getCode(), "Cannot send to same account");
+                        AssertUtil.isTrue(request.getPayeeAccountNo().equals(request.getPayerAccountNo()), BusinessResultCode.PARAM_ILLEGAL, "Cannot send to same account");
 
                         // query account info from account
                         QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
@@ -96,12 +89,12 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                         AccountBizResult<AccountInfoItem> payerAccountInfo = accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
 
                         // validate both accounts exists
-                        AssertUtil.notNull(payerAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND.getCode(), "payer account not found");
-                        AssertUtil.notNull(payeeAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND.getCode(), "payee account not found");
+                        AssertUtil.notNull(payerAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "payer account not found");
+                        AssertUtil.notNull(payeeAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "payee account not found");
 
                         // verify user is authorised
                         AssertUtil.isTrue(payerAccountInfo.getResult().getAccRelationId().equals(userId),
-                                BusinessResultCode.INVALID_REQUEST.getCode(), "User is not authorised");
+                                BusinessResultCode.INVALID_REQUEST, "User is not authorised");
 
                         // validate balance is sufficient
                         CurrencyUnit payerAccountCurrent = Monetary.getCurrency(payerAccountInfo.getResult().getCurrency());
@@ -117,15 +110,6 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                         insertTransactionRecordRequest.setAmount(requestAmount);
                         //check if amount over limit,
                         if (requestAmount.isGreaterThan(LIMIT)) {
-                            // query user info to retrieve phone no.
-                            QueryUserInfoRequest queryUserInfoRequest = new QueryUserInfoRequest();
-                            queryUserInfoRequest.setUserId(request.getOperatorId());
-                            UserBizResult<UserInfoItem> userInfoItem = userServiceClient.queryUserInfo(queryUserInfoRequest);
-                            // call user center service, send OTP.
-                            OTPRequest otpRequest = new OTPRequest();
-                            otpRequest.setPhoneNo(userInfoItem.getResult().getPhoneNo());
-                            userServiceClient.sendOTP(otpRequest);
-
                             // set status to OTP_OVER_LIMIT
                             insertTransactionRecordRequest.setStatus(TransactionStatusEnum.OTP_OVER_LIMIT);
                             //insert new record in transaction, status OTP_AMOUNT_OVER_LIMIT
@@ -137,9 +121,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                             insertTransactionRecordRequest.setStatus(TransactionStatusEnum.PENDING);
                             AccountBizResult<TransactionRecordItem> transactionRecord = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
 
-                            BigDecimal amount = new BigDecimal(requestAmount.getNumber().doubleValue());
                             if (transactionRecord != null && transactionRecord.isSuccess()) {
-
                                 // after success insert new transaction record, then update the idempotency keys with the transaction id,
                                 // update to PENDING for account center to check
                                 IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.updateIdempotencyKeys(transactionRecord.getResult().getTxnId(),
@@ -147,17 +129,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
 
                                 // check idempotency keys success
                                 if (idempotencyKeys != null) {
-                                    // publish EC_TRANSACTION event code for transfer service to listen
-                                    EcTransactionEvent event = new EcTransactionEvent(
-                                            insertTransactionRecordRequest.getTxnId(),
-                                            insertTransactionRecordRequest.getPayeeAccountNo(),
-                                            insertTransactionRecordRequest.getPayerAccountNo(),
-                                            amount
-                                    );
-
-                                    // Use accountId as key → guarantees ordering per account
-                                    kafkaTemplate.send("EC_TRANSACTION", String.valueOf(event.getAmount()), event);
-                                    ResponseBuilder.success(response, null, BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
+                                    // return txnId to frontend to perform transferConfirm authentication
+                                    ResponseBuilder.success(response, transactionRecord.getResult().getTxnId(), BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
                                 } else {
                                     ResponseBuilder.fail(response, BusinessActionEnum.TRANSFER.getCode(), "Update idempotency keys failed");
                                 }
@@ -197,7 +170,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
 
     @Override
     public BusinessBizResult<String> transferConfirm(TransferConfirmRequest request, String userId) {
-        return businessServiceTemplate.execute(request, BusinessActionEnum.TRANSFER_CONFIRM_OVER_LIMIT,
+        return businessServiceTemplate.execute(request, BusinessActionEnum.PASSWORD_CONFIRM,
                 new BusinessBizCallback<>() {
                     @Override
                     protected BusinessBizResult<String> createDefaultResponse() {
@@ -211,37 +184,22 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
 
                     @Override
                     protected void process(TransferConfirmRequest request, BusinessBizResult<String> response) {
-                        // then in confirm, verifyOTP
-                        // call user center first,
-                        VerifyOtpRequest verifyOtpRequest = new VerifyOtpRequest();
-                        verifyOtpRequest.setOtp(request.getOtp());
-                        verifyOtpRequest.setChallengeId(request.getChallengeId());
-                        verifyOtpRequest.setSceneCode(request.getSceneCode());
-                        UserBizResult<String> otpResult = userServiceClient.verifyOTP(verifyOtpRequest);
+                        // because now there could be two use case, one for view anything sensitive such as view balance, we need
+                        // verification of password such as face id
+                        VerifyUserAuthRequest verifyUserAuthRequest = new VerifyUserAuthRequest();
+                        verifyUserAuthRequest.setUserId(userId);
+                        UserBizResult<String> authInfo = userServiceClient.verifyUserAuth(verifyUserAuthRequest);
 
-                        UpdateTransactionRecordRequest updateTransactionRecordRequest = new UpdateTransactionRecordRequest();
-                        updateTransactionRecordRequest.setTxnId(request.getTxnId());
+                        AssertUtil.isTrue(authInfo.isSuccess(), BusinessResultCode.PASSWORD_INCORRECT, "Invalid password");
 
-                        if (otpResult != null && otpResult.isSuccess()) {
-                            updateTransactionRecordRequest.setStatus(TransactionStatusEnum.PENDING.getCode());
-                            AccountBizResult<TransactionRecordItem> transactionRecord = accountServiceClient
-                                    .updateTransactionRecord(updateTransactionRecordRequest);
-                            // convert money to big decimal
-                            BigDecimal amount = BigDecimal.valueOf(request.getTransferAmount().getAmount().doubleValue())
-                                    .setScale(2, RoundingMode.HALF_UP);
-
-                            if (transactionRecord != null && transactionRecord.isSuccess()) {
-                                // publish EC_TRANSACTION event code for transfer service to listen
-                                EcTransactionEvent event = new EcTransactionEvent(
-                                        updateTransactionRecordRequest.getTxnId(),
-                                        transactionRecord.getResult().getPayeeAccountId(),
-                                        transactionRecord.getResult().getPayerAccountId(),
-                                        amount
-                                );
-
-                                // Use accountId as key → guarantees ordering per account
-                                kafkaTemplate.send("EC_TRANSACTION", event.getPayeeAccountNo(), event);
-                            }
+                        PublishTransferRequest publishTransferRequest = new PublishTransferRequest();
+                        publishTransferRequest.setAccountId(request.getAccountId());
+                        publishTransferRequest.setTxnId(request.getTxnId());
+                        AccountBizResult<String> accountBizResult = accountServiceClient.publishTransfer(publishTransferRequest);
+                        if (accountBizResult.isSuccess()) {
+                            ResponseBuilder.success(response, null, BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
+                        } else {
+                            ResponseBuilder.fail(response, BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
                         }
                     }
                 });

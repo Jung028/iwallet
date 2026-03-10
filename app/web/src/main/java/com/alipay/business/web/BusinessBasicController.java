@@ -33,7 +33,6 @@ public class BusinessBasicController {
             @RequestBody TransferConfirmRequest request) {
         // retrieve JWT from header, verify JWT via public key.
         JwtClaims claims = JwtContextHolder.get();
-
         return businessService.transferConfirm(request, claims.getUserId());
     }
 

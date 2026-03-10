@@ -1,57 +1,40 @@
 package com.alipay.business.common.service.facade.request;
 
 import com.alipay.business.common.service.facade.baseresult.BusinessBaseRequest;
+import com.alipay.business.common.service.facade.enums.AuthTypeEnum;
 import com.alipay.business.common.service.facade.money.Money;
 import com.alipay.usercenter.common.service.facade.enums.OTPSceneEnum;
 
 import javax.money.CurrencyUnit;
 
 public class TransferConfirmRequest extends BusinessBaseRequest {
-    private String challengeId;
-    private String otp;
-    private OTPSceneEnum sceneCode;
-    private Money transferAmount;
-    private CurrencyUnit transferCurrency;
+    private String password;
+    private String accountId;
+    private AuthTypeEnum authTypeEnum;
     private String txnId;
 
-    public String getChallengeId() {
-        return this.challengeId;
+    public String getPassword() {
+        return password;
     }
 
-    public void setChallengeId(String challengeId) {
-        this.challengeId = challengeId;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getOtp() {
-        return this.otp;
+    public String getAccountId() {
+        return accountId;
     }
 
-    public void setOtp(String otp) {
-        this.otp = otp;
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
-    public OTPSceneEnum getSceneCode() {
-        return this.sceneCode;
+    public AuthTypeEnum getAuthTypeEnum() {
+        return authTypeEnum;
     }
 
-    public void setSceneCode(OTPSceneEnum sceneCode) {
-        this.sceneCode = sceneCode;
-    }
-
-    public Money getTransferAmount() {
-        return transferAmount;
-    }
-
-    public void setTransferAmount(Money transferAmount) {
-        this.transferAmount = transferAmount;
-    }
-
-    public CurrencyUnit getTransferCurrency() {
-        return transferCurrency;
-    }
-
-    public void setTransferCurrency(CurrencyUnit transferCurrency) {
-        this.transferCurrency = transferCurrency;
+    public void setAuthTypeEnum(AuthTypeEnum authTypeEnum) {
+        this.authTypeEnum = authTypeEnum;
     }
 
     public String getTxnId() {
