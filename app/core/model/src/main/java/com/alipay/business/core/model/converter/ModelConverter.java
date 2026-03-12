@@ -36,7 +36,6 @@ public class ModelConverter {
             return null;
         }
         IdempotencyKeysDO keys = new IdempotencyKeysDO();
-        keys.setId(idempotencyKeys.getId());
         keys.setUserId(idempotencyKeys.getUserId());
         keys.setIdempotencyKey(idempotencyKeys.getIdempotencyKey());
         keys.setRequestHash(idempotencyKeys.getRequestHash());

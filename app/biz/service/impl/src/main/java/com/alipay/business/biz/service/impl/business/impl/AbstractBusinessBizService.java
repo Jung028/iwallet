@@ -6,6 +6,7 @@ import com.alipay.business.common.service.integration.account.AccountServiceClie
 import com.alipay.business.common.service.integration.user.UserServiceClient;
 import com.alipay.business.core.service.IdempotencyKeysRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public abstract class AbstractBusinessBizService implements BusinessService {
 
@@ -20,6 +21,9 @@ public abstract class AbstractBusinessBizService implements BusinessService {
 
     @Autowired
     protected UserServiceClient userServiceClient;
+
+    @Autowired
+    protected TransactionTemplate transactionTemplate;
 
     public void setBusinessServiceTemplate(BusinessServiceTemplate businessServiceTemplate) {
         this.businessServiceTemplate = businessServiceTemplate;

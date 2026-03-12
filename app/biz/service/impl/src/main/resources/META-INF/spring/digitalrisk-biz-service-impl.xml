@@ -6,13 +6,13 @@
            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- Example bean declaration -->
-    <bean id="testCustomDao" class="com.alipay.alipay_plus.common.service.facade.daoimpl.TestCustomDaoImpl">
+    <bean id="testCustomDao" class="com.alipay.account_center.common.service.facade.daoimpl.TestCustomDaoImpl">
         <property name="testCustomMapper" ref="testCustomMapper"/>
     </bean>
 
     <!-- Mapper bean -->
     <bean id="testCustomMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
-        <property name="mapperInterface" value="com.alipay.alipay_plus.common.service.facade.auto.daointerface.TestCustomMapper"/>
+        <property name="mapperInterface" value="com.alipay.account_center.common.service.facade.auto.daointerface.TestCustomMapper"/>
         <!-- If using SqlSessionFactory, add below -->
         <!-- <property name="sqlSessionFactory" ref="sqlSessionFactory"/> -->
     </bean>

@@ -1,12 +1,11 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
-import com.alipay.alipay_plus.common.service.facade.baseresult.AccountBizResult;
-import com.alipay.alipay_plus.common.service.facade.enums.TransactionStatusEnum;
-import com.alipay.alipay_plus.common.service.facade.event.EcTransactionEvent;
-import com.alipay.alipay_plus.common.service.facade.item.AccountInfoItem;
-import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
-import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
-import com.alipay.alipay_plus.common.service.facade.request.*;
+import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
+import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
+import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
+import com.alipay.account_center.common.service.facade.item.TransactionHistoryItem;
+import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
+import com.alipay.account_center.common.service.facade.request.*;
 import com.alipay.business.biz.service.impl.checker.BusinessRequestChecker;
 import com.alipay.business.biz.service.impl.helper.ResponseBuilder;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
@@ -18,27 +17,25 @@ import com.alipay.business.common.service.facade.money.MoneyUtil;
 import com.alipay.business.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.request.TransferRequest;
 import com.alipay.business.common.service.facade.result.*;
-import com.alipay.business.common.util.password.BusinessPasswordUtil;
+import com.alipay.business.common.util.requesthash.HashUtil;
 import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
 import com.alipay.business.core.model.exception.BusinessException;
 import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
-import com.alipay.usercenter.common.service.facade.enums.UserResultCode;
 import com.alipay.usercenter.common.service.facade.request.VerifyUserAuthRequest;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 
@@ -72,84 +69,100 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
 
                         IdempotencyKeys existing = checkOrInsertIdempotencyKey(request, userId);
 
-                        if (existing != null) {
+                        if (existing != null && !existing.getStatus().equals(IdempotencyKeysStatusEnum.INIT)) {
                             // Replay stored response
                             response.setResult(existing.getResponseSnapshot());
                             return;
                         }
 
-                        // check payer != payee
-                        AssertUtil.isTrue(request.getPayeeAccountNo().equals(request.getPayerAccountNo()), BusinessResultCode.PARAM_ILLEGAL, "Cannot send to same account");
+                        transactionTemplate.execute(status -> {
+                            // check payer != payee
+                            AssertUtil.isTrue(!request.getPayeeAccountNo().equals(request.getPayerAccountNo()), BusinessResultCode.PARAM_ILLEGAL, "Cannot send to same account");
 
-                        // query account info from account
-                        QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
-                        queryAccountInfoRequest.setAccountId(request.getPayeeAccountNo());
-                        AccountBizResult<AccountInfoItem> payeeAccountInfo = accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
-                        queryAccountInfoRequest.setAccountId(request.getPayerAccountNo());
-                        AccountBizResult<AccountInfoItem> payerAccountInfo = accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
+                            // query account info from account
+                            QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
+                            queryAccountInfoRequest.setAccountId(request.getPayeeAccountNo());
+                            System.out.println(request.getPayeeAccountNo());
+                            AccountBizResult<AccountInfoItem> payeeAccountInfo = accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
+                            queryAccountInfoRequest.setAccountId(request.getPayerAccountNo());
+                            AccountBizResult<AccountInfoItem> payerAccountInfo = accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
 
-                        // validate both accounts exists
-                        AssertUtil.notNull(payerAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "payer account not found");
-                        AssertUtil.notNull(payeeAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "payee account not found");
+                            // check user is the account's owner.
+                            AssertUtil.isTrue(userId.equals(payerAccountInfo.getResult().getAccRelationId()),
+                                    BusinessResultCode.INVALID_REQUEST, "User not authorized to perform this transfer");
 
-                        // verify user is authorised
-                        AssertUtil.isTrue(payerAccountInfo.getResult().getAccRelationId().equals(userId),
-                                BusinessResultCode.INVALID_REQUEST, "User is not authorised");
+                            // validate both accounts exists
+                            AssertUtil.notNull(payerAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "payer account not found");
+                            AssertUtil.notNull(payeeAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "payee account not found");
 
-                        // validate balance is sufficient
-                        CurrencyUnit payerAccountCurrent = Monetary.getCurrency(payerAccountInfo.getResult().getCurrency());
-                        MonetaryAmount payerBalance = MoneyUtil.toMonetaryAmount(payerAccountInfo.getResult().getBalance(), payerAccountCurrent);
-                        MonetaryAmount requestAmount = MoneyUtil.toMonetaryAmount(request.getAmount().getAmount(), request.getAmount().getCurrency());
-                        if (payerBalance.isLessThan(requestAmount)){
-                            throw new RuntimeException("insufficient balance");
-                        }
+                            // verify user is authorised
+                            AssertUtil.isTrue(payerAccountInfo.getResult().getAccRelationId().equals(userId),
+                                    BusinessResultCode.INVALID_REQUEST, "User is not authorised");
 
-                        InsertTransactionRecordRequest insertTransactionRecordRequest = new InsertTransactionRecordRequest();
-                        insertTransactionRecordRequest.setPayeeAccountNo(request.getPayeeAccountNo());
-                        insertTransactionRecordRequest.setPayerAccountNo(request.getPayerAccountNo());
-                        insertTransactionRecordRequest.setAmount(requestAmount);
-                        //check if amount over limit,
-                        if (requestAmount.isGreaterThan(LIMIT)) {
-                            // set status to OTP_OVER_LIMIT
-                            insertTransactionRecordRequest.setStatus(TransactionStatusEnum.OTP_OVER_LIMIT);
-                            //insert new record in transaction, status OTP_AMOUNT_OVER_LIMIT
-                            AccountBizResult<TransactionRecordItem> result = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
-                            if (result != null && result.getResult() != null) {
-                                ResponseBuilder.success(response, null, BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
+                            // validate balance is sufficient
+                            CurrencyUnit payerAccountCurrent = Monetary.getCurrency(payerAccountInfo.getResult().getCurrency());
+                            MonetaryAmount payerBalance = MoneyUtil.toMonetaryAmount(payerAccountInfo.getResult().getBalance(), payerAccountCurrent);
+                            System.out.println(request.getAmount().getAmount());
+                            MonetaryAmount requestAmount = MoneyUtil.toMonetaryAmount(request.getAmount().getAmount(), request.getAmount().getCurrency());
+                            if (payerBalance.isLessThan(requestAmount)){
+                                throw new RuntimeException("insufficient balance");
                             }
-                        } else {
-                            insertTransactionRecordRequest.setStatus(TransactionStatusEnum.PENDING);
-                            AccountBizResult<TransactionRecordItem> transactionRecord = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
 
-                            if (transactionRecord != null && transactionRecord.isSuccess()) {
-                                // after success insert new transaction record, then update the idempotency keys with the transaction id,
-                                // update to PENDING for account center to check
-                                IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.updateIdempotencyKeys(transactionRecord.getResult().getTxnId(),
-                                        IdempotencyKeysStatusEnum.PENDING.getCode(), 0);
+                            InsertTransactionRecordRequest insertTransactionRecordRequest = new InsertTransactionRecordRequest();
+                            insertTransactionRecordRequest.setPayeeAccountNo(request.getPayeeAccountNo());
+                            insertTransactionRecordRequest.setPayerAccountNo(request.getPayerAccountNo());
+                            insertTransactionRecordRequest.setAmount(request.getAmount().getAmount());
+                            insertTransactionRecordRequest.setCurrency(request.getAmount().getCurrency());
+                            //check if amount over limit,
+                            if (requestAmount.isGreaterThan(LIMIT)) {
+                                // set status to OTP_OVER_LIMIT
+                                insertTransactionRecordRequest.setStatus(TransactionStatusEnum.OTP_OVER_LIMIT);
+                                //insert new record in transaction, status OTP_AMOUNT_OVER_LIMIT
+                                AccountBizResult<TransactionRecordItem> result = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
+                                if (result != null && result.getResult() != null) {
+                                    ResponseBuilder.success(response, null, BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
+                                }
+                            } else {
+                                insertTransactionRecordRequest.setStatus(TransactionStatusEnum.PENDING);
+                                AccountBizResult<TransactionRecordItem> transactionRecord = accountServiceClient.insertTransactionRecord(insertTransactionRecordRequest);
 
-                                // check idempotency keys success
-                                if (idempotencyKeys != null) {
-                                    // return txnId to frontend to perform transferConfirm authentication
-                                    ResponseBuilder.success(response, transactionRecord.getResult().getTxnId(), BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
-                                } else {
-                                    ResponseBuilder.fail(response, BusinessActionEnum.TRANSFER.getCode(), "Update idempotency keys failed");
+                                if (transactionRecord != null && transactionRecord.isSuccess()) {
+                                    // after success insert new transaction record, then update the idempotency keys with the transaction id,
+                                    // update to PENDING for account center to check
+                                    IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.updateIdempotencyKeys(transactionRecord.getResult().getTxnId(),
+                                            IdempotencyKeysStatusEnum.PENDING.getCode(), 0);
+
+                                    // check idempotency keys success
+                                    if (idempotencyKeys != null) {
+                                        // return txnId to frontend to perform transferConfirm authentication
+                                        ResponseBuilder.success(response, transactionRecord.getResult().getTxnId(), BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
+                                    } else {
+                                        ResponseBuilder.fail(response, BusinessActionEnum.TRANSFER.getCode(), "Update idempotency keys failed");
+                                    }
                                 }
                             }
-                        }
+
+                            return null;
+                        });
+
                     }
                 });
     }
 
     private IdempotencyKeys checkOrInsertIdempotencyKey(TransferRequest request, String userId) {
-        // insert or return idempotent record,
         try {
             IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
             idempotencyKeys.setIdempotencyKey(request.getUniqueRequestId());
             idempotencyKeys.setUserId(Long.valueOf(userId));
+            idempotencyKeys.setRequestHash(HashUtil.generateIdempotentRequestHash
+                    (request.getAmount(), request.getPayerAccountNo(), request.getPayeeAccountNo()));
+            idempotencyKeys.setTxnId(null);
+            System.out.println(idempotencyKeys.getIdempotencyKey());
+            System.out.println(idempotencyKeys.getUserId());
+            System.out.println(idempotencyKeys.getRequestHash());
             idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.INIT);
             idempotencyKeys.setCreatedAt(new Date());
             idempotencyKeys.setUpdatedAt(new Date());
-            System.out.println(userId);
             idempotencyKeysRepository.insertIdempotencyKey(idempotencyKeys);
         } catch (DuplicateKeyException e) {
             // if the record is valid, return duplicate request result
@@ -160,9 +173,13 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
             return switch (idempotencyKeys.getStatus()) {
                 case PENDING ->
                         throw new BusinessException(BusinessResultCode.REPEATED_SUBMIT, "Request is processing");
-                case SUCCESS, FAILED -> idempotencyKeys;
+                case SUCCESS, FAILED->
+                    throw new BusinessException(BusinessResultCode.REPEATED_SUBMIT, "Screenshot: " + idempotencyKeys.getResponseSnapshot());
+                case INIT -> idempotencyKeys;
                 default -> throw new IllegalStateException("Unknown status");
             };
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }
@@ -188,6 +205,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                         // verification of password such as face id
                         VerifyUserAuthRequest verifyUserAuthRequest = new VerifyUserAuthRequest();
                         verifyUserAuthRequest.setUserId(userId);
+                        verifyUserAuthRequest.setCredential(request.getPassword());
                         UserBizResult<String> authInfo = userServiceClient.verifyUserAuth(verifyUserAuthRequest);
 
                         AssertUtil.isTrue(authInfo.isSuccess(), BusinessResultCode.PASSWORD_INCORRECT, "Invalid password");
@@ -195,6 +213,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                         PublishTransferRequest publishTransferRequest = new PublishTransferRequest();
                         publishTransferRequest.setAccountId(request.getAccountId());
                         publishTransferRequest.setTxnId(request.getTxnId());
+                        System.out.println(authInfo.getResult());
                         AccountBizResult<String> accountBizResult = accountServiceClient.publishTransfer(publishTransferRequest);
                         if (accountBizResult.isSuccess()) {
                             ResponseBuilder.success(response, null, BusinessActionEnum.TRANSFER.getCode(), BusinessActionEnum.TRANSFER.getDesc());
@@ -227,7 +246,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService {
                         queryTransactionRecordRequest.setAccountId(request.getAccountId());
                         queryTransactionRecordRequest.setTxnId(request.getTxnId());
                         AccountBizResult<TransactionRecordItem> accountBizResult = accountServiceClient.queryTransactionRecord(queryTransactionRecordRequest);
-                        result.setResult(ItemConverter.convertToTxnDetails(accountBizResult));
+                        ResponseBuilder.success(result, ItemConverter.convertToTxnDetails(accountBizResult), BusinessActionEnum.QUERY_TRANSACTION_DETAILS.getCode(),
+                                BusinessActionEnum.QUERY_TRANSACTION_DETAILS.getDesc());
                     }
                 });
 

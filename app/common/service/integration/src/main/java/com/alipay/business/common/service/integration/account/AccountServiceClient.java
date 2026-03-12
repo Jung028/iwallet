@@ -1,10 +1,10 @@
 package com.alipay.business.common.service.integration.account;
 
-import com.alipay.alipay_plus.common.service.facade.baseresult.AccountBizResult;
-import com.alipay.alipay_plus.common.service.facade.item.AccountInfoItem;
-import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
-import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
-import com.alipay.alipay_plus.common.service.facade.request.*;
+import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
+import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
+import com.alipay.account_center.common.service.facade.item.TransactionHistoryItem;
+import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
+import com.alipay.account_center.common.service.facade.request.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

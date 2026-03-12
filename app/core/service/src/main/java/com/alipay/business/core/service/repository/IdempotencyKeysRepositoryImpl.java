@@ -41,12 +41,7 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
 
     @Override
     public void insertIdempotencyKey(IdempotencyKeys idempotencyKeys) {
-        try {
-            IdempotencyKeysDO idempotencyKeysDO = modelConverter.convertToDO(idempotencyKeys);
-            idempotencyKeysDAO.insertIdempotencyKey(idempotencyKeysDO);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException("insert IdempotencyKeys error!", e);
-        }
+        IdempotencyKeysDO idempotencyKeysDO = modelConverter.convertToDO(idempotencyKeys);
+        idempotencyKeysDAO.insertIdempotencyKey(idempotencyKeysDO);
     }
 }

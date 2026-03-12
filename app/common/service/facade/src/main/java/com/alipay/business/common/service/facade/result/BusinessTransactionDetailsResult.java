@@ -1,7 +1,7 @@
 package com.alipay.business.common.service.facade.result;
 
-import com.alipay.alipay_plus.common.service.facade.enums.TransactionStatusEnum;
-import com.alipay.alipay_plus.common.service.facade.enums.TransactionTypeEnum;
+import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
+import com.alipay.account_center.common.service.facade.enums.TransactionTypeEnum;
 import com.alipay.business.common.service.facade.baseresult.BusinessBaseResult;
 
 import java.math.BigDecimal;
@@ -19,7 +19,7 @@ public class BusinessTransactionDetailsResult extends BusinessBaseResult {
     private TransactionTypeEnum txnType;
     private TransactionStatusEnum txnStatus;
     private String failureReason;
-    private String desc;
+    private String extInfo;
 
     public String getTxnId() {
         return this.txnId;
@@ -109,11 +109,11 @@ public class BusinessTransactionDetailsResult extends BusinessBaseResult {
         this.failureReason = failureReason;
     }
 
-    public String getDesc() {
-        return this.desc;
+    public String getExtInfo() {
+        return extInfo;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setExtInfo(String extInfo) {
+        this.extInfo = extInfo;
     }
 }

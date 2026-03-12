@@ -68,7 +68,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
-
+        <!-- Source: https://mvnrepository.com/artifact/com.alipay.sofa/rpc-sofa-boot-starter -->
+        <dependency>
+            <groupId>com.alipay.sofa</groupId>
+            <artifactId>rpc-sofa-boot-starter</artifactId>
+            <version>6.0.4</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.adam</groupId>
             <artifactId>account_center-common-service-facade</artifactId>

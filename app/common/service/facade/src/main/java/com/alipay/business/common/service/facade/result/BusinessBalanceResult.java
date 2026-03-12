@@ -16,7 +16,7 @@ public class BusinessBalanceResult extends BusinessBaseResult {
     private String status;
     private Date gmtCreate;
     private Date gmtModified;
-    private String desc;
+    private String extInfo;
 
     public String getAccountId() {
         return this.accountId;
@@ -98,11 +98,11 @@ public class BusinessBalanceResult extends BusinessBaseResult {
         this.gmtModified = gmtModified;
     }
 
-    public String getDesc() {
-        return this.desc;
+    public String getExtInfo() {
+        return extInfo;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setExtInfo(String extInfo) {
+        this.extInfo = extInfo;
     }
 }

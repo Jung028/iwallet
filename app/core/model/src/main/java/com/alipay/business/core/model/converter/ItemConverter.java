@@ -1,9 +1,9 @@
 package com.alipay.business.core.model.converter;
 
-import com.alipay.alipay_plus.common.service.facade.baseresult.AccountBizResult;
-import com.alipay.alipay_plus.common.service.facade.item.AccountInfoItem;
-import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
-import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
+import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
+import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
+import com.alipay.account_center.common.service.facade.item.TransactionHistoryItem;
+import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
 import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
@@ -28,7 +28,7 @@ public class ItemConverter {
             transactionHistoryItem.setAmount(item.getAmount());
             transactionHistoryItem.setStatus(item.getStatus());
             transactionHistoryItem.setCurrency(item.getCurrency());
-            transactionHistoryItem.setDesc(item.getDesc());
+            transactionHistoryItem.setExtInfo(item.getExtInfo());
             transactionHistoryItem.setTxnId(item.getTxnId());
             transactionHistoryItem.setDirection(item.getDirection());
             transactionHistoryItem.setGmtCreate(item.getGmtCreate());
@@ -53,7 +53,7 @@ public class ItemConverter {
         result.setTxnType(accountBizResult.getResult().getTxnType());
         result.setTxnStatus(accountBizResult.getResult().getTxnStatus());
         result.setFailureReason(accountBizResult.getResult().getFailureReason());
-        result.setDesc(accountBizResult.getResult().getDesc());
+        result.setExtInfo(accountBizResult.getResult().getExtInfo());
         return result;
     }
 
@@ -72,7 +72,7 @@ public class ItemConverter {
         result.setStatus(accountInfo.getResult().getStatus());
         result.setGmtCreate(accountInfo.getResult().getGmtCreate());
         result.setGmtModified(accountInfo.getResult().getGmtModified());
-        result.setDesc(accountInfo.getResult().getDesc());
+        result.setExtInfo(accountInfo.getResult().getExtInfo());
         return result;
     }
 

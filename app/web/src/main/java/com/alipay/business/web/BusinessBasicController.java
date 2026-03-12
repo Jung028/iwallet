@@ -10,6 +10,7 @@ import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
 import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
 import com.alipay.business.common.service.facade.result.BusinessTransactionHistoryResult;
 import com.alipay.business.common.service.facade.result.UpdateIdempotencyKeysResult;
+import com.alipay.sofa.runtime.api.annotation.SofaReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,8 @@ public class BusinessBasicController {
 
     @Autowired
     private BusinessService businessService;
+
+
     @PostMapping("/transfer.json")
     public BusinessBizResult<String> transfer(
             @RequestBody TransferRequest request) {
@@ -33,7 +36,8 @@ public class BusinessBasicController {
             @RequestBody TransferConfirmRequest request) {
         // retrieve JWT from header, verify JWT via public key.
         JwtClaims claims = JwtContextHolder.get();
-        return businessService.transferConfirm(request, claims.getUserId());
+
+        return businessService.transferConfirm(request, claims.getSubject());
     }
 
     @PostMapping("/queryTransactionDetails.json")

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.alipay.business.common.dal.auto.custom.IdempotencyKeysDAO">
+
+    <resultMap id="BaseResultMap" type="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="idempotency_key" jdbcType="VARCHAR" property="idempotencyKey"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="request_hash" jdbcType="VARCHAR" property="requestHash"/>
+        <result column="txn_id" jdbcType="VARCHAR" property="txnId"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="error_code" jdbcType="VARCHAR" property="errorCode"/>
+        <result column="response_snapshot" jdbcType="VARCHAR" property="responseSnapshot"/>
+        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt"/>
+    </resultMap>
+
+    <insert id="insertIdempotencyKey" parameterType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
+        INSERT INTO idempotency_keys
+        (idempotency_key, user_id, request_hash, txn_id, status, error_code, response_snapshot, created_at, updated_at)
+        VALUES
+        (#{idempotencyKey,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
+        #{requestHash,jdbcType=VARCHAR}, #{txnId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+        #{errorCode,jdbcType=VARCHAR}, #{responseSnapshot,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
+        #{updatedAt,jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="queryIdempotencyKeysByUniqueRequestId" resultMap="BaseResultMap">
+        SELECT * FROM idempotency_keys WHERE idempotency_key = #{uniqueRequestId}
+    </select>
+
+    <select id="queryIdempotencyKeysByTxnId" resultMap="BaseResultMap">
+        SELECT * FROM idempotency_keys WHERE txn_id = #{txnId}
+    </select>
+
+    <update id="updateIdempotencyKeys">
+        UPDATE idempotency_keys
+        SET status = #{status},
+            updated_at = NOW()
+        WHERE txn_id = #{txnId}
+    </update>
+
+</mapper>

@@ -1,10 +1,10 @@
 package com.alipay.business.common.service.integration.account;
 
-import com.alipay.alipay_plus.common.service.facade.baseresult.AccountBizResult;
-import com.alipay.alipay_plus.common.service.facade.item.AccountInfoItem;
-import com.alipay.alipay_plus.common.service.facade.item.TransactionHistoryItem;
-import com.alipay.alipay_plus.common.service.facade.item.TransactionRecordItem;
-import com.alipay.alipay_plus.common.service.facade.request.*;
+import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
+import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
+import com.alipay.account_center.common.service.facade.item.TransactionHistoryItem;
+import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
+import com.alipay.account_center.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.integration.AbstractServiceClient;
 import com.alipay.business.core.model.util.AssertUtil;
@@ -75,11 +75,11 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
     @Override
     public AccountBizResult<TransactionRecordItem> insertTransactionRecord(InsertTransactionRecordRequest request) {
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "Insert transaction record request cannot be null");
-        AssertUtil.notBlank(request.getTxnId(), BusinessResultCode.PARAM_ILLEGAL, "transaction id cannot be blank");
         AssertUtil.notBlank(request.getPayeeAccountNo(), BusinessResultCode.PARAM_ILLEGAL, "payee account no cannot be blank");
         AssertUtil.notBlank(request.getPayerAccountNo(), BusinessResultCode.PARAM_ILLEGAL, "payer account no cannot be blank");
-        AssertUtil.notNull(request.getAmount(), BusinessResultCode.PARAM_ILLEGAL, "amount cannot be blank");
-        AssertUtil.notBlank(request.getStatus().getCode(), BusinessResultCode.PARAM_ILLEGAL, "status cannot be blank");
+        AssertUtil.notBlank(String.valueOf(request.getAmount()), BusinessResultCode.PARAM_ILLEGAL, "amount cannot be blank");
+        AssertUtil.notBlank(request.getCurrency().getCurrencyCode(), BusinessResultCode.PARAM_ILLEGAL, "currency cannot be blank");
+        AssertUtil.notBlank(String.valueOf(request.getStatus()), BusinessResultCode.PARAM_ILLEGAL, "status cannot be blank");
 
         // set cross invoke
         AccountBizResult<TransactionRecordItem> result = accountService.insertTransactionRecord(request);
