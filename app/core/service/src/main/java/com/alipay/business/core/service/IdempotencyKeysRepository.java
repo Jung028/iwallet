@@ -10,7 +10,7 @@ public interface IdempotencyKeysRepository {
 
     IdempotencyKeys queryIdempotencyKeysByTxnId(String txnId);
 
-    IdempotencyKeys updateIdempotencyKeys(String txnId, String status, int retryCount);
+    int updateIdempotencyKeys(String txnId, String status, int retryCount);
 
     void insertIdempotencyKey(IdempotencyKeys idempotencyKeys);
 }

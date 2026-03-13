@@ -15,29 +15,33 @@
         <result column="response_snapshot" jdbcType="VARCHAR" property="responseSnapshot"/>
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="retry_count" jdbcType="INTEGER" property="retryCount" />
     </resultMap>
 
     <insert id="insertIdempotencyKey" parameterType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
         INSERT INTO idempotency_keys
-        (idempotency_key, user_id, request_hash, txn_id, status, error_code, response_snapshot, created_at, updated_at)
+        (idempotency_key, user_id, request_hash, txn_id, status, error_code, response_snapshot, created_at, updated_at, retry_count)
         VALUES
         (#{idempotencyKey,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
         #{requestHash,jdbcType=VARCHAR}, #{txnId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
         #{errorCode,jdbcType=VARCHAR}, #{responseSnapshot,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
-        #{updatedAt,jdbcType=TIMESTAMP})
+        #{updatedAt,jdbcType=TIMESTAMP}, #{retryCount,jdbcType=INTEGER})
     </insert>
 
     <select id="queryIdempotencyKeysByUniqueRequestId" resultMap="BaseResultMap">
-        SELECT * FROM idempotency_keys WHERE idempotency_key = #{uniqueRequestId}
+        SELECT idempotency_key, user_id, request_hash, txn_id, status, error_code, response_snapshot, created_at, updated_at, retry_count
+        FROM idempotency_keys WHERE idempotency_key = #{uniqueRequestId}
     </select>
 
     <select id="queryIdempotencyKeysByTxnId" resultMap="BaseResultMap">
-        SELECT * FROM idempotency_keys WHERE txn_id = #{txnId}
+        SELECT idempotency_key, user_id, request_hash, txn_id, status, error_code, response_snapshot, created_at, updated_at, retry_count
+        FROM idempotency_keys WHERE txn_id = #{txnId}
     </select>
 
     <update id="updateIdempotencyKeys">
         UPDATE idempotency_keys
         SET status = #{status},
+        retry_count = #{retryCount},
             updated_at = NOW()
         WHERE txn_id = #{txnId}
     </update>

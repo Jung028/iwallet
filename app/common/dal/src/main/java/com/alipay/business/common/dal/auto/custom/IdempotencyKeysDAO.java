@@ -11,10 +11,10 @@ public interface IdempotencyKeysDAO {
 
     IdempotencyKeysDO queryIdempotencyKeysByTxnId(@Param("txnId") String txnId);
 
-    IdempotencyKeysDO updateIdempotencyKeys(@Param("txnId") String txnId,
+    int updateIdempotencyKeys(@Param("txnId") String txnId,
                                             @Param("status") String status,
                                             @Param("retryCount") int retryCount);
 
-    void insertIdempotencyKey(IdempotencyKeysDO idempotencyKeysDO);
+    int insertIdempotencyKey(IdempotencyKeysDO idempotencyKeysDO);
 
 }

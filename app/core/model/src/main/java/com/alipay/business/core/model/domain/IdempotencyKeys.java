@@ -15,7 +15,7 @@ public class IdempotencyKeys {
     private String responseSnapshot;
     private Date createdAt;
     private Date updatedAt;
-
+    private int retryCount;
 
     public Long getId() {
         return id;
@@ -95,5 +95,13 @@ public class IdempotencyKeys {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
     }
 }

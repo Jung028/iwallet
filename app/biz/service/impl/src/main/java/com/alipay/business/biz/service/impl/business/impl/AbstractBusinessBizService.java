@@ -8,7 +8,7 @@ import com.alipay.business.core.service.IdempotencyKeysRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public abstract class AbstractBusinessBizService implements BusinessService {
+public abstract class AbstractBusinessBizService {
 
     @Autowired
     protected BusinessServiceTemplate businessServiceTemplate;

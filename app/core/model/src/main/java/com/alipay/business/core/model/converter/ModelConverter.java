@@ -28,6 +28,7 @@ public class ModelConverter {
         keys.setResponseSnapshot(idempotencyKeysDO.getResponseSnapshot());
         keys.setCreatedAt(idempotencyKeysDO.getCreatedAt());
         keys.setUpdatedAt(idempotencyKeysDO.getUpdatedAt());
+        keys.setRetryCount(idempotencyKeysDO.getRetryCount());
         return keys;
     }
 
@@ -45,6 +46,7 @@ public class ModelConverter {
         keys.setResponseSnapshot(idempotencyKeys.getResponseSnapshot());
         keys.setCreatedAt(idempotencyKeys.getCreatedAt());
         keys.setUpdatedAt(idempotencyKeys.getUpdatedAt());
+        keys.setRetryCount(idempotencyKeys.getRetryCount());
         return keys;
     }
 }

@@ -30,7 +30,6 @@ public class ItemConverter {
             transactionHistoryItem.setCurrency(item.getCurrency());
             transactionHistoryItem.setExtInfo(item.getExtInfo());
             transactionHistoryItem.setTxnId(item.getTxnId());
-            transactionHistoryItem.setDirection(item.getDirection());
             transactionHistoryItem.setGmtCreate(item.getGmtCreate());
             items.add(transactionHistoryItem);
         });
@@ -66,7 +65,7 @@ public class ItemConverter {
         result.setAccountNumber(accountInfo.getResult().getAccountNumber());
         result.setAccountName(accountInfo.getResult().getAccountName());
         result.setAccountType(accountInfo.getResult().getAccountType());
-        result.setAccRelationId(accountInfo.getResult().getAccRelationId());
+        result.setAccRelationId(accountInfo.getResult().getAccountRelationId());
         result.setCurrency(accountInfo.getResult().getCurrency());
         result.setBalance(accountInfo.getResult().getBalance());
         result.setStatus(accountInfo.getResult().getStatus());

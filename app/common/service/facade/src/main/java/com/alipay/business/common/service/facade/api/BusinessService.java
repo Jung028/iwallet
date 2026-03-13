@@ -5,6 +5,15 @@ import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.result.*;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("/businessService")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public interface BusinessService {
 
     /**
@@ -48,6 +57,8 @@ public interface BusinessService {
      * @param request
      * @return
      */
+    @POST
+    @Path("updateIdempotencyKeys")
     BusinessBizResult<UpdateIdempotencyKeysResult> updateIdempotencyKeys(UpdateIdempotencyKeysRequest request);
 
     /**
@@ -55,6 +66,8 @@ public interface BusinessService {
      * @param request
      * @return
      */
+    @POST
+    @Path("queryIdempotencyKeys")
     BusinessBizResult<IdempotencyKeysItem> queryIdempotencyKeys(QueryIdempotencyKeysRequest request);
 
 }
