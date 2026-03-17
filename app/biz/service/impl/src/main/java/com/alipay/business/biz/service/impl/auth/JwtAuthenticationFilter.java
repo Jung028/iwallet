@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && jwtUtils.validate(token)) {
 
             JwtClaims claims = jwtUtils.parse(token);
-            System.out.println("JWT valid for user: " + claims.getSubject());
+            System.out.println("JWT valid for user: " + claims.getUserId());
 
             Authentication auth = new UsernamePasswordAuthenticationToken(
                     claims,

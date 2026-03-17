@@ -1,7 +1,11 @@
 package com.alipay.business.biz.service.impl.helper;
 
 
+import com.alipay.account_center.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
+import com.alipay.business.common.service.facade.result.BusinessTransactionHistoryResult;
+
+import java.util.List;
 
 /**
  * @author adam
@@ -11,6 +15,7 @@ public class ResponseBuilder {
 
     /**
      * base response builder for success result
+     *
      * @param response
      * @param data
      * @param message
@@ -27,6 +32,7 @@ public class ResponseBuilder {
 
     /**
      * base response builder for failed result
+     *
      * @param response
      * @param message
      * @param code
@@ -37,5 +43,4 @@ public class ResponseBuilder {
         response.setResultMessage(message);
         response.setResultCode(code);
     }
-
 }

@@ -1,8 +1,8 @@
 package com.alipay.business.common.service.facade.request;
 
-import com.alipay.business.common.service.facade.baseresult.BusinessBaseRequest;
+import com.alipay.business.common.service.facade.baseresult.BusinessBasePageRequest;
 
-public class BusinessTransactionHistoryRequest extends BusinessBaseRequest {
+public class BusinessTransactionHistoryRequest extends BusinessBasePageRequest {
     private String accountId;
     private String txnId;
 

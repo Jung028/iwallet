@@ -16,18 +16,6 @@ import java.util.List;
 public class AccountServiceClientImpl extends AbstractServiceClient implements AccountServiceClient {
 
 
-    @Override
-    public AccountBizResult<String> createAccount(CreateAccountRequest request) {
-        AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "Create account request cannot be null");
-        AssertUtil.notBlank(request.getOperatorId(), BusinessResultCode.PARAM_ILLEGAL, "to account no cannot be blank");
-
-        // set cross invoke
-        AccountBizResult<String> result = accountService.createAccount(request);
-        AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
-        AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL, ", result is null");
-        AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
-        return result;
-    }
 
     @Override
     public AccountBizResult<AccountInfoItem> queryAccountInfo(QueryAccountInfoRequest request) {
@@ -57,17 +45,15 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
     }
 
     @Override
-    public AccountBizResult<List<TransactionHistoryItem>> queryTransactionHistory(QueryTransactionHistoryRequest request) {
+    public AccountBizResult<QueryTransactionHistoryResult> queryTransactionHistory(QueryTransactionHistoryRequest request) {
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "Query transaction history request cannot be null");
-        AssertUtil.notBlank(request.getTxnId(), BusinessResultCode.PARAM_ILLEGAL, "transaction id cannot be blank");
         AssertUtil.notBlank(request.getAccountId(), BusinessResultCode.PARAM_ILLEGAL, "account no cannot be blank");
 
         // set cross invoke
-        AccountBizResult <List<TransactionHistoryItem>> result = accountService.queryTransactionHistory(request);
+        AccountBizResult <QueryTransactionHistoryResult> result = accountService.queryTransactionHistory(request);
         AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
         AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL, ", result is null");
         AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
-        //convert to business result BusinessTransactionHistoryResult
 
         return result;
     }
@@ -78,13 +64,12 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
         AssertUtil.notBlank(request.getPayeeAccountNo(), BusinessResultCode.PARAM_ILLEGAL, "payee account no cannot be blank");
         AssertUtil.notBlank(request.getPayerAccountNo(), BusinessResultCode.PARAM_ILLEGAL, "payer account no cannot be blank");
         AssertUtil.notBlank(String.valueOf(request.getAmount()), BusinessResultCode.PARAM_ILLEGAL, "amount cannot be blank");
-        AssertUtil.notBlank(request.getCurrency().getCurrencyCode(), BusinessResultCode.PARAM_ILLEGAL, "currency cannot be blank");
+        AssertUtil.notBlank(request.getCurrency(), BusinessResultCode.PARAM_ILLEGAL, "currency cannot be blank");
         AssertUtil.notBlank(String.valueOf(request.getStatus()), BusinessResultCode.PARAM_ILLEGAL, "status cannot be blank");
 
         // set cross invoke
         AccountBizResult<TransactionRecordItem> result = accountService.insertTransactionRecord(request);
         AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
-        AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL, ", result is null");
         AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
         return result;
     }
@@ -116,5 +101,17 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
         return result;
     }
 
+    @Override
+    public AccountBizResult<TransactionRecordItem> queryTransactionByStatus(QueryTransactionRecordRequest request) {
+        AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "Query transaction record request cannot be null");
+        AssertUtil.notBlank(request.getAccountId(),  BusinessResultCode.PARAM_ILLEGAL, "account id cannot be blank");
+        AssertUtil.notEmpty(request.getTxnStatusList(), BusinessResultCode.PARAM_ILLEGAL, "txn status list cannot be empty");
+        // set cross invoke
+        AccountBizResult<TransactionRecordItem> result = accountService.queryTransactionByStatus(request);
+        AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
+        AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL, ", result is null");
+        AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
+        return result;
+    }
 
 }

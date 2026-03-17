@@ -21,7 +21,7 @@ public interface BusinessService {
      * @param request
      * @return
      */
-    BusinessBizResult<String> transfer(TransferRequest request, String userId);
+    BusinessBizResult<String> transferInit(TransferRequest request, String userId);
 
     /**
      * confirm otp for transfer over limit

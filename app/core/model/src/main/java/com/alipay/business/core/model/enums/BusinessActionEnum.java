@@ -7,7 +7,7 @@ public enum BusinessActionEnum {
     QUERY_TRANSACTION_DETAILS("QUERY_TRANSACTION_DETAILS", "Query transaction details"),
     QUERY_TRANSACTION_HISTORY("QUERY_TRANSACTION_HISTORY", "Query transaction history"),
     QUERY_BALANCE("QUERY_BALANCE", "Query account balance"),
-    PASSWORD_CONFIRM("PASSWORD_CONFIRM","Password Confirmation"),
+    CONFIRM_TRANSFER("CONFIRM_TRANSFER","Password Confirmation, Initiate transfer"),
     UPDATE_IDEMPOTENCY_KEYS("UPDATE_IDEMPOTENCY_KEYS", "update idempotency keys"),
     QUERY_IDEMPOTENCY_KEYS("QUERY_IDEMPOTENCY_KEYS","query idempotency keys" );
 

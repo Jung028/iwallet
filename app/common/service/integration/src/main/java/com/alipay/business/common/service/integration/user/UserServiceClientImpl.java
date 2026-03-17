@@ -5,11 +5,9 @@ import com.alipay.business.common.service.integration.AbstractServiceClient;
 import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
 import com.alipay.usercenter.common.service.facade.enums.OTPSceneEnum;
+import com.alipay.usercenter.common.service.facade.item.OtpVerifiedClaims;
 import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
-import com.alipay.usercenter.common.service.facade.request.OTPRequest;
-import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
-import com.alipay.usercenter.common.service.facade.request.VerifyOtpRequest;
-import com.alipay.usercenter.common.service.facade.request.VerifyUserAuthRequest;
+import com.alipay.usercenter.common.service.facade.request.*;
 import com.alipay.usercenter.common.service.facade.result.OTPResult;
 import org.springframework.stereotype.Service;
 
@@ -86,6 +84,16 @@ public class UserServiceClientImpl extends AbstractServiceClient implements User
         AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL, ", result is null");
         AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
         return result;
+    }
+
+    @Override
+    public void verifyVerifiedToken(VerifyVerifiedTokenRequest request) {
+        AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, ", verify verified token request is null");
+        AssertUtil.notBlank(request.getVerifiedToken(), BusinessResultCode.PARAM_ILLEGAL, ", verified token cannot be blank");
+
+        UserBizResult<OtpVerifiedClaims> result = userService.verifyVerifiedToken(request);
+        AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
+        AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
     }
 
 

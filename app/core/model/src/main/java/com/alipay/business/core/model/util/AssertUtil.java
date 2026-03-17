@@ -1,10 +1,13 @@
 package com.alipay.business.core.model.util;
 
  
+import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.core.model.exception.BaseSlipException;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 public class AssertUtil {
 
@@ -26,8 +29,13 @@ public class AssertUtil {
     public static void isTrue(final boolean expression, final BusinessResultCode businessResultCode,
                               final String resultMsg) {
         check(() -> Assert.isTrue(expression,"is true"), businessResultCode, resultMsg);
-    } 
- 
+    }
+
+    public static void notEmpty(List<String> txnStatusList, BusinessResultCode businessResultCode, String s) {
+        check(() -> Assert.notEmpty((txnStatusList),"is true"),
+                businessResultCode, s);
+    }
+
 
     public static interface AssertTemplate {
         public void doAssert();

@@ -6,9 +6,10 @@ public enum IdempotencyKeysStatusEnum {
     PENDING("PENDING", "transaction is in pending state"),
     SUCCESS("SUCCESS", "idempotency check is success" ),
     FAILED("FAILED", "failed to insert idempotent record"),
-    PROCESSING("PROCESSING", "idempotency check is processing")
-
-    ;
+    PROCESSING("PROCESSING", "idempotency check is processing"),
+    OTP_OVER_LIMIT("OTP_OVER_LIMIT", "require OTP verification for transfer amount over limit"),
+    TIMED_LOCKOUT("TIMED_LOCKOUT", "lockout user from making transfers for a specific time"),
+    PERMANENT_LOCKOUT("PERMANENT_LOCKOUT", "lockout user permanently, requires change of password/recovery");
     private String code;
     private String desc;
 

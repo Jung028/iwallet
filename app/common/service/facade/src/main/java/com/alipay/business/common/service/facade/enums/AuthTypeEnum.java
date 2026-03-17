@@ -6,7 +6,8 @@ package com.alipay.business.common.service.facade.enums;
  */
 public enum AuthTypeEnum {
     AUTH_TRANSFER("CONFIRM_TRANSFER", "confirm password for transfer operation"),
-    AUTH_QUERY_BALANCE("CONFIRM_QUERY_BALANCE", "confirm password for query balance")
+    AUTH_QUERY_BALANCE("CONFIRM_QUERY_BALANCE", "confirm password for query balance"),
+    OTP("OTP", "confirm OTP verification result")
 
     ;
 

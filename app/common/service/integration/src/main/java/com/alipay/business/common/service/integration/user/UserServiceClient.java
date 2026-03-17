@@ -2,10 +2,7 @@ package com.alipay.business.common.service.integration.user;
 
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
 import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
-import com.alipay.usercenter.common.service.facade.request.OTPRequest;
-import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
-import com.alipay.usercenter.common.service.facade.request.VerifyOtpRequest;
-import com.alipay.usercenter.common.service.facade.request.VerifyUserAuthRequest;
+import com.alipay.usercenter.common.service.facade.request.*;
 import com.alipay.usercenter.common.service.facade.result.OTPResult;
 
 public interface UserServiceClient {
@@ -37,4 +34,11 @@ public interface UserServiceClient {
      * @return
      */
     UserBizResult<String> verifyUserAuth(VerifyUserAuthRequest request);
+
+    /**
+     * verify verified token from OTP
+     *
+     * @param request
+     */
+    void verifyVerifiedToken(VerifyVerifiedTokenRequest request);
 }

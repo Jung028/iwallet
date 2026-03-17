@@ -2,16 +2,13 @@ package com.alipay.business.common.service.facade.request;
 
 import com.alipay.business.common.service.facade.baseresult.BusinessBaseRequest;
 import com.alipay.business.common.service.facade.enums.AuthTypeEnum;
-import com.alipay.business.common.service.facade.money.Money;
-import com.alipay.usercenter.common.service.facade.enums.OTPSceneEnum;
-
-import javax.money.CurrencyUnit;
 
 public class TransferConfirmRequest extends BusinessBaseRequest {
     private String password;
     private String accountId;
     private AuthTypeEnum authTypeEnum;
     private String txnId;
+    private String verifiedToken;
 
     public String getPassword() {
         return password;
@@ -43,5 +40,13 @@ public class TransferConfirmRequest extends BusinessBaseRequest {
 
     public void setTxnId(String txnId) {
         this.txnId = txnId;
+    }
+
+    public String getVerifiedToken() {
+        return verifiedToken;
+    }
+
+    public void setVerifiedToken(String verifiedToken) {
+        this.verifiedToken = verifiedToken;
     }
 }

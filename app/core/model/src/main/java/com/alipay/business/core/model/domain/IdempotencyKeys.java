@@ -16,6 +16,7 @@ public class IdempotencyKeys {
     private Date createdAt;
     private Date updatedAt;
     private int retryCount;
+    private Date lockedUntil;
 
     public Long getId() {
         return id;
@@ -103,5 +104,13 @@ public class IdempotencyKeys {
 
     public void setRetryCount(int retryCount) {
         this.retryCount = retryCount;
+    }
+
+    public Date getLockedUntil() {
+        return lockedUntil;
+    }
+
+    public void setLockedUntil(Date lockedUntil) {
+        this.lockedUntil = lockedUntil;
     }
 }

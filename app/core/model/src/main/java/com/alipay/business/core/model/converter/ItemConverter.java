@@ -4,6 +4,7 @@ import com.alipay.account_center.common.service.facade.baseresult.AccountBizResu
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.account_center.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
+import com.alipay.account_center.common.service.facade.request.QueryTransactionHistoryResult;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
 import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
@@ -17,13 +18,13 @@ import java.util.List;
  * reason for this converter is to prevent account item from being exposed to user center
  */
 public class ItemConverter {
-    public static List<TransactionHistoryItem> convertToTxnHistory(AccountBizResult<List<TransactionHistoryItem>> result) {
-        if  (result == null || result.getResult().isEmpty()) {
+    public static List<TransactionHistoryItem> convertToTxnHistory(AccountBizResult<QueryTransactionHistoryResult> result) {
+        if  (result == null || result.getResult().getTransactionHistoryList().isEmpty()) {
             return Collections.emptyList();
         }
         List<TransactionHistoryItem> items = new ArrayList<>();
         //stream
-        result.getResult().forEach(item -> {
+        result.getResult().getTransactionHistoryList().forEach(item -> {
             TransactionHistoryItem transactionHistoryItem = new TransactionHistoryItem();
             transactionHistoryItem.setAmount(item.getAmount());
             transactionHistoryItem.setStatus(item.getStatus());

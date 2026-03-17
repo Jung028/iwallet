@@ -12,17 +12,17 @@ import java.util.List;
 @Service
 public interface AccountServiceClient {
 
-    AccountBizResult<String> createAccount(CreateAccountRequest request);
-
     AccountBizResult<AccountInfoItem> queryAccountInfo(QueryAccountInfoRequest request);
 
     AccountBizResult<TransactionRecordItem> queryTransactionRecord(QueryTransactionRecordRequest request);
 
-    AccountBizResult<List<TransactionHistoryItem>> queryTransactionHistory(QueryTransactionHistoryRequest request);
+    AccountBizResult<QueryTransactionHistoryResult> queryTransactionHistory(QueryTransactionHistoryRequest request);
 
     AccountBizResult<TransactionRecordItem> insertTransactionRecord(InsertTransactionRecordRequest request);
 
     AccountBizResult<TransactionRecordItem> updateTransactionRecord(UpdateTransactionRecordRequest request);
 
     AccountBizResult<String> publishTransfer(PublishTransferRequest request);
+
+    AccountBizResult<TransactionRecordItem> queryTransactionByStatus(QueryTransactionRecordRequest transactionRecordRequest);
 }

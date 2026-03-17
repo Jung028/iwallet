@@ -7,14 +7,19 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface IdempotencyKeysDAO {
 
-    IdempotencyKeysDO queryIdempotencyKeysByUniqueRequestId(@Param("uniqueRequestId") String uniqueRequestId);
+    IdempotencyKeysDO queryIdempotencyKeysByIdempotencyKey(@Param("idempotencyKey") String idempotencyKey);
 
     IdempotencyKeysDO queryIdempotencyKeysByTxnId(@Param("txnId") String txnId);
 
-    int updateIdempotencyKeys(@Param("txnId") String txnId,
-                                            @Param("status") String status,
-                                            @Param("retryCount") int retryCount);
+    IdempotencyKeysDO queryIdempotencyKeysByRequestHash(@Param("requestHash") String requestHash, @Param("userId") Long userId);
+
+    IdempotencyKeysDO queryActiveIdempotencyKeyByHash(@Param("requestHash") String requestHash, @Param("userId") Long userId);
+
+    int updateIdempotencyKeysByTxnId(IdempotencyKeysDO idempotencyKeysDO);
+
+    int updateIdempotencyKeys(IdempotencyKeysDO idempotencyKeysDO);
 
     int insertIdempotencyKey(IdempotencyKeysDO idempotencyKeysDO);
 
+    int countActiveTransactionsByUserId(@Param("userId") Long userId);
 }
