@@ -22,7 +22,8 @@ public enum BusinessResultCode {
     ACCOUNT_NOT_FOUND(ResultCodeLevel.WARN, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "02", "Account Not Found"),
     INVALID_REQUEST(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "03", "Invalid Request"),
     PASSWORD_INCORRECT(ResultCodeLevel.WARN, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "04", "Password Incorrect" ),
-    ILLEGAL_STATUS(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "05", "Transaction Status is illegal");
+    ILLEGAL_STATUS(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "05", "Transaction Status is illegal"),
+    INSUFFICIENT_BALANCE(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "06","Insufficient balance");
 
     private final String code;
 

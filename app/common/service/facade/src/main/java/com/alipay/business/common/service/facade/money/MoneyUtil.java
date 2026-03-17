@@ -81,4 +81,5 @@ public class MoneyUtil {
         BigDecimal bd = BigDecimal.valueOf(minor, scale);
         return Money.of(bd, currency);
     }
+
 }

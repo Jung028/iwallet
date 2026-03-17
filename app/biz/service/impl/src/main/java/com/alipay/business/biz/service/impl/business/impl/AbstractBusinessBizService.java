@@ -1,5 +1,6 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
+import com.alipay.business.biz.service.impl.auth.TransferTokenService;
 import com.alipay.business.biz.service.impl.template.BusinessServiceTemplate;
 import com.alipay.business.common.service.facade.api.BusinessService;
 import com.alipay.business.common.service.integration.account.AccountServiceClient;
@@ -12,6 +13,9 @@ public abstract class AbstractBusinessBizService {
 
     @Autowired
     protected BusinessServiceTemplate businessServiceTemplate;
+
+    @Autowired
+    protected TransferTokenService transferTokenService;
 
     @Autowired
     protected AccountServiceClient accountServiceClient;

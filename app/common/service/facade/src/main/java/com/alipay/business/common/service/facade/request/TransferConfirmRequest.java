@@ -9,6 +9,7 @@ public class TransferConfirmRequest extends BusinessBaseRequest {
     private AuthTypeEnum authTypeEnum;
     private String txnId;
     private String verifiedToken;
+    private String transferToken;
 
     public String getPassword() {
         return password;
@@ -48,5 +49,13 @@ public class TransferConfirmRequest extends BusinessBaseRequest {
 
     public void setVerifiedToken(String verifiedToken) {
         this.verifiedToken = verifiedToken;
+    }
+
+    public String getTransferToken() {
+        return transferToken;
+    }
+
+    public void setTransferToken(String transferToken) {
+        this.transferToken = transferToken;
     }
 }
