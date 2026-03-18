@@ -20,7 +20,7 @@ public class TransferTokenService {
 
     private static final long TTL_MILLIS = 10 * 60 * 1000; // 10 minutes
 
-//    @Value("${transfer.token.secret}")   // put this in your application.properties
+    @Value("${transfer.token.secret}")   // put this in your application.properties
     private String secret;
 
     public String issue(String uniqueRequestId,

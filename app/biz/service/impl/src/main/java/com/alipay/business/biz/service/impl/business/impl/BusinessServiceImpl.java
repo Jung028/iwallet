@@ -6,6 +6,7 @@ import com.alipay.account_center.common.service.facade.enums.TransactionTypeEnum
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.*;
+import com.alipay.business.biz.service.impl.auth.JwtUtil;
 import com.alipay.business.biz.service.impl.auth.TransferTokenPayload;
 import com.alipay.business.biz.service.impl.checker.BusinessRequestChecker;
 import com.alipay.business.biz.service.impl.helper.ResponseBuilder;
@@ -20,6 +21,7 @@ import com.alipay.business.common.service.facade.money.MoneyUtil;
 import com.alipay.business.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.request.TransferRequest;
 import com.alipay.business.common.service.facade.result.*;
+import com.alipay.business.common.util.requesthash.HashUtil;
 import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
@@ -39,7 +41,9 @@ import javax.money.CurrencyUnit;
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Business service impl
@@ -111,7 +115,6 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                         boolean requiresOtp = requestAmount.isGreaterThan(LIMIT);
 
-                        //TODO: use user center to validate adn issue
                         String transferToken = transferTokenService.issue(
                                 request.getUniqueRequestId(),
                                 request.getPayerAccountNo(),
@@ -259,6 +262,11 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
                             idempotencyKeys.setIdempotencyKey(payload.getUniqueRequestId());
                             idempotencyKeys.setUserId(Long.valueOf(userId));
+                            try {
+                                idempotencyKeys.setRequestHash(HashUtil.generateIdempotentRequestHash(freshBalance, payload.getPayerAccountNo(), payload.getPayeeAccountNo()));
+                            } catch (NoSuchAlgorithmException e) {
+                                throw new RuntimeException(e);
+                            }
                             idempotencyKeys.setTxnId(txnId);
                             idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.PENDING);
                             idempotencyKeys.setRetryCount(0);
