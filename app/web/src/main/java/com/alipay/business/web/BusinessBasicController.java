@@ -70,5 +70,9 @@ public class BusinessBasicController {
         return businessService.queryIdempotencyKeys(request);
     }
 
+    public BusinessBizResult<String> createTopUpIntent(TopUpRequest request) {
+        JwtClaims claims = JwtContextHolder.get();
+        return businessService.createTopUpIntent(request, claims.getSubject());
+    }
 
 }

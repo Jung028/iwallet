@@ -4,6 +4,8 @@ import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
+
 @Mapper
 public interface IdempotencyKeysDAO {
 
@@ -22,4 +24,9 @@ public interface IdempotencyKeysDAO {
     int insertIdempotencyKey(IdempotencyKeysDO idempotencyKeysDO);
 
     int countActiveTransactionsByUserId(@Param("userId") Long userId);
+
+    int updateFailedAttempts(@Param("idempotencyKey") String idempotencyKey, @Param("status") String status,
+                             @Param("retryCount") int retryCount,@Param("lockedUntil") Date lockedUntil);
+
+    int updateTxnId(@Param("idempotencyKey") String idempotencyKey, @Param("txnId") String txnId);
 }

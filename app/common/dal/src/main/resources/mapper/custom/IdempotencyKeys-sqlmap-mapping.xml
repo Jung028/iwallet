@@ -55,6 +55,24 @@
         ORDER BY created_at DESC LIMIT 1
     </select>
 
+
+    <update id="updateFailedAttempts" parameterType="String">
+        UPDATE idempotency_keys
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="retryCount != null">retry_count = #{retryCount},</if>
+            <if test="lockedUntil != null">locked_until = #{lockedUntil},</if>
+            updated_at = NOW()
+        </set>
+        WHERE idempotency_key = #{idempotencyKey}
+    </update>
+
+    <update id="updateTxnId" parameterType="String">
+        UPDATE idempotency_keys
+        SET txn_id = #{txnId}
+        WHERE idempotency_key = #{idempotencyKey}
+    </update>
+
     <update id="updateIdempotencyKeysByTxnId" parameterType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
         UPDATE idempotency_keys
         <set>

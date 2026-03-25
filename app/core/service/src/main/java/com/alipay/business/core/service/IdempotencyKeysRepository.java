@@ -1,8 +1,5 @@
 package com.alipay.business.core.service;
 
-import com.alipay.business.common.dal.auto.custom.IdempotencyKeysDAO;
-import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
-import com.alipay.business.common.service.facade.request.UpdateIdempotencyKeysRequest;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import org.springframework.stereotype.Repository;
 
@@ -20,7 +17,13 @@ public interface IdempotencyKeysRepository {
 
     void insertIdempotencyKey(IdempotencyKeys idempotencyKeys);
 
+    void updateFailedAttempts(IdempotencyKeys idempotencyKeys);
+
+    void updateTxnId(String idempotencyKey, String txnId);
+
     int updateIdempotencyKeys(IdempotencyKeys idempotencyKeys);
 
     int countActiveTransactionsByUserId(Long userId);
+
+    boolean existsByPaymentIntentId(String id);
 }

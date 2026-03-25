@@ -18,6 +18,7 @@ public interface BusinessService {
 
     /**
      * transfer
+     *
      * @param request
      * @return
      */
@@ -25,6 +26,7 @@ public interface BusinessService {
 
     /**
      * confirm otp for transfer over limit
+     *
      * @param request
      * @param userId
      * @return
@@ -33,6 +35,7 @@ public interface BusinessService {
 
     /**
      * query transaction details
+     *
      * @param request
      * @return
      */
@@ -40,6 +43,7 @@ public interface BusinessService {
 
     /**
      * query transaction history
+     *
      * @param request
      * @return
      */
@@ -47,6 +51,7 @@ public interface BusinessService {
 
     /**
      * query balance
+     *
      * @param request
      * @return
      */
@@ -54,6 +59,7 @@ public interface BusinessService {
 
     /**
      * update idempotency keys
+     *
      * @param request
      * @return
      */
@@ -63,6 +69,7 @@ public interface BusinessService {
 
     /**
      * query idempotency keys
+     *
      * @param request
      * @return
      */
@@ -70,4 +77,16 @@ public interface BusinessService {
     @Path("queryIdempotencyKeys")
     BusinessBizResult<IdempotencyKeysItem> queryIdempotencyKeys(QueryIdempotencyKeysRequest request);
 
+
+
+
+    BusinessBizResult<TopUpResult> createTopUpIntent(TopUpRequest request, String userId);
+
+
+
+    BusinessBizResult<String> publishTopUp(PublishTopUpRequest request);
+
+
+
+    BusinessBizResult<String> chargeCard(ChargeCardRequest request, String userId);
 }

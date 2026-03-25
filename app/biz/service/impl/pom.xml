@@ -32,6 +32,11 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>26.0.0</version> <!-- Use the latest version -->
+        </dependency>
+        <dependency>
             <groupId>org.adam</groupId>
             <artifactId>business-common-util</artifactId>
             <version>1.0-SNAPSHOT</version>

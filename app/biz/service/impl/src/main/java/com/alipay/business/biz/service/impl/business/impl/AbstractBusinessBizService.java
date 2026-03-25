@@ -1,10 +1,9 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
-import com.alipay.business.biz.service.impl.auth.JwtUtil;
 import com.alipay.business.biz.service.impl.auth.TransferTokenService;
 import com.alipay.business.biz.service.impl.template.BusinessServiceTemplate;
-import com.alipay.business.common.service.facade.api.BusinessService;
 import com.alipay.business.common.service.integration.account.AccountServiceClient;
+import com.alipay.business.common.service.integration.user.TopUpServiceClient;
 import com.alipay.business.common.service.integration.user.UserServiceClient;
 import com.alipay.business.core.service.IdempotencyKeysRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,21 +27,9 @@ public abstract class AbstractBusinessBizService {
     protected UserServiceClient userServiceClient;
 
     @Autowired
+    protected TopUpServiceClient topUpServiceClient;
+
+    @Autowired
     protected TransactionTemplate transactionTemplate;
 
-    public void setBusinessServiceTemplate(BusinessServiceTemplate businessServiceTemplate) {
-        this.businessServiceTemplate = businessServiceTemplate;
-    }
-
-    public void setAccountServiceClient(AccountServiceClient accountServiceClient) {
-        this.accountServiceClient = accountServiceClient;
-    }
-
-    public void setIdempotencyKeysRepository(IdempotencyKeysRepository idempotencyKeysRepository) {
-        this.idempotencyKeysRepository = idempotencyKeysRepository;
-    }
-
-    public void setUserServiceClient(UserServiceClient userServiceClient) {
-        this.userServiceClient = userServiceClient;
-    }
 }

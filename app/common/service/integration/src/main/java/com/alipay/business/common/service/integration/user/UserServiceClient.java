@@ -41,4 +41,18 @@ public interface UserServiceClient {
      * @param request
      */
     void verifyVerifiedToken(VerifyVerifiedTokenRequest request);
+
+    /**
+     * update user ext info
+     *
+     * @param updateRequest
+     */
+    void updateExtInfo(UpdateUserInfoRequest updateRequest);
+
+    /**
+     * save card details
+     *
+     * @param insertNewCardRequest
+     */
+    void insertNewCard(InsertNewCardRequest insertNewCardRequest);
 }

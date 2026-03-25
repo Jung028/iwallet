@@ -96,5 +96,38 @@ public class UserServiceClientImpl extends AbstractServiceClient implements User
         AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
     }
 
+    @Override
+    public void updateExtInfo(UpdateUserInfoRequest request) {
+        AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, ", verify verified token request is null");
+        AssertUtil.notBlank(request.getExtInfo(), BusinessResultCode.PARAM_ILLEGAL, ", extInfo cannot be blank");
+        AssertUtil.notBlank(request.getUserId(), BusinessResultCode.PARAM_ILLEGAL, ", userId cannot be blank");
+
+        UserBizResult<String> result = userService.updateExtInfo(request);
+        AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
+        AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
+    }
+
+    @Override
+    public void insertNewCard(InsertNewCardRequest request) {
+        AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "SaveCardRequest is null");
+        AssertUtil.notBlank(request.getUserId(), BusinessResultCode.PARAM_ILLEGAL, "userId cannot be blank");
+        AssertUtil.notBlank(request.getStripeCustomerId(), BusinessResultCode.PARAM_ILLEGAL, "stripeCustomerId cannot be blank");
+        AssertUtil.notBlank(request.getProviderToken(), BusinessResultCode.PARAM_ILLEGAL, "providerToken cannot be blank");
+        AssertUtil.notBlank(request.getLast4(), BusinessResultCode.PARAM_ILLEGAL, "last4 cannot be blank");
+        AssertUtil.isTrue(request.getLast4().length() == 4, BusinessResultCode.PARAM_ILLEGAL, "last4 must be exactly 4 digits");
+        AssertUtil.notBlank(String.valueOf(request.getCardIssuer()), BusinessResultCode.PARAM_ILLEGAL, "card network cannot be blank");
+        AssertUtil.notNull(request.getExpiryMonth(), BusinessResultCode.PARAM_ILLEGAL, "expiryMonth cannot be null");
+        AssertUtil.notBlank(String.valueOf(request.getExpiryMonth()), BusinessResultCode.PARAM_ILLEGAL, "expiryMonth must be between 1 and 12");
+        AssertUtil.isTrue(request.getExpiryMonth() >= 1 && request.getExpiryMonth() <= 12, BusinessResultCode.PARAM_ILLEGAL, "expiryMonth must be between 1 and 12");
+        AssertUtil.notBlank(String.valueOf(request.getExpiryYear()), BusinessResultCode.PARAM_ILLEGAL, "expiryYear cannot be null");
+        AssertUtil.notNull(request.getExpiryYear(), BusinessResultCode.PARAM_ILLEGAL, "expiryYear cannot be null");
+        AssertUtil.isTrue(request.getExpiryYear() >= 2020, BusinessResultCode.PARAM_ILLEGAL, "expiryYear is invalid");
+        AssertUtil.notNull(request.getDefault(), BusinessResultCode.PARAM_ILLEGAL, "default flag cannot be null");
+
+        UserBizResult<String> result = topUpService.insertNewCard(request);
+        AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
+        AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
+    }
+
 
 }

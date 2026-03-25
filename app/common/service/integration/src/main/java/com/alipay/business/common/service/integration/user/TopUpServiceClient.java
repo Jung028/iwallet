@@ -1,0 +1,22 @@
+package com.alipay.business.common.service.integration.user;
+
+import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
+import com.alipay.usercenter.common.service.facade.item.UserCardDetailItem;
+import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
+import com.alipay.usercenter.common.service.facade.request.QueryDefaultCardRequest;
+import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
+
+/**
+ * @author adam
+ * @date 24/3/2026 11:17 PM
+ */
+public interface TopUpServiceClient {
+
+    /**
+     * query user info
+     * @param request
+     * @return
+     */
+    UserBizResult<UserCardDetailItem> queryDefaultCard(QueryDefaultCardRequest request);
+
+}

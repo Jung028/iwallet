@@ -2,7 +2,6 @@ package com.alipay.business.core.service.repository;
 
 import com.alipay.business.common.dal.auto.custom.IdempotencyKeysDAO;
 import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
-import com.alipay.business.common.service.facade.request.UpdateIdempotencyKeysRequest;
 import com.alipay.business.core.model.converter.ModelConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.exception.RepositoryException;
@@ -54,6 +53,38 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
     }
 
     @Override
+    public void updateFailedAttempts(IdempotencyKeys idempotencyKeys) {
+        try {
+            int rows = idempotencyKeysDAO.updateFailedAttempts(idempotencyKeys.getIdempotencyKey(),
+                    idempotencyKeys.getStatus().toString(), idempotencyKeys.getRetryCount(),
+                    idempotencyKeys.getLockedUntil());
+            if (rows <= 0) {
+                throw new RepositoryException("Update affected 0 rows for idempotencyKey: "
+                        + idempotencyKeys.getIdempotencyKey());
+            }
+        } catch (RepositoryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RepositoryException("DB error during update idempotency key", e);
+        }
+    }
+
+    @Override
+    public void updateTxnId(String idempotencyKey, String txnId) {
+        try {
+            int rows = idempotencyKeysDAO.updateTxnId(idempotencyKey, txnId);
+            if (rows <= 0) {
+                throw new RepositoryException("Update affected 0 rows for idempotencyKey: "
+                        + idempotencyKey);
+            }
+        } catch (RepositoryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RepositoryException("DB error during update idempotency key", e);
+        }
+    }
+
+    @Override
     public int updateIdempotencyKeys(IdempotencyKeys idempotencyKeys) {
         try {
             IdempotencyKeysDO idempotencyKeysDO = modelConverter.convertToDO(idempotencyKeys);
@@ -76,6 +107,11 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
             return 0;
         }
         return idempotencyKeysDAO.countActiveTransactionsByUserId(userId);
+    }
+
+    @Override
+    public boolean existsByPaymentIntentId(String id) {
+        return idempotencyKeysDAO.queryIdempotencyKeysByPaymentIntentId(id);
     }
 
     @Override

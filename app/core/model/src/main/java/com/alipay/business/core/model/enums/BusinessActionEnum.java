@@ -9,7 +9,12 @@ public enum BusinessActionEnum {
     QUERY_BALANCE("QUERY_BALANCE", "Query account balance"),
     CONFIRM_TRANSFER("CONFIRM_TRANSFER","Password Confirmation, Initiate transfer"),
     UPDATE_IDEMPOTENCY_KEYS("UPDATE_IDEMPOTENCY_KEYS", "update idempotency keys"),
-    QUERY_IDEMPOTENCY_KEYS("QUERY_IDEMPOTENCY_KEYS","query idempotency keys" );
+    QUERY_IDEMPOTENCY_KEYS("QUERY_IDEMPOTENCY_KEYS","query idempotency keys" ),
+    CHARGE_CARD("CHARGE_CARD", "charge card"),
+
+    PUBLISH_TOP_UP("PUBLISH_TOP_UP", "publish top up"),
+
+    CREATE_TOP_UP_INTENT("CREATE_TOP_UP_INTENT", "create top up intent"),;
 
     private String code;
     private String desc;

@@ -23,7 +23,11 @@ public enum BusinessResultCode {
     INVALID_REQUEST(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "03", "Invalid Request"),
     PASSWORD_INCORRECT(ResultCodeLevel.WARN, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "04", "Password Incorrect" ),
     ILLEGAL_STATUS(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "05", "Transaction Status is illegal"),
-    INSUFFICIENT_BALANCE(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "06","Insufficient balance");
+    INSUFFICIENT_BALANCE(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "06","Insufficient balance"),
+    CARD_NOT_FOUND(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "07","Card Not Found"),
+
+
+    ;
 
     private final String code;
 
