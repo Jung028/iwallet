@@ -7,19 +7,19 @@ import org.springframework.stereotype.Repository;
 public interface IdempotencyKeysRepository {
     IdempotencyKeys queryIdempotencyKeysByIdempotencyKey(String idempotencyKey);
 
-    IdempotencyKeys queryIdempotencyKeysByTxnId(String txnId);
+    IdempotencyKeys queryIdempotencyKeysByReferenceId(String referenceId);
 
     IdempotencyKeys queryIdempotencyKeysByRequestHash(String requestHash, Long userId);
 
     IdempotencyKeys queryActiveIdempotencyKeyByHash(String requestHash, Long userId);
 
-    int updateIdempotencyKeysByTxnId(IdempotencyKeys idempotencyKeys);
+    int updateIdempotencyKeysByReferenceId(IdempotencyKeys idempotencyKeys);
 
     void insertIdempotencyKey(IdempotencyKeys idempotencyKeys);
 
     void updateFailedAttempts(IdempotencyKeys idempotencyKeys);
 
-    void updateTxnId(String idempotencyKey, String txnId);
+    void updateReferenceId(String idempotencyKey, String referenceId);
 
     int updateIdempotencyKeys(IdempotencyKeys idempotencyKeys);
 

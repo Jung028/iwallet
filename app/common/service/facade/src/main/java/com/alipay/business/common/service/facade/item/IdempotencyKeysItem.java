@@ -3,17 +3,17 @@ package com.alipay.business.common.service.facade.item;
 import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
 
 public class IdempotencyKeysItem {
-    private String txnId;
+    private String referenceId;
     private String status;
     private Long userId;
     private int retryCount;
 
-    public String getTxnId() {
-        return txnId;
+    public String getReferenceId() {
+        return referenceId;
     }
 
-    public void setTxnId(String txnId) {
-        this.txnId = txnId;
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
     }
 
     public String getStatus() {

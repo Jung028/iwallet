@@ -40,14 +40,14 @@ public class BusinessRequestChecker {
     public static void checkUpdateIdempotencyKeysRequest(UpdateIdempotencyKeysRequest request) {
         // make sure that the request to update the status should only be within
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "request is null");
-        AssertUtil.notBlank(request.getTxnId(), BusinessResultCode.PARAM_ILLEGAL, "requestTxnId is required");
+        AssertUtil.notBlank(request.getReferenceId(), BusinessResultCode.PARAM_ILLEGAL, "requestTxnId is required");
         AssertUtil.notBlank(String.valueOf(request.getRetryCount()), BusinessResultCode.PARAM_ILLEGAL, "retry count is required");
         AssertUtil.notBlank(request.getStatus().getCode(), BusinessResultCode.PARAM_ILLEGAL, "status is required");
     }
 
     public static void checkQueryIdempotencyKeysRequest(QueryIdempotencyKeysRequest request) {
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "request is null");
-        AssertUtil.notBlank(request.getTxnId(), BusinessResultCode.PARAM_ILLEGAL, "requestTxnId is required");
+        AssertUtil.notBlank(request.getReferenceId(), BusinessResultCode.PARAM_ILLEGAL, "requestTxnId is required");
     }
 
     public static void checkCreateTopUpIntentRequest(TopUpRequest request) {

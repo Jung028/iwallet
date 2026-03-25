@@ -22,7 +22,7 @@ public class ModelConverter {
         keys.setUserId(idempotencyKeysDO.getUserId());
         keys.setIdempotencyKey(idempotencyKeysDO.getIdempotencyKey());
         keys.setRequestHash(idempotencyKeysDO.getRequestHash());
-        keys.setTxnId(idempotencyKeysDO.getTxnId());
+        keys.setReferenceId(idempotencyKeysDO.getReferenceId());
         keys.setStatus(IdempotencyKeysStatusEnum.valueOf(idempotencyKeysDO.getStatus()));
         keys.setErrorCode(idempotencyKeysDO.getErrorCode());
         keys.setResponseSnapshot(idempotencyKeysDO.getResponseSnapshot());
@@ -40,7 +40,7 @@ public class ModelConverter {
         keys.setUserId(idempotencyKeys.getUserId());
         keys.setIdempotencyKey(idempotencyKeys.getIdempotencyKey());
         keys.setRequestHash(idempotencyKeys.getRequestHash());
-        keys.setTxnId(idempotencyKeys.getTxnId());
+        keys.setReferenceId(idempotencyKeys.getReferenceId());
         keys.setStatus(idempotencyKeys.getStatus().getCode());
         keys.setErrorCode(idempotencyKeys.getErrorCode());
         keys.setResponseSnapshot(idempotencyKeys.getResponseSnapshot());

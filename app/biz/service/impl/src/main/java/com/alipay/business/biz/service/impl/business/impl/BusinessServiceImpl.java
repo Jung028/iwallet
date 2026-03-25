@@ -206,7 +206,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         IdempotencyKeys existingKey = idempotencyKeysRepository
                                 .queryIdempotencyKeysByIdempotencyKey(payload.getUniqueRequestId());
 
-                        if (existingKey != null && existingKey.getTxnId() != null) {
+                        if (existingKey != null && existingKey.getReferenceId() != null) {
                             if (existingKey.getStatus().equals(IdempotencyKeysStatusEnum.SUCCESS)) {
                                 response.setResult(existingKey.getResponseSnapshot());
                                 System.out.println("Already processed");
@@ -214,7 +214,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             }
                             if (existingKey.getStatus().equals(IdempotencyKeysStatusEnum.PENDING) ||
                                     existingKey.getStatus().equals(IdempotencyKeysStatusEnum.PROCESSING)) {
-                                ResponseBuilder.success(response, existingKey.getTxnId(),
+                                ResponseBuilder.success(response, existingKey.getReferenceId(),
                                         BusinessActionEnum.TRANSFER.getCode(),
                                         "Transfer is already in progress");
                                 return;
@@ -304,11 +304,11 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                     BusinessResultCode.SYSTEM_EXCEPTION,
                                     "Failed to create transaction record");
 
-                            String txnId = transactionRecord.getResult().getTxnId();
+                            String referenceId = transactionRecord.getResult().getTxnId();
 
-                            idempotencyKeysRepository.updateTxnId(payload.getUniqueRequestId(), txnId);
+                            idempotencyKeysRepository.updateReferenceId(payload.getUniqueRequestId(), referenceId);
 
-                            ResponseBuilder.success(response, txnId,
+                            ResponseBuilder.success(response, referenceId,
                                     BusinessActionEnum.TRANSFER.getCode(),
                                     BusinessActionEnum.TRANSFER.getDesc());
 
@@ -486,15 +486,15 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                     protected void process(UpdateIdempotencyKeysRequest request, BusinessBizResult<UpdateIdempotencyKeysResult> response) {
                         // update idempotency keys status to Error or finished after account center finish debit and credit accounts
                         IdempotencyKeys updateIdempotencyKeys = new IdempotencyKeys();
-                        updateIdempotencyKeys.setTxnId(request.getTxnId());
+                        updateIdempotencyKeys.setReferenceId(request.getReferenceId());
                         updateIdempotencyKeys.setStatus(request.getStatus());
                         updateIdempotencyKeys.setRetryCount(request.getRetryCount());
-                        int rows = idempotencyKeysRepository.updateIdempotencyKeysByTxnId(updateIdempotencyKeys);
+                        int rows = idempotencyKeysRepository.updateIdempotencyKeysByReferenceId(updateIdempotencyKeys);
 
-                        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.queryIdempotencyKeysByTxnId(request.getTxnId());
+                        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.queryIdempotencyKeysByReferenceId(request.getReferenceId());
                         if (rows > 0) {
                             UpdateIdempotencyKeysResult updateIdempotencyKeysResult = new UpdateIdempotencyKeysResult();
-                            updateIdempotencyKeysResult.setTxnId(idempotencyKeys.getTxnId());
+                            updateIdempotencyKeysResult.setReferenceId(idempotencyKeys.getReferenceId());
                             updateIdempotencyKeysResult.setStatus(idempotencyKeys.getStatus().getCode());
                             updateIdempotencyKeysResult.setRetryCount(idempotencyKeys.getRetryCount());
 
@@ -528,7 +528,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                     @Override
                     protected void process(QueryIdempotencyKeysRequest request, BusinessBizResult<IdempotencyKeysItem> response) {
                         // update idempotency keys status to Error or finished after account center finish debit and credit accounts
-                        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.queryIdempotencyKeysByTxnId(request.getTxnId());
+                        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository.queryIdempotencyKeysByReferenceId(request.getReferenceId());
                         if (idempotencyKeys != null) {
                             //convert to idempotency Keys item,
                             ResponseBuilder.success(response, ItemConverter.convertToIdempotencyKeys(idempotencyKeys), BusinessActionEnum.QUERY_IDEMPOTENCY_KEYS.getCode(),
@@ -657,6 +657,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                 // 3. Idempotency guard — Stripe fires webhooks at least once,
                 //    sometimes twice. Also handles Flow B sync credit duplicate.
+                // can we set the first few numbers to idemptify that tis apymentIntentId, because other idempotencyKey is nroamlly frontedn generated
                 if (idempotencyKeysRepository
                         .existsByPaymentIntentId(intent.getId())) {
                     logger.info("Duplicate webhook for pi={}, skipping",

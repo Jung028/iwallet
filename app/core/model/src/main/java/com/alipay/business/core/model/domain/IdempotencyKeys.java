@@ -9,7 +9,7 @@ public class IdempotencyKeys {
     private String idempotencyKey;
     private Long userId;
     private String requestHash;
-    private String txnId;
+    private String referenceId;
     private IdempotencyKeysStatusEnum status;
     private String errorCode;
     private String responseSnapshot;
@@ -50,12 +50,12 @@ public class IdempotencyKeys {
         this.requestHash = requestHash;
     }
 
-    public String getTxnId() {
-        return txnId;
+    public String getReferenceId() {
+        return referenceId;
     }
 
-    public void setTxnId(String txnId) {
-        this.txnId = txnId;
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
     }
 
     public IdempotencyKeysStatusEnum getStatus() {

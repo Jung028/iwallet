@@ -29,8 +29,8 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
     }
 
     @Override
-    public IdempotencyKeys queryIdempotencyKeysByTxnId(String txnId) {
-        IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.queryIdempotencyKeysByTxnId(txnId);
+    public IdempotencyKeys queryIdempotencyKeysByReferenceId(String referenceId) {
+        IdempotencyKeysDO idempotencyKeysDO = idempotencyKeysDAO.queryIdempotencyKeysByReferenceId(referenceId);
         return modelConverter.convertToModel(idempotencyKeysDO);
     }
 
@@ -70,9 +70,9 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
     }
 
     @Override
-    public void updateTxnId(String idempotencyKey, String txnId) {
+    public void updateReferenceId(String idempotencyKey, String referenceId) {
         try {
-            int rows = idempotencyKeysDAO.updateTxnId(idempotencyKey, txnId);
+            int rows = idempotencyKeysDAO.updateReferenceId(idempotencyKey, referenceId);
             if (rows <= 0) {
                 throw new RepositoryException("Update affected 0 rows for idempotencyKey: "
                         + idempotencyKey);
@@ -111,16 +111,17 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
 
     @Override
     public boolean existsByPaymentIntentId(String id) {
-        return idempotencyKeysDAO.queryIdempotencyKeysByPaymentIntentId(id);
+        //return idempotencyKeysDAO.queryIdempotencyKeysByRequestHash(id);
+        return false;
     }
 
     @Override
-    public int updateIdempotencyKeysByTxnId(IdempotencyKeys idempotencyKeys) {
+    public int updateIdempotencyKeysByReferenceId(IdempotencyKeys idempotencyKeys) {
         try {
             IdempotencyKeysDO idempotencyKeysDO = modelConverter.convertToDO(idempotencyKeys);
-            int rows = idempotencyKeysDAO.updateIdempotencyKeysByTxnId(idempotencyKeysDO);
+            int rows = idempotencyKeysDAO.updateIdempotencyKeysByReferenceId(idempotencyKeysDO);
             if (rows <= 0) {
-                throw new RepositoryException("Update affected 0 rows for txnId: " + idempotencyKeys.getTxnId());
+                throw new RepositoryException("Update affected 0 rows for referenceId: " + idempotencyKeys.getReferenceId());
             }
             return rows;
         } catch (RepositoryException e) {

@@ -79,7 +79,7 @@ public class ItemConverter {
     public static IdempotencyKeysItem convertToIdempotencyKeys(IdempotencyKeys idempotencyKeys) {
         IdempotencyKeysItem idempotencyKeyItem = new IdempotencyKeysItem();
         idempotencyKeyItem.setUserId(idempotencyKeys.getUserId());
-        idempotencyKeyItem.setTxnId(idempotencyKeys.getTxnId());
+        idempotencyKeyItem.setReferenceId(idempotencyKeys.getReferenceId());
         idempotencyKeyItem.setStatus(idempotencyKeys.getStatus().getCode());
         idempotencyKeyItem.setRetryCount(idempotencyKeyItem.getRetryCount());
         return idempotencyKeyItem;

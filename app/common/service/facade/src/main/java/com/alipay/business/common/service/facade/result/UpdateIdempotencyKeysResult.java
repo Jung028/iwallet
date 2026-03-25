@@ -4,7 +4,7 @@ import com.alipay.business.common.service.facade.baseresult.BusinessBaseResult;
 
 public class UpdateIdempotencyKeysResult extends BusinessBaseResult {
     private String status;
-    private String txnId;
+    private String referenceId;
     private int retryCount;
 
     public String getStatus() {
@@ -15,12 +15,12 @@ public class UpdateIdempotencyKeysResult extends BusinessBaseResult {
         this.status = status;
     }
 
-    public String getTxnId() {
-        return txnId;
+    public String getReferenceId() {
+        return referenceId;
     }
 
-    public void setTxnId(String txnId) {
-        this.txnId = txnId;
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
     }
 
     public int getRetryCount() {

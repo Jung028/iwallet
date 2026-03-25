@@ -4,16 +4,16 @@ import com.alipay.business.common.service.facade.baseresult.BusinessBaseRequest;
 import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
 
 public class UpdateIdempotencyKeysRequest extends BusinessBaseRequest {
-    private String txnId;
+    private String referenceId;
     private IdempotencyKeysStatusEnum status;
     private int retryCount;
 
-    public String getTxnId() {
-        return txnId;
+    public String getReferenceId() {
+        return referenceId;
     }
 
-    public void setTxnId(String txnId) {
-        this.txnId = txnId;
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
     }
 
     public IdempotencyKeysStatusEnum getStatus() {
