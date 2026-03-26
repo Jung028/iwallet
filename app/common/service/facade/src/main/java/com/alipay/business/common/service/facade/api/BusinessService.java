@@ -84,9 +84,5 @@ public interface BusinessService {
 
 
 
-    BusinessBizResult<String> publishTopUp(PublishTopUpRequest request);
-
-
-
     BusinessBizResult<String> chargeCard(ChargeCardRequest request, String userId);
 }

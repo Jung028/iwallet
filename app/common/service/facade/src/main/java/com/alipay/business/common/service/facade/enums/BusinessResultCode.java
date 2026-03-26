@@ -25,6 +25,8 @@ public enum BusinessResultCode {
     ILLEGAL_STATUS(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "05", "Transaction Status is illegal"),
     INSUFFICIENT_BALANCE(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "06","Insufficient balance"),
     CARD_NOT_FOUND(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "07","Card Not Found"),
+    PAYMENT_INTENT_ILLEGAL(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "08","Payment intent Illegal"),
+    INVALID_WEBHOOK_SIGNATURE(ResultCodeLevel.ERROR, ResultCodeType.BIZ_ERROR, BusinessBizType.COMMON, "09","Invalid webhook signature"),
 
 
     ;

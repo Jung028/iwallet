@@ -1,7 +1,7 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
 import com.alipay.account_center.common.service.facade.event.EcTransactionEvent;
-import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
+import com.alipay.business.biz.service.impl.business.TransactionService;
 import org.springframework.stereotype.Service;
 
 /**

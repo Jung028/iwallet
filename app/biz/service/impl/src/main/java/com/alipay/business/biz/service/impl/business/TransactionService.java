@@ -1,7 +1,6 @@
-package com.alipay.business.biz.service.impl.business.impl;
+package com.alipay.business.biz.service.impl.business;
 
 import com.alipay.account_center.common.service.facade.event.EcTransactionEvent;
-import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 
 /**
  * @author adam

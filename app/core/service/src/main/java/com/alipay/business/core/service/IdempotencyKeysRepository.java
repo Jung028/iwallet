@@ -24,6 +24,4 @@ public interface IdempotencyKeysRepository {
     int updateIdempotencyKeys(IdempotencyKeys idempotencyKeys);
 
     int countActiveTransactionsByUserId(Long userId);
-
-    boolean existsByPaymentIntentId(String id);
 }

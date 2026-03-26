@@ -110,12 +110,6 @@ public class IdempotencyKeysRepositoryImpl implements IdempotencyKeysRepository 
     }
 
     @Override
-    public boolean existsByPaymentIntentId(String id) {
-        //return idempotencyKeysDAO.queryIdempotencyKeysByRequestHash(id);
-        return false;
-    }
-
-    @Override
     public int updateIdempotencyKeysByReferenceId(IdempotencyKeys idempotencyKeys) {
         try {
             IdempotencyKeysDO idempotencyKeysDO = modelConverter.convertToDO(idempotencyKeys);
