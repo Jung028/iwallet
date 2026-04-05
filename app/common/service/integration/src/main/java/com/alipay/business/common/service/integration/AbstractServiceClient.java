@@ -31,7 +31,7 @@ public class AbstractServiceClient {
      * user service
      */
     @SofaReference(interfaceType = TopUpService.class,
-            binding = @SofaReferenceBinding(bindingType = "rest", directUrl = "http://127.0.0.1:8343"),
+            binding = @SofaReferenceBinding(bindingType = "rest", directUrl = "http://127.0.0.1:8342"),
             jvmFirst = true)
     protected TopUpService topUpService;
 

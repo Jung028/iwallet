@@ -1,7 +1,5 @@
 package com.alipay.business.common.service.facade.item;
 
-import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
-
 public class IdempotencyKeysItem {
     private String referenceId;
     private String status;

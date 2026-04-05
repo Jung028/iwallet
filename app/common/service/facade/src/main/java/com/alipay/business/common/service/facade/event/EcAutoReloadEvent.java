@@ -4,14 +4,12 @@ import java.math.BigDecimal;
 
 /**
  * @author adam
- * @date 24/3/2026 10:07 PM
+ * @date 26/3/2026 6:44 PM
  */
-public class EcTopUpEvent {
+public class EcAutoReloadEvent {
     private String userId;
     private BigDecimal amount;
     private String currency;
-    private String paymentIntentId;
-    private long gmtTaskOccur;
 
     public String getUserId() {
         return userId;
@@ -35,21 +33,5 @@ public class EcTopUpEvent {
 
     public void setCurrency(String currency) {
         this.currency = currency;
-    }
-
-    public String getPaymentIntentId() {
-        return paymentIntentId;
-    }
-
-    public void setPaymentIntentId(String paymentIntentId) {
-        this.paymentIntentId = paymentIntentId;
-    }
-
-    public long getGmtTaskOccur() {
-        return gmtTaskOccur;
-    }
-
-    public void setGmtTaskOccur(long gmtTaskOccur) {
-        this.gmtTaskOccur = gmtTaskOccur;
     }
 }

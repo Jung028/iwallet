@@ -2,7 +2,6 @@ package com.alipay.business.core.model.converter;
 
 
 import com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO;
-import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +22,13 @@ public class ModelConverter {
         keys.setIdempotencyKey(idempotencyKeysDO.getIdempotencyKey());
         keys.setRequestHash(idempotencyKeysDO.getRequestHash());
         keys.setReferenceId(idempotencyKeysDO.getReferenceId());
-        keys.setStatus(IdempotencyKeysStatusEnum.valueOf(idempotencyKeysDO.getStatus()));
+        keys.setStatus(idempotencyKeysDO.getStatus());
         keys.setErrorCode(idempotencyKeysDO.getErrorCode());
         keys.setResponseSnapshot(idempotencyKeysDO.getResponseSnapshot());
         keys.setCreatedAt(idempotencyKeysDO.getCreatedAt());
         keys.setUpdatedAt(idempotencyKeysDO.getUpdatedAt());
         keys.setRetryCount(idempotencyKeysDO.getRetryCount());
+        keys.setIdempotencyType(idempotencyKeysDO.getIdempotencyType());
         return keys;
     }
 
@@ -41,12 +41,13 @@ public class ModelConverter {
         keys.setIdempotencyKey(idempotencyKeys.getIdempotencyKey());
         keys.setRequestHash(idempotencyKeys.getRequestHash());
         keys.setReferenceId(idempotencyKeys.getReferenceId());
-        keys.setStatus(idempotencyKeys.getStatus().getCode());
+        keys.setStatus(idempotencyKeys.getStatus());
         keys.setErrorCode(idempotencyKeys.getErrorCode());
         keys.setResponseSnapshot(idempotencyKeys.getResponseSnapshot());
         keys.setCreatedAt(idempotencyKeys.getCreatedAt());
         keys.setUpdatedAt(idempotencyKeys.getUpdatedAt());
         keys.setRetryCount(idempotencyKeys.getRetryCount());
+        keys.setIdempotencyType(idempotencyKeys.getIdempotencyType());
         return keys;
     }
 }

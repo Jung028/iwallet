@@ -15,7 +15,8 @@ import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.enums.AuthTypeEnum;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
-import com.alipay.business.common.service.facade.event.EcTopUpEvent;
+import com.alipay.business.common.service.facade.enums.IdempotencyTypeEnum;
+import com.alipay.business.common.service.facade.event.EcAutoReloadEvent;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.money.MoneyUtil;
 import com.alipay.business.common.service.facade.request.*;
@@ -25,37 +26,25 @@ import com.alipay.business.common.util.requesthash.HashUtil;
 import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
-import com.alipay.business.core.model.exception.BusinessException;
 import com.alipay.business.core.model.util.AssertUtil;
-import com.alipay.sofa.rpc.common.utils.JSONUtils;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
 import com.alipay.sofa.runtime.api.annotation.SofaServiceBinding;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
-import com.alipay.usercenter.common.service.facade.config.ExtInfo;
-import com.alipay.usercenter.common.service.facade.enums.CardIssuer;
-import com.alipay.usercenter.common.service.facade.enums.CardStatus;
-import com.alipay.usercenter.common.service.facade.enums.CardType;
+import com.alipay.usercenter.common.service.facade.enums.AuthScene;
+import com.alipay.usercenter.common.service.facade.enums.AuthType;
 import com.alipay.usercenter.common.service.facade.enums.Provider;
+import com.alipay.usercenter.common.service.facade.item.AutoReloadConfigItem;
 import com.alipay.usercenter.common.service.facade.item.UserCardDetailItem;
-import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
+import com.alipay.usercenter.common.service.facade.item.UserCardProviderItem;
 import com.alipay.usercenter.common.service.facade.request.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stripe.exception.CardException;
-import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
-import com.stripe.model.Customer;
-import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
-import com.stripe.model.PaymentMethod;
-import com.stripe.net.Webhook;
-import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
-import okhttp3.Response;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -66,6 +55,8 @@ import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+
+import static com.alipay.business.biz.service.impl.constant.GlobalBizConstants.*;
 
 /**
  * Business service impl
@@ -85,7 +76,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
     private static final MonetaryAmount LIMIT =
             Money.of(new BigDecimal("200.00"), "MYR");
 
-
+    @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
@@ -205,13 +196,13 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                 .queryIdempotencyKeysByIdempotencyKey(payload.getUniqueRequestId());
 
                         if (existingKey != null && existingKey.getReferenceId() != null) {
-                            if (existingKey.getStatus().equals(IdempotencyKeysStatusEnum.SUCCESS)) {
+                            if (existingKey.getStatus().equals(IdempotencyKeysStatusEnum.SUCCESS.getCode())) {
                                 response.setResult(existingKey.getResponseSnapshot());
                                 System.out.println("Already processed");
                                 return;
                             }
-                            if (existingKey.getStatus().equals(IdempotencyKeysStatusEnum.PENDING) ||
-                                    existingKey.getStatus().equals(IdempotencyKeysStatusEnum.PROCESSING)) {
+                            if (existingKey.getStatus().equals(IdempotencyKeysStatusEnum.PENDING.getCode()) ||
+                                    existingKey.getStatus().equals(IdempotencyKeysStatusEnum.PROCESSING.getCode())) {
                                 ResponseBuilder.success(response, existingKey.getReferenceId(),
                                         BusinessActionEnum.TRANSFER.getCode(),
                                         "Transfer is already in progress");
@@ -222,6 +213,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         // verify user password
                         VerifyUserAuthRequest verifyUserAuthRequest = new VerifyUserAuthRequest();
                         verifyUserAuthRequest.setUserId(userId);
+                        verifyUserAuthRequest.setAuthScene(AuthScene.TRANSFER_CONFIRM);
+                        verifyUserAuthRequest.setAuthType(AuthType.TRANSFER_PIN);
                         verifyUserAuthRequest.setCredential(request.getPassword());
                         UserBizResult<String> authInfo =
                                 userServiceClient.verifyUserAuth(verifyUserAuthRequest);
@@ -231,20 +224,22 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             return;
                         }
 
-                        transactionTemplate.execute(status -> {
+                        String referenceId = transactionTemplate.execute(status -> {
 
                             // insert idempotency record of pending status
                             IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
                             idempotencyKeys.setIdempotencyKey(payload.getUniqueRequestId());
                             idempotencyKeys.setUserId(Long.valueOf(userId));
+                            idempotencyKeys.setIdempotencyType(IdempotencyTypeEnum.TRANSFER.getCode());;
+
                             try {
                                 idempotencyKeys.setRequestHash(HashUtil.
-                                        generateIdempotentRequestHash(payload.getAmount(), payload.getCurrency(),
+                                        generateTransferRequestHash(payload.getAmount(), payload.getCurrency(),
                                                 payload.getPayerAccountNo(), payload.getPayeeAccountNo()));
                             } catch (NoSuchAlgorithmException e) {
                                 throw new RuntimeException(e);
                             }
-                            idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.PENDING);
+                            idempotencyKeys.setStatus(String.valueOf(IdempotencyKeysStatusEnum.PENDING));
                             idempotencyKeys.setRetryCount(0);
                             idempotencyKeys.setCreatedAt(new Date());
                             idempotencyKeys.setUpdatedAt(new Date());
@@ -277,12 +272,23 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             MonetaryAmount requestAmount = MoneyUtil.toMonetaryAmount(
                                     payload.getAmount(), currencyUnit);
 
-                            // TODO: we will check if the auto reload is triggered, if its not we assert balance insufficient
-                            //  else, we will call chargeSavedCard() which will call the stripejs deduct and return response
-                            //  and we will add the balance and continue the publishTransfer below
-                            AssertUtil.isTrue(!freshBalance.isLessThan(requestAmount),
-                                    BusinessResultCode.INSUFFICIENT_BALANCE,
-                                    "Insufficient balance, please check your account and try again");
+                            QueryAutoReloadConfigRequest queryAutoReloadConfigRequest = new QueryAutoReloadConfigRequest();
+                            queryAutoReloadConfigRequest.setUserId(userId);
+                            UserBizResult<AutoReloadConfigItem> autoReloadConfig =
+                                    userServiceClient.queryAutoReloadConfig(queryAutoReloadConfigRequest);
+                            System.out.println(autoReloadConfig.getResult().getConfigId());
+                            if (autoReloadConfig.getResult().getIsActive().equals(true) && !freshBalance.isLessThan(requestAmount)) {
+                                // publish auto reload event
+                                EcAutoReloadEvent ecAutoReloadEvent = new EcAutoReloadEvent();
+                                ecAutoReloadEvent.setAmount(payload.getAmount());
+                                ecAutoReloadEvent.setCurrency(payload.getCurrency());
+                                ecAutoReloadEvent.setUserId(userId);
+                                kafkaTemplate.send("EC_AUTO_RELOAD", ecAutoReloadEvent);
+                            } else {
+                                AssertUtil.isTrue(!freshBalance.isLessThan(requestAmount),
+                                        BusinessResultCode.INSUFFICIENT_BALANCE,
+                                        "Insufficient balance, please check your account and try again");
+                            }
 
                             // insert transaction record of pending status
                             InsertTransactionRecordRequest insertRequest =
@@ -298,27 +304,27 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                     accountServiceClient.insertTransactionRecord(insertRequest);
 
                             AssertUtil.isTrue(
-                                    transactionRecord != null && transactionRecord.isSuccess(),
+                                    transactionRecord != null
+                                            && transactionRecord.isSuccess()
+                                            && transactionRecord.getResult() != null,
                                     BusinessResultCode.SYSTEM_EXCEPTION,
                                     "Failed to create transaction record");
 
-                            String referenceId = transactionRecord.getResult().getTxnId();
+                            // only after a transaction record is confirmed to insert, we update the reference id for idempotent record
+                            String txnId = transactionRecord.getResult().getTxnId();
 
-                            idempotencyKeysRepository.updateReferenceId(payload.getUniqueRequestId(), referenceId);
+                            idempotencyKeysRepository.updateReferenceId(payload.getUniqueRequestId(), txnId);
 
-                            ResponseBuilder.success(response, referenceId,
+                            ResponseBuilder.success(response, txnId,
                                     BusinessActionEnum.TRANSFER.getCode(),
                                     BusinessActionEnum.TRANSFER.getDesc());
 
-                            return null;
+                            return txnId;
                         });
 
                         // Only runs if the transaction block above succeeded
                         if (response.isSuccess() && response.getResult() != null) {
-                            PublishTransferRequest publishRequest = new PublishTransferRequest();
-                            publishRequest.setAccountId(payload.getPayerAccountNo());
-                            publishRequest.setTxnId(response.getResult());
-                            accountServiceClient.publishTransfer(publishRequest);
+                            transactionService.publishTransfer(payload.getPayerAccountNo(), referenceId);
                         }
                     }
                 });
@@ -337,7 +343,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
         if (idempotencyKeys == null) {
             idempotencyKeys = new IdempotencyKeys();
             idempotencyKeys.setIdempotencyKey(uniqueRequestId);
-            idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.INIT);
+            idempotencyKeys.setStatus(String.valueOf(IdempotencyKeysStatusEnum.INIT));
+            idempotencyKeys.setIdempotencyType(IdempotencyTypeEnum.TRANSFER_INCORRECT_PIN.getCode());
             idempotencyKeys.setRetryCount(0);
             idempotencyKeys.setCreatedAt(new Date());
             idempotencyKeys.setUpdatedAt(new Date());
@@ -351,13 +358,13 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
         update.setRetryCount(newRetryCount);
 
         if (newRetryCount >= 5) {
-            update.setStatus(IdempotencyKeysStatusEnum.PERMANENT_LOCKOUT);
+            update.setStatus(String.valueOf(IdempotencyKeysStatusEnum.PERMANENT_LOCKOUT));
             idempotencyKeysRepository.updateFailedAttempts(update);
             ResponseBuilder.fail(response, BusinessActionEnum.CONFIRM_TRANSFER.getCode(),
                     "Account permanently locked, please contact support");
 
         } else if (newRetryCount >= 3) {
-            update.setStatus(IdempotencyKeysStatusEnum.TIMED_LOCKOUT);
+            update.setStatus(String.valueOf(IdempotencyKeysStatusEnum.TIMED_LOCKOUT));
             update.setLockedUntil(new Date(System.currentTimeMillis() + 30 * 60 * 1000L));
             idempotencyKeysRepository.updateFailedAttempts(update);
             ResponseBuilder.fail(response, BusinessActionEnum.CONFIRM_TRANSFER.getCode(),
@@ -485,7 +492,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         // update idempotency keys status to Error or finished after account center finish debit and credit accounts
                         IdempotencyKeys updateIdempotencyKeys = new IdempotencyKeys();
                         updateIdempotencyKeys.setReferenceId(request.getReferenceId());
-                        updateIdempotencyKeys.setStatus(request.getStatus());
+                        updateIdempotencyKeys.setStatus(String.valueOf(request.getStatus()));
                         updateIdempotencyKeys.setRetryCount(request.getRetryCount());
                         int rows = idempotencyKeysRepository.updateIdempotencyKeysByReferenceId(updateIdempotencyKeys);
 
@@ -493,7 +500,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         if (rows > 0) {
                             UpdateIdempotencyKeysResult updateIdempotencyKeysResult = new UpdateIdempotencyKeysResult();
                             updateIdempotencyKeysResult.setReferenceId(idempotencyKeys.getReferenceId());
-                            updateIdempotencyKeysResult.setStatus(idempotencyKeys.getStatus().getCode());
+                            updateIdempotencyKeysResult.setStatus(idempotencyKeys.getStatus());
                             updateIdempotencyKeysResult.setRetryCount(idempotencyKeys.getRetryCount());
 
                             ResponseBuilder.success(response, updateIdempotencyKeysResult,
@@ -553,14 +560,28 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                     @Override
                     protected void checkParams(TopUpRequest request) {
-                        BusinessRequestChecker.checkCreateTopUpIntentRequest(request);
+//                        BusinessRequestChecker.checkCreateTopUpIntentRequest(request);
                     }
 
                     @Override
                     protected void process(TopUpRequest request, BusinessBizResult<TopUpResult> response) {
                         try {
-                            // getOrCreateStripeCustomer
-                            String stripeCustomerId = getOrCreateStripeCustomer(userId);
+                            // there should be idempotency get or insert to prevent duplicate create top up intent
+
+
+                            AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "top up request is required");
+                            AssertUtil.notNull(request.getAmount(), BusinessResultCode.PARAM_ILLEGAL, "amount is required");
+                            AssertUtil.notBlank(request.getCurrency(), BusinessResultCode.PARAM_ILLEGAL, "currency is required");
+
+                            // get the stripeCustomerId from the extInfo
+                            QueryUserCardProviderRequest queryUserCardProviderRequest = new QueryUserCardProviderRequest();
+                            queryUserCardProviderRequest.setUserId(userId);
+                            queryUserCardProviderRequest.setProvider(Provider.STRIPE);
+                            UserBizResult<UserCardProviderItem> result = userServiceClient.queryUserCardProvider(queryUserCardProviderRequest);
+                            String providerCustomerId = result.getResult().getProviderCustomerId();
+                            // ensure not null
+                            AssertUtil.notBlank(providerCustomerId, BusinessResultCode.PARAM_ILLEGAL,
+                                    "Stripe customer not found for userId=" + userId);
 
                             // then build payment intent params
                             PaymentIntentCreateParams.Builder paramsBuilder =
@@ -568,9 +589,10 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                             .setAmount(request.getAmount()
                                                     .multiply(BigDecimal.valueOf(100)).longValue())
                                             .setCurrency(request.getCurrency().toLowerCase())
-                                            .setCustomer(stripeCustomerId)
-                                            .putMetadata("userId", userId)
-                                            .putMetadata("saveCard", String.valueOf(request.isSaveCard()));
+                                            .setCustomer(providerCustomerId)
+                                            .putMetadata(USER_ID, userId)
+                                            .putMetadata(SAVE_CARD, String.valueOf(request.isSaveCard()))
+                                            .putMetadata(UNIQUE_REFERENCE_ID, request.getUniqueRequestId());
 
                             // if the user wants to save the card
                             if (request.isSaveCard()) {
@@ -582,18 +604,37 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             PaymentIntent paymentIntent;
                             paymentIntent = PaymentIntent.create(paramsBuilder.build());
 
+                            // then we insert a new idempotency record for the paymentIntentId for publishTopUp to
+                            // prevent processing same paymentIntent
+                            IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
+                            idempotencyKeys.setIdempotencyKey(request.getUniqueRequestId());
+                            idempotencyKeys.setIdempotencyType(IdempotencyTypeEnum.TOP_UP.getCode());
+                            idempotencyKeys.setReferenceId(paymentIntent.getId());
+                            idempotencyKeys.setUserId(Long.valueOf(userId));
+                            try {
+                                idempotencyKeys.setRequestHash(HashUtil.
+                                        generateTopUpRequestHash(request.getAmount(), request.getCurrency(),
+                                                String.valueOf(request.getCardType()), request.getUniqueRequestId()));
+                            } catch (NoSuchAlgorithmException e) {
+                                throw new RuntimeException(e);
+                            }
+                            idempotencyKeys.setStatus(String.valueOf(IdempotencyKeysStatusEnum.INIT));
+                            idempotencyKeys.setRetryCount(0);
+                            idempotencyKeys.setCreatedAt(new Date());
+                            idempotencyKeys.setUpdatedAt(new Date());
+                            idempotencyKeysRepository.insertIdempotencyKey(idempotencyKeys);
+
                             // then we pass the client secret which is result of create and return to frontend to
                             // pass into payment using the card
-                            TopUpResult result = new TopUpResult();
-                            result.setSecretClient(paymentIntent.getClientSecret());
-                            result.setPaymentIntentId(paymentIntent.getId());
+                            TopUpResult topUpResult = new TopUpResult();
+                            topUpResult.setSecretClient(paymentIntent.getClientSecret());
+                            topUpResult.setPaymentIntentId(paymentIntent.getId());
 
-                            ResponseBuilder.success(response, result,
+                            ResponseBuilder.success(response, topUpResult,
                                     BusinessActionEnum.CREATE_TOP_UP_INTENT.getCode(),
                                     BusinessActionEnum.CREATE_TOP_UP_INTENT.getDesc());
 
-
-                        } catch (StripeException | JsonProcessingException e) {
+                        } catch (StripeException e) {
                             throw new RuntimeException(e);
                         }
                     }
@@ -639,13 +680,13 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                             .setAmount(request.getAmount()
                                                     .multiply(BigDecimal.valueOf(100)).longValue())
                                             .setCurrency(request.getCurrency().toLowerCase())
-                                            .setCustomer(card.getStripeCustomerId())
+                                            .setCustomer(card.getProviderCustomerId())
                                             .setPaymentMethod(card.getProviderToken()) // pm_xxx
                                             .setConfirm(true)       // charge immediately
                                             .setOffSession(true)    // user NOT present
-                                            .putMetadata("userId", userId)
-                                            .putMetadata("saveCard", "false")
-                                            .putMetadata("type", "AUTO_RELOAD")
+                                            .putMetadata(USER_ID, userId)
+                                            .putMetadata(SAVE_CARD, FALSE)
+                                            .putMetadata(TYPE, AUTO_RELOAD)
                                             .build()
                             );
 
@@ -677,54 +718,9 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                 });
     }
 
-    /**
-     * return or insert new stripe customer id
-     * @param userId
-     * @return
-     * @throws StripeException
-     * @throws JsonProcessingException
-     */
-    private String getOrCreateStripeCustomer(String userId) throws StripeException, JsonProcessingException {
-        // Check local DB first — one Stripe Customer per user, never duplicate
-        QueryUserInfoRequest queryUserInfoRequest = new QueryUserInfoRequest();
-        queryUserInfoRequest.setUserId(userId);
-        UserBizResult<UserInfoItem> userInfo = userServiceClient.queryUserInfo(queryUserInfoRequest);
-        String customerId = null;
-        ObjectMapper objectMapper = new ObjectMapper();
 
-        if (userInfo.getResult() != null && userInfo.getResult().getExtInfo() != null) {
-            // parse extInfo JSON to get stripeCustomerId
-            ExtInfo extInfo = objectMapper.readValue(
-                    userInfo.getResult().getExtInfo(), ExtInfo.class);
-            customerId = extInfo.getStripeCustomerId();
-        }
-
-        if (customerId == null) {
-            // first time — create on Stripe and save back to extInfo
-            Customer customer = Customer.create(
-                    CustomerCreateParams.builder()
-                            .putMetadata("userId", userId)
-                            .build());
-
-            ExtInfo extInfo = userInfo.getResult().getExtInfo() != null
-                    ? objectMapper.readValue(userInfo.getResult().getExtInfo(), ExtInfo.class)
-                    : new ExtInfo();
-
-            extInfo.setStripeCustomerId(customer.getId());
-
-            UpdateUserInfoRequest updateRequest = new UpdateUserInfoRequest();
-            updateRequest.setUserId(userId);
-            updateRequest.setExtInfo(objectMapper.writeValueAsString(extInfo));
-            userServiceClient.updateExtInfo(updateRequest);
-
-            customerId = customer.getId();
-        }
-
-        return customerId;
-    }
 
 
 }
-
 
 

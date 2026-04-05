@@ -69,9 +69,16 @@ public class BusinessBasicController {
         return businessService.queryIdempotencyKeys(request);
     }
 
-    public BusinessBizResult<TopUpResult> createTopUpIntent(TopUpRequest request) {
+    @PostMapping("/topup/createTopUpIntent.json")
+    public BusinessBizResult<TopUpResult> createTopUpIntent(@RequestBody TopUpRequest request) {
         JwtClaims claims = JwtContextHolder.get();
         return businessService.createTopUpIntent(request, claims.getSubject());
+    }
+
+    @PostMapping("/topup/chargeCard.json")
+    public BusinessBizResult<String> chargeCard(@RequestBody ChargeCardRequest request) {
+        JwtClaims claims = JwtContextHolder.get();
+        return businessService.chargeCard(request, claims.getSubject());
     }
 
 }

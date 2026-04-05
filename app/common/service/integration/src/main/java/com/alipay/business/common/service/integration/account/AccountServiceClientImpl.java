@@ -89,19 +89,6 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
     }
 
     @Override
-    public AccountBizResult<String> publishTransfer(PublishTransferRequest request) {
-        AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "Update transaction record request cannot be null");
-        AssertUtil.notBlank(request.getAccountId(), BusinessResultCode.PARAM_ILLEGAL, "Account Id cannot be blank");
-        AssertUtil.notBlank(request.getTxnId(),  BusinessResultCode.PARAM_ILLEGAL, "txnId cannot be blank");
-
-        // set cross invoke
-        AccountBizResult<String> result = accountService.publishTransfer(request);
-        AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
-        AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
-        return result;
-    }
-
-    @Override
     public AccountBizResult<TransactionRecordItem> queryTransactionByStatus(QueryTransactionRecordRequest request) {
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "Query transaction record request cannot be null");
         AssertUtil.notBlank(request.getAccountId(),  BusinessResultCode.PARAM_ILLEGAL, "account id cannot be blank");

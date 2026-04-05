@@ -7,5 +7,5 @@ import com.alipay.account_center.common.service.facade.event.EcTransactionEvent;
  * @date 15/3/2026 4:36 PM
  */
 public interface TransactionService {
-    void handleTransactionEvent(EcTransactionEvent event);
+    void publishTransfer(String payerAccountNo, String txnId);
 }

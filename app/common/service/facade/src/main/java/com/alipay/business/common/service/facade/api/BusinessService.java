@@ -77,12 +77,25 @@ public interface BusinessService {
     @Path("queryIdempotencyKeys")
     BusinessBizResult<IdempotencyKeysItem> queryIdempotencyKeys(QueryIdempotencyKeysRequest request);
 
-
-
-
+    /**
+     * create top up intent before publish top up
+     *
+     * @param request
+     * @param userId
+     * @return
+     */
+    @POST
+    @Path("createTopUpIntent")
     BusinessBizResult<TopUpResult> createTopUpIntent(TopUpRequest request, String userId);
 
-
-
+    /**
+     * auto charge the card
+     *
+     * @param request
+     * @param userId
+     * @return
+     */
+    @POST
+    @Path("chargeCard")
     BusinessBizResult<String> chargeCard(ChargeCardRequest request, String userId);
 }

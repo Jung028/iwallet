@@ -22,7 +22,5 @@ public interface AccountServiceClient {
 
     AccountBizResult<TransactionRecordItem> updateTransactionRecord(UpdateTransactionRecordRequest request);
 
-    AccountBizResult<String> publishTransfer(PublishTransferRequest request);
-
     AccountBizResult<TransactionRecordItem> queryTransactionByStatus(QueryTransactionRecordRequest transactionRecordRequest);
 }

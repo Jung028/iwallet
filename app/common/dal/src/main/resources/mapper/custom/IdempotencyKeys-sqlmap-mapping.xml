@@ -9,6 +9,7 @@
         <result column="idempotency_key" jdbcType="VARCHAR" property="idempotencyKey"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="request_hash" jdbcType="VARCHAR" property="requestHash"/>
+        <result column="idempotency_type" jdbcType="VARCHAR" property="idempotencyType" />
         <result column="reference_id" jdbcType="VARCHAR" property="referenceId" />
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="error_code" jdbcType="VARCHAR" property="errorCode"/>
@@ -22,33 +23,33 @@
         insert into idempotency_keys (idempotency_key, user_id,
         request_hash, reference_id, status,
         error_code, response_snapshot, created_at,
-        updated_at, retry_count, locked_until
-        )
+        updated_at, retry_count, locked_until,
+        idempotency_type)
         values (#{idempotencyKey,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
         #{requestHash,jdbcType=VARCHAR}, #{referenceId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
         #{errorCode,jdbcType=VARCHAR}, #{responseSnapshot,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
-        #{updatedAt,jdbcType=TIMESTAMP}, #{retryCount,jdbcType=INTEGER}, #{lockedUntil,jdbcType=TIMESTAMP}
-        )
+        #{updatedAt,jdbcType=TIMESTAMP}, #{retryCount,jdbcType=INTEGER}, #{lockedUntil,jdbcType=TIMESTAMP},
+        #{idempotencyType,jdbcType=VARCHAR})
     </insert>
 
     <select id="queryIdempotencyKeysByIdempotencyKey" resultMap="BaseResultMap">
-        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until
+        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until, idempotency_type
         FROM idempotency_keys WHERE idempotency_key = #{idempotencyKey}
     </select>
 
-    <select id="queryIdempotencyKeysByreferenceId" resultMap="BaseResultMap">
-        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until
+    <select id="queryIdempotencyKeysByReferenceId" resultMap="BaseResultMap">
+        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until, idempotency_type
         FROM idempotency_keys WHERE reference_id = #{referenceId}
     </select>
 
     <select id="queryIdempotencyKeysByRequestHash" resultMap="BaseResultMap">
-        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until
+        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until, idempotency_type
         FROM idempotency_keys WHERE request_hash = #{requestHash} AND user_id = #{userId}
         ORDER BY created_at DESC LIMIT 1
     </select>
 
     <select id="queryActiveIdempotencyKeyByHash" resultMap="BaseResultMap">
-        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until
+        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until, idempotency_type
         FROM idempotency_keys
         WHERE request_hash = #{requestHash} AND user_id = #{userId}
         AND status IN ('INIT', 'PENDING', 'OTP_OVER_LIMIT')
@@ -67,13 +68,13 @@
         WHERE idempotency_key = #{idempotencyKey}
     </update>
 
-    <update id="updatereferenceId" parameterType="String">
+    <update id="updateReferenceId">
         UPDATE idempotency_keys
         SET reference_id = #{referenceId}
         WHERE idempotency_key = #{idempotencyKey}
     </update>
 
-    <update id="updateIdempotencyKeysByreferenceId" parameterType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
+    <update id="updateIdempotencyKeysByReferenceId" parameterType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
         UPDATE idempotency_keys
         <set>
             <if test="status != null">status = #{status},</if>

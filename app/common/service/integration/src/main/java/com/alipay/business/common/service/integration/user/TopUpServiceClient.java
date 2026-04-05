@@ -6,6 +6,9 @@ import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
 import com.alipay.usercenter.common.service.facade.request.QueryDefaultCardRequest;
 import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
 
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+
 /**
  * @author adam
  * @date 24/3/2026 11:17 PM
@@ -17,6 +20,8 @@ public interface TopUpServiceClient {
      * @param request
      * @return
      */
+    @POST
+    @Path("/queryDefaultCard")
     UserBizResult<UserCardDetailItem> queryDefaultCard(QueryDefaultCardRequest request);
 
 }

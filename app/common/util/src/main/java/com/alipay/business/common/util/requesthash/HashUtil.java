@@ -22,15 +22,23 @@ public class HashUtil {
      * @return
      * @throws NoSuchAlgorithmException
      */
-    public static String generateIdempotentRequestHash(BigDecimal amount, String currency, String payerAccountNo, String payeeAccountNo) throws NoSuchAlgorithmException {
+    public static String generateTransferRequestHash(BigDecimal amount, String currency, String payerAccountNo, String payeeAccountNo) throws NoSuchAlgorithmException {
             String input = amount.toString() + "." + currency + "." + payerAccountNo + "." + payeeAccountNo;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(encodedHash); // Returns 64-char hex string
     }
 
+    public static String generateTopUpRequestHash(BigDecimal amount, String currency, String cardType, String uniqueRequestId) throws NoSuchAlgorithmException {
+        String input = amount.toString() + "." + currency + "." + cardType + "." + uniqueRequestId;
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] encodedHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+        return HexFormat.of().formatHex(encodedHash); // Returns 64-char hex string
+    }
 
-    public static String generateIdempotentRequestHash(Long amount, String currency, String customer) throws NoSuchAlgorithmException {
+
+
+    public static String generatePublishTopUpRequestHash(Long amount, String currency, String customer) throws NoSuchAlgorithmException {
         String input = amount.toString() + "." + currency + "." + customer;
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] encodedHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
