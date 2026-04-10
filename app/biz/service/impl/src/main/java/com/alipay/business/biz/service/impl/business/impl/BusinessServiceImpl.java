@@ -3,6 +3,7 @@ package com.alipay.business.biz.service.impl.business.impl;
 import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
 import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
 import com.alipay.account_center.common.service.facade.enums.TransactionTypeEnum;
+import com.alipay.account_center.common.service.facade.enums.TxnEventType;
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.*;
@@ -12,10 +13,10 @@ import com.alipay.business.biz.service.impl.helper.ResponseBuilder;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.api.BusinessService;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
-import com.alipay.business.common.service.facade.enums.AuthTypeEnum;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
 import com.alipay.business.common.service.facade.enums.IdempotencyTypeEnum;
+import com.alipay.business.common.service.facade.enums.TransferType;
 import com.alipay.business.common.service.facade.event.EcAutoReloadEvent;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.money.MoneyUtil;
@@ -30,17 +31,16 @@ import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
 import com.alipay.sofa.runtime.api.annotation.SofaServiceBinding;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
-import com.alipay.usercenter.common.service.facade.enums.AuthScene;
 import com.alipay.usercenter.common.service.facade.enums.AuthType;
 import com.alipay.usercenter.common.service.facade.enums.Provider;
-import com.alipay.usercenter.common.service.facade.item.AutoReloadConfigItem;
-import com.alipay.usercenter.common.service.facade.item.UserCardDetailItem;
-import com.alipay.usercenter.common.service.facade.item.UserCardProviderItem;
+import com.alipay.usercenter.common.service.facade.item.*;
 import com.alipay.usercenter.common.service.facade.request.*;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.stripe.net.RequestOptions;
 import com.stripe.param.PaymentIntentCreateParams;
+import net.sf.jsqlparser.statement.select.Top;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,10 +176,13 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         AssertUtil.notNull(payload,
                                 BusinessResultCode.INVALID_REQUEST,
                                 "Transfer session expired or invalid, please start again");
+                        // TODO: we do not need to do anything to the transaction if it has failed because it was not updated to PROCESSING, meaning
+                        //  the trasnsaction has not started to deduct your money, so if it failed in business Center, we do not need to
+                        //  re-handle it. just add a scheduler to check where the GMT create is more than a day and status is PENDING.
 
                         if (payload.isRequiresOtp()) {
                             AssertUtil.isTrue(
-                                    request.getAuthTypeEnum().equals(AuthTypeEnum.OTP),
+                                    request.getTransferType().equals(TransferType.OTP.getCode()),
                                     BusinessResultCode.ILLEGAL_STATUS,
                                     "This transfer requires OTP verification");
                             AssertUtil.notBlank(request.getVerifiedToken(), BusinessResultCode.PARAM_ILLEGAL,
@@ -191,7 +194,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             userServiceClient.verifyVerifiedToken(verifyVerifiedTokenRequest);
                         }
 
-                        // check if there is existing idempotency record
+                        // check if there is existing frontend request
                         IdempotencyKeys existingKey = idempotencyKeysRepository
                                 .queryIdempotencyKeysByIdempotencyKey(payload.getUniqueRequestId());
 
@@ -213,8 +216,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         // verify user password
                         VerifyUserAuthRequest verifyUserAuthRequest = new VerifyUserAuthRequest();
                         verifyUserAuthRequest.setUserId(userId);
-                        verifyUserAuthRequest.setAuthScene(AuthScene.TRANSFER_CONFIRM);
-                        verifyUserAuthRequest.setAuthType(AuthType.TRANSFER_PIN);
+                        verifyUserAuthRequest.setAuthType(String.valueOf(AuthType.TRANSFER_PIN));
                         verifyUserAuthRequest.setCredential(request.getPassword());
                         UserBizResult<String> authInfo =
                                 userServiceClient.verifyUserAuth(verifyUserAuthRequest);
@@ -324,7 +326,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                         // Only runs if the transaction block above succeeded
                         if (response.isSuccess() && response.getResult() != null) {
-                            transactionService.publishTransfer(payload.getPayerAccountNo(), referenceId);
+                            transactionService.publishTransfer(payload.getPayerAccountNo(), referenceId, TxnEventType.TRANSFER.getCode());
                         }
                     }
                 });
@@ -369,6 +371,49 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
             idempotencyKeysRepository.updateFailedAttempts(update);
             ResponseBuilder.fail(response, BusinessActionEnum.CONFIRM_TRANSFER.getCode(),
                     "Too many attempts, locked for 30 minutes");
+
+        } else {
+            idempotencyKeysRepository.updateFailedAttempts(update);
+            ResponseBuilder.fail(response, BusinessActionEnum.CONFIRM_TRANSFER.getCode(),
+                    "Incorrect password, " + (5 - newRetryCount) + " attempts remaining");
+        }
+    }
+
+    private void handleFailedPinAttemptTopUp(String uniqueRequestId, BusinessBizResult<TopUpResult> response) {
+        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository
+                .queryIdempotencyKeysByIdempotencyKey(uniqueRequestId);
+
+        // insert a lightweight tracking row if this is the first wrong attempt
+        if (idempotencyKeys == null) {
+            idempotencyKeys = new IdempotencyKeys();
+            idempotencyKeys.setIdempotencyKey(uniqueRequestId);
+            idempotencyKeys.setStatus(String.valueOf(IdempotencyKeysStatusEnum.INIT));
+            idempotencyKeys.setIdempotencyType(IdempotencyTypeEnum.TRANSFER_INCORRECT_PIN.getCode());
+            idempotencyKeys.setRetryCount(0);
+            idempotencyKeys.setCreatedAt(new Date());
+            idempotencyKeys.setUpdatedAt(new Date());
+            idempotencyKeysRepository.insertIdempotencyKey(idempotencyKeys);
+        }
+
+        int newRetryCount = idempotencyKeys.getRetryCount() + 1;
+
+        IdempotencyKeys update = new IdempotencyKeys();
+        update.setIdempotencyKey(uniqueRequestId);
+        update.setRetryCount(newRetryCount);
+
+        if (newRetryCount >= 5) {
+            update.setStatus(String.valueOf(IdempotencyKeysStatusEnum.PERMANENT_LOCKOUT));
+            idempotencyKeysRepository.updateFailedAttempts(update);
+            ResponseBuilder.fail(response, BusinessActionEnum.CONFIRM_TRANSFER.getCode(),
+                    "Account permanently locked, please contact support");
+
+        } else if (newRetryCount >= 3) {
+            update.setStatus(String.valueOf(IdempotencyKeysStatusEnum.TIMED_LOCKOUT));
+            update.setLockedUntil(new Date(System.currentTimeMillis() + 30 * 60 * 1000L));
+            idempotencyKeysRepository.updateFailedAttempts(update);
+            ResponseBuilder.fail(response, BusinessActionEnum.CONFIRM_TRANSFER.getCode(),
+                    "Too many attempts, locked for 30 minutes" +
+                            (5 - newRetryCount) + " attempts remaining");
 
         } else {
             idempotencyKeysRepository.updateFailedAttempts(update);
@@ -560,57 +605,135 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                     @Override
                     protected void checkParams(TopUpRequest request) {
-//                        BusinessRequestChecker.checkCreateTopUpIntentRequest(request);
+                        BusinessRequestChecker.checkCreateTopUpIntentRequest(request);
                     }
 
                     @Override
                     protected void process(TopUpRequest request, BusinessBizResult<TopUpResult> response) {
-                        try {
-                            // there should be idempotency get or insert to prevent duplicate create top up intent
+                        // verify password pin
+                        VerifyUserAuthRequest verifyUserAuthRequest = new VerifyUserAuthRequest();
+                        verifyUserAuthRequest.setUserId(userId);
+                        verifyUserAuthRequest.setCredential(request.getPasswordPin());
+                        verifyUserAuthRequest.setAuthType(AuthType.TRANSFER_PIN.getCode());
+                        UserBizResult<String> userAuthItem = userServiceClient.verifyUserAuth(verifyUserAuthRequest);
+                        AssertUtil.isTrue(userAuthItem.isSuccess(), BusinessResultCode.ILLEGAL_STATUS, "Password incorrect");
 
+                        if (!userAuthItem.isSuccess()) {
+                            handleFailedPinAttemptTopUp(request.getUniqueRequestId(), response);
+                            return;
+                        }
 
-                            AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "top up request is required");
-                            AssertUtil.notNull(request.getAmount(), BusinessResultCode.PARAM_ILLEGAL, "amount is required");
-                            AssertUtil.notBlank(request.getCurrency(), BusinessResultCode.PARAM_ILLEGAL, "currency is required");
+                        // get the stripeCustomerId from user_card_provider
+                        QueryUserCardProviderRequest queryUserCardProviderRequest = new QueryUserCardProviderRequest();
+                        queryUserCardProviderRequest.setUserId(userId);
+                        queryUserCardProviderRequest.setProvider(Provider.STRIPE);
+                        UserBizResult<UserCardProviderItem> result = userServiceClient.queryUserCardProvider(queryUserCardProviderRequest);
+                        String providerCustomerId = result.getResult().getProviderCustomerId();
+                        // ensure not null
+                        AssertUtil.notBlank(providerCustomerId, BusinessResultCode.PARAM_ILLEGAL,
+                                "Stripe customer not found for userId=" + userId);
 
-                            // get the stripeCustomerId from the extInfo
-                            QueryUserCardProviderRequest queryUserCardProviderRequest = new QueryUserCardProviderRequest();
-                            queryUserCardProviderRequest.setUserId(userId);
-                            queryUserCardProviderRequest.setProvider(Provider.STRIPE);
-                            UserBizResult<UserCardProviderItem> result = userServiceClient.queryUserCardProvider(queryUserCardProviderRequest);
-                            String providerCustomerId = result.getResult().getProviderCustomerId();
-                            // ensure not null
-                            AssertUtil.notBlank(providerCustomerId, BusinessResultCode.PARAM_ILLEGAL,
-                                    "Stripe customer not found for userId=" + userId);
+                        // retrieve user name
+                        QueryUserInfoRequest queryUserInfoRequest = new QueryUserInfoRequest();
+                        queryUserInfoRequest.setUserId(userId);
+                        UserBizResult<UserInfoItem> userInfo = userServiceClient.queryUserInfoByUserId(queryUserInfoRequest);
 
-                            // then build payment intent params
-                            PaymentIntentCreateParams.Builder paramsBuilder =
-                                    PaymentIntentCreateParams.builder()
-                                            .setAmount(request.getAmount()
-                                                    .multiply(BigDecimal.valueOf(100)).longValue())
-                                            .setCurrency(request.getCurrency().toLowerCase())
-                                            .setCustomer(providerCustomerId)
-                                            .putMetadata(USER_ID, userId)
-                                            .putMetadata(SAVE_CARD, String.valueOf(request.isSaveCard()))
-                                            .putMetadata(UNIQUE_REFERENCE_ID, request.getUniqueRequestId());
+                        // then build payment intent params
+                        PaymentIntentCreateParams.Builder paramsBuilder =
+                                PaymentIntentCreateParams.builder()
+                                        .setAmount(request.getAmount()
+                                                .multiply(BigDecimal.valueOf(100)).longValue())
+                                        .setCurrency(request.getCurrency().toLowerCase())
+                                        .setCustomer(providerCustomerId)
+                                        .putMetadata(USER_ID, userId)
+                                        .putMetadata(SAVE_CARD, String.valueOf(request.isSaveCard()))
+                                        .putMetadata(USER_NAME, userInfo.getResult().getUserName());
 
-                            // if the user wants to save the card
-                            if (request.isSaveCard()) {
-                                paramsBuilder.setSetupFutureUsage(
-                                        PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
+                        // if the user wants to save the card
+                        if (request.isSaveCard()) {
+                            paramsBuilder.setSetupFutureUsage(
+                                    PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
+                        }
+
+                        // query idempotency for the request id if not exist then only continue below,
+                        IdempotencyKeys existingKey = idempotencyKeysRepository.queryIdempotencyKeysByIdempotencyKey(
+                                request.getUniqueRequestId()
+                        );
+
+                        if (existingKey != null && existingKey.getReferenceId() != null) {
+                            if (existingKey.getStatus().equals(IdempotencyKeysStatusEnum.SUCCESS.getCode())) {
+                                TopUpResult topUpResult = new TopUpResult();
+                                topUpResult.setPaymentIntentId(existingKey.getReferenceId());
+                                ResponseBuilder.success(response, topUpResult, BusinessActionEnum.CREATE_TOP_UP_INTENT.getCode(),
+                                        "Already processed this top up intent");
+                                return;
                             }
+                            if (existingKey.getStatus().equals(IdempotencyKeysStatusEnum.INIT.getCode()) ||
+                                    existingKey.getStatus().equals(IdempotencyKeysStatusEnum.PENDING.getCode()) ||
+                                    existingKey.getStatus().equals(IdempotencyKeysStatusEnum.PROCESSING.getCode())) {
+                                TopUpResult topUpResult = new TopUpResult();
+                                PaymentIntent existingIntent = null;
+                                try {
+                                    existingIntent = PaymentIntent.retrieve(existingKey.getReferenceId());
+                                } catch (StripeException e) {
+                                    throw new RuntimeException(e);
+                                }
 
+                                topUpResult.setSecretClient(existingIntent.getClientSecret());
+                                topUpResult.setPaymentIntentId(existingIntent.getId());
+                                ResponseBuilder.success(response, topUpResult,
+                                        BusinessActionEnum.CREATE_TOP_UP_INTENT.getCode(),
+                                        "Transfer is already in progress");
+                                return;
+                            }
+                        }
+
+                        //surround in a transactional template
+                        TopUpResult topUpResult = transactionTemplate.execute(status -> {
+
+                            // geet the payer account id, insert a new transaction of the STRIPE_ACCOUNT
+                            QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
+                            queryAccountInfoRequest.setUserId(userId);
+                            AccountBizResult<AccountInfoItem> accountInfo = accountServiceClient.queryAccountInfoByUserId(queryAccountInfoRequest);
+
+                            // insert transaction record of pending status
+                            InsertTransactionRecordRequest insertRequest =
+                                    new InsertTransactionRecordRequest();
+                            insertRequest.setPayerAccountNo(STRIPE_CLEARING_ACCOUNT);
+                            insertRequest.setPayeeAccountNo(accountInfo.getResult().getAccountId());
+                            insertRequest.setAmount(request.getAmount());
+                            insertRequest.setCurrency(request.getCurrency());
+                            insertRequest.setTxnType(TransactionTypeEnum.TOP_UP);
+                            insertRequest.setStatus(TransactionStatusEnum.PENDING);
+
+                            AccountBizResult<TransactionRecordItem> transactionRecord =
+                                    accountServiceClient.insertTransactionRecord(insertRequest);
+                            AssertUtil.notNull(transactionRecord, BusinessResultCode.PARAM_ILLEGAL,
+                                    "transaction record is null");
+
+                            // ensure the txnId is set so that publishTopUp can pass in the txnId into the publishTransfer
+                            paramsBuilder.putMetadata(TXN_ID, transactionRecord.getResult().getTxnId());
+
+                            // set the idempotency key
+                            RequestOptions options = RequestOptions.builder()
+                                    .setIdempotencyKey(request.getUniqueRequestId())
+                                    .build();
                             // then we build paymentIntent which is a stripe constructor for creating a PaymentIntent
                             PaymentIntent paymentIntent;
-                            paymentIntent = PaymentIntent.create(paramsBuilder.build());
+                            try {
+                                paymentIntent = PaymentIntent.create(paramsBuilder.build(), options);
+                            } catch (StripeException e) {
+                                throw new RuntimeException(e);
+                            }
 
                             // then we insert a new idempotency record for the paymentIntentId for publishTopUp to
                             // prevent processing same paymentIntent
                             IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
                             idempotencyKeys.setIdempotencyKey(request.getUniqueRequestId());
                             idempotencyKeys.setIdempotencyType(IdempotencyTypeEnum.TOP_UP.getCode());
-                            idempotencyKeys.setReferenceId(paymentIntent.getId());
                             idempotencyKeys.setUserId(Long.valueOf(userId));
+                            // set idempotency reference Id to the txnId
+                            idempotencyKeys.setReferenceId(transactionRecord.getResult().getTxnId());
                             try {
                                 idempotencyKeys.setRequestHash(HashUtil.
                                         generateTopUpRequestHash(request.getAmount(), request.getCurrency(),
@@ -622,21 +745,51 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             idempotencyKeys.setRetryCount(0);
                             idempotencyKeys.setCreatedAt(new Date());
                             idempotencyKeys.setUpdatedAt(new Date());
-                            idempotencyKeysRepository.insertIdempotencyKey(idempotencyKeys);
+                            try {
+                                idempotencyKeysRepository.insertIdempotencyKey(idempotencyKeys);
+                            } catch (DuplicateKeyException e) {
+                                // concurrent confirm race — other request won, replay its result
+                                TopUpResult topResult = new TopUpResult();
 
+                                IdempotencyKeys existing = idempotencyKeysRepository
+                                        .queryIdempotencyKeysByIdempotencyKey(request.getUniqueRequestId());
+                                try {
+                                    paymentIntent = PaymentIntent.retrieve(existing.getReferenceId());
+                                } catch (StripeException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                                AssertUtil.notNull(paymentIntent, BusinessResultCode.PARAM_ILLEGAL, "payment intent is null");
+                                topResult.setSecretClient(paymentIntent.getClientSecret());
+                                topResult.setPaymentIntentId(paymentIntent.getId());
+                                ResponseBuilder.success(response, topResult,
+                                        BusinessActionEnum.CREATE_TOP_UP_INTENT.getCode(),
+                                        "Transfer is already in progress");
+                            }
                             // then we pass the client secret which is result of create and return to frontend to
                             // pass into payment using the card
-                            TopUpResult topUpResult = new TopUpResult();
-                            topUpResult.setSecretClient(paymentIntent.getClientSecret());
-                            topUpResult.setPaymentIntentId(paymentIntent.getId());
 
-                            ResponseBuilder.success(response, topUpResult,
-                                    BusinessActionEnum.CREATE_TOP_UP_INTENT.getCode(),
-                                    BusinessActionEnum.CREATE_TOP_UP_INTENT.getDesc());
 
-                        } catch (StripeException e) {
-                            throw new RuntimeException(e);
-                        }
+                            // --- build TopUpResult to return both ---
+                            TopUpResult finalResult = new TopUpResult();
+                            finalResult.setPaymentIntentId(paymentIntent.getId());
+                            finalResult.setSecretClient(paymentIntent.getClientSecret());
+                            finalResult.setTxnId(transactionRecord.getResult().getTxnId());
+
+                            return finalResult;
+                        });
+
+                        AssertUtil.notNull(topUpResult, BusinessResultCode.PARAM_ILLEGAL, "payment intent is null");
+                        AssertUtil.notNull(topUpResult.getTxnId(), BusinessResultCode.PARAM_ILLEGAL, "txnId is null");
+                        AssertUtil.notNull(topUpResult.getPaymentIntentId(), BusinessResultCode.PARAM_ILLEGAL, "payment intent is null");
+                        AssertUtil.notNull(topUpResult.getSecretClient(), BusinessResultCode.PARAM_ILLEGAL, "secret client is null");
+
+                        logger.info("TopUpIntent created: requestId={}, paymentIntentId={}",
+                                request.getUniqueRequestId(), topUpResult.getPaymentIntentId());
+
+                        ResponseBuilder.success(response, topUpResult,
+                                BusinessActionEnum.CREATE_TOP_UP_INTENT.getCode(),
+                                BusinessActionEnum.CREATE_TOP_UP_INTENT.getDesc());
+
                     }
                 });
     }

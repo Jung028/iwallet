@@ -1,12 +1,11 @@
 package com.alipay.business.common.service.facade.request;
 
 import com.alipay.business.common.service.facade.baseresult.BusinessBaseRequest;
-import com.alipay.business.common.service.facade.enums.AuthTypeEnum;
 
 public class TransferConfirmRequest extends BusinessBaseRequest {
     private String password;
     private String accountId;
-    private AuthTypeEnum authTypeEnum;
+    private String transferType;
     private String verifiedToken;
     private String transferToken;
 
@@ -26,12 +25,12 @@ public class TransferConfirmRequest extends BusinessBaseRequest {
         this.accountId = accountId;
     }
 
-    public AuthTypeEnum getAuthTypeEnum() {
-        return authTypeEnum;
+    public String getTransferType() {
+        return transferType;
     }
 
-    public void setAuthTypeEnum(AuthTypeEnum authTypeEnum) {
-        this.authTypeEnum = authTypeEnum;
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
     }
 
     public String getVerifiedToken() {

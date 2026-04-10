@@ -1,16 +1,25 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
+import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
+import com.alipay.account_center.common.service.facade.enums.TxnEventType;
+import com.alipay.account_center.common.service.facade.event.EcTransactionEvent;
+import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
+import com.alipay.account_center.common.service.facade.request.QueryAccountInfoRequest;
 import com.alipay.business.biz.service.impl.business.TopUpService;
+import com.alipay.business.biz.service.impl.business.TransactionService;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
-import com.alipay.business.common.service.facade.event.EcTopUpEvent;
+import com.alipay.business.common.service.integration.account.AccountServiceClient;
 import com.alipay.business.common.service.integration.user.UserServiceClient;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.exception.BusinessException;
 import com.alipay.business.core.service.IdempotencyKeysRepository;
+import com.stripe.exception.EventDataObjectDeserializationException;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
+import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.StripeObject;
 import com.stripe.net.Webhook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,63 +50,47 @@ public class TopUpServiceImpl implements TopUpService {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
+    @Autowired
+    private AccountServiceClient accountServiceClient;
+
+    @Autowired
+    private TransactionService transactionService;
+
     @Value("${stripe.webhook-secret}")
     private String webhookSecret;
 
-    public void publishTopUp(String payload, String signature) {
-        System.out.print("START PUBLISH TOP UP");
-        // 1 verify the signature from the topUpInit result, using the webhook and signature
-        Event event;
-        try {
-            event = Webhook.constructEvent(payload, signature,
-                    webhookSecret);
-        } catch (SignatureVerificationException e) {
-            logger.warn("Invalid Stripe webhook signature: {}",
-                    e.getMessage());
-            throw new BusinessException(BusinessResultCode.INVALID_WEBHOOK_SIGNATURE);
+    /**
+     * Process Stripe webhook event for top-up
+     */
+    public void publishTopUp(Event event) {
+
+
+        // only care about success event
+        if (!"payment_intent.succeeded".equals(event.getType())) {
+            return;
+        }
+        System.out.print(event.getType());
+        System.out.print(event.getId());
+
+        EventDataObjectDeserializer deserializer = event.getDataObjectDeserializer();
+
+        StripeObject stripeObject = deserializer.getObject()
+                .orElseGet(() -> {
+                    try {
+                        return deserializer.deserializeUnsafe();
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to deserialize Stripe object", e);
+                    }
+                });
+
+        if (!(stripeObject instanceof PaymentIntent intent)) {
+            throw new IllegalStateException("Event is not PaymentIntent");
         }
 
-        // ensure payment intent is payment intent success.
-        if (!PAYMENT_INTENT_SUCCESS.equals(event.getType())) {
-            logger.warn("Invalid Stripe webhook signature: {}",
-                    event.getType());
-            throw new BusinessException(BusinessResultCode.PAYMENT_INTENT_ILLEGAL,
-                    "Event not handled");
-        }
+        String paymentIntentId = intent.getId(); // ✅ pi_xxx
+        // push to Kafka (event-driven)
+        kafkaTemplate.send("TOP_UP_SUCCESS", paymentIntentId);
 
-        PaymentIntent intent = (PaymentIntent) event
-                .getDataObjectDeserializer().getObject()
-                .orElseThrow(() -> new BusinessException(BusinessResultCode.SYSTEM_EXCEPTION,
-                        "failed to deserialize payment_intent"));
-
-        String userId = intent.getMetadata().get(USER_ID);
-        BigDecimal amount = BigDecimal.valueOf(intent.getAmount())
-                .divide(BigDecimal.valueOf(100));
-        String currency = intent.getCurrency().toUpperCase();
-
-        // Idempotency guard — Stripe fires webhooks at least once,
-        IdempotencyKeys idempotencyKeys = idempotencyKeysRepository
-                .queryIdempotencyKeysByReferenceId(intent.getId());
-        if (!idempotencyKeys.getStatus().equals(IdempotencyKeysStatusEnum.PENDING.toString())) {
-            logger.info("Duplicate webhook for pi={}, skipping",
-                    intent.getId());
-            throw new BusinessException(BusinessResultCode.PARAM_ILLEGAL,
-                    "Duplicate webhook for pi : " + intent.getId());
-        }
-
-        // 5. Mark idempotency before publishing — prevents double credit
-        idempotencyKeys.setStatus(String.valueOf(IdempotencyKeysStatusEnum.PENDING));
-        idempotencyKeysRepository.updateIdempotencyKeys(idempotencyKeys);
-
-        // 6. Publish EC_TOPUP_RECEIVED → AccountCenter credits balance
-        EcTopUpEvent topUpEvent = new EcTopUpEvent();
-        topUpEvent.setUserId(userId);
-        topUpEvent.setAmount(amount);
-        topUpEvent.setCurrency(currency);
-        topUpEvent.setPaymentIntentId(intent.getId());
-        topUpEvent.setGmtTaskOccur(System.currentTimeMillis());
-
-        kafkaTemplate.send("EC_TOPUP_RECEIVED", topUpEvent);
-
+        logger.info("Enqueued top-up event for PI={}", paymentIntentId);
     }
 }

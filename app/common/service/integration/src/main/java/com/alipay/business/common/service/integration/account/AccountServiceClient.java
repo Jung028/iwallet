@@ -12,6 +12,8 @@ import java.util.List;
 @Service
 public interface AccountServiceClient {
 
+    AccountBizResult<String> createAccount(CreateAccountRequest createAccountRequest);
+
     AccountBizResult<AccountInfoItem> queryAccountInfo(QueryAccountInfoRequest request);
 
     AccountBizResult<TransactionRecordItem> queryTransactionRecord(QueryTransactionRecordRequest request);
@@ -23,4 +25,6 @@ public interface AccountServiceClient {
     AccountBizResult<TransactionRecordItem> updateTransactionRecord(UpdateTransactionRecordRequest request);
 
     AccountBizResult<TransactionRecordItem> queryTransactionByStatus(QueryTransactionRecordRequest transactionRecordRequest);
+
+    AccountBizResult<AccountInfoItem> queryAccountInfoByUserId(QueryAccountInfoRequest queryAccountInfoRequest);
 }

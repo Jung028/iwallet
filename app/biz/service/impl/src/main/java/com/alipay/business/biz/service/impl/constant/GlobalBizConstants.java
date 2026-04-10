@@ -17,6 +17,11 @@ public class GlobalBizConstants {
     public static final String SAVE_CARD = "saveCard";
 
     /**
+     * user name
+     */
+    public static final String USER_NAME = "userName";
+
+    /**
      * unique reference id
      */
     public static final String UNIQUE_REFERENCE_ID = "uniqueReferenceId";
@@ -50,4 +55,14 @@ public class GlobalBizConstants {
      * false for save card
      */
     public static final String FALSE = "false";
+
+    /**
+     * Stripe clearing account for top up.
+     */
+    public static final String STRIPE_CLEARING_ACCOUNT = "STRIPE_CLEARING_ACCOUNT";
+
+    /**
+     * transaction id
+     */
+    public static final String TXN_ID = "txnId";
 }

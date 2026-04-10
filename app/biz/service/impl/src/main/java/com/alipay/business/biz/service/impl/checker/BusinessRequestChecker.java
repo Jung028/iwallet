@@ -52,10 +52,10 @@ public class BusinessRequestChecker {
 
     public static void checkCreateTopUpIntentRequest(TopUpRequest request) {
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "request is null");
-        AssertUtil.notBlank(request.getCurrency(),  BusinessResultCode.PARAM_ILLEGAL, "currency is required");
-        AssertUtil.notBlank(request.getUserId(),  BusinessResultCode.PARAM_ILLEGAL, "userId required");
-        AssertUtil.notBlank(request.getUniqueRequestId(), BusinessResultCode.PARAM_ILLEGAL, "uniqueRequestId is required");
-        AssertUtil.notBlank(request.getCardType().toString(), BusinessResultCode.PARAM_ILLEGAL, "card type is required");
-        AssertUtil.notBlank(request.getAmount().toString(), BusinessResultCode.PARAM_ILLEGAL, "amount is required");
+//        AssertUtil.notBlank(request.getCurrency(),  BusinessResultCode.PARAM_ILLEGAL, "currency is required");
+//        AssertUtil.notBlank(request.getUserId(),  BusinessResultCode.PARAM_ILLEGAL, "userId required");
+//        AssertUtil.notBlank(request.getUniqueRequestId(), BusinessResultCode.PARAM_ILLEGAL, "uniqueRequestId is required");
+//        AssertUtil.notBlank(request.getCardType().toString(), BusinessResultCode.PARAM_ILLEGAL, "card type is required");
+//        AssertUtil.notBlank(request.getAmount().toString(), BusinessResultCode.PARAM_ILLEGAL, "amount is required");
     }
 }

@@ -1,14 +1,13 @@
 package com.alipay.business.common.service.facade.result;
 
-import com.alipay.business.common.service.facade.baseresult.BusinessBaseResult;
-
 /**
  * @author adam
  * @date 24/3/2026 9:03 PM
  */
-public class TopUpResult extends BusinessBaseResult {
+public class TopUpResult {
     private String secretClient;
     private String paymentIntentId;
+    private String txnId;
 
     public String getSecretClient() {
         return secretClient;
@@ -24,5 +23,13 @@ public class TopUpResult extends BusinessBaseResult {
 
     public void setPaymentIntentId(String paymentIntentId) {
         this.paymentIntentId = paymentIntentId;
+    }
+
+    public String getTxnId() {
+        return txnId;
+    }
+
+    public void setTxnId(String txnId) {
+        this.txnId = txnId;
     }
 }

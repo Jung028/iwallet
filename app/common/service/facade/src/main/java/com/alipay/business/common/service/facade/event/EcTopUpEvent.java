@@ -1,6 +1,7 @@
 package com.alipay.business.common.service.facade.event;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author adam
@@ -11,7 +12,19 @@ public class EcTopUpEvent {
     private BigDecimal amount;
     private String currency;
     private String paymentIntentId;
-    private long gmtTaskOccur;
+    private String payerAccountId;
+    private String payeeAccountId;
+    private Date gmtTaskOccur;
+
+    public EcTopUpEvent(String userId, BigDecimal amount, String currency, String paymentIntentId, String payerAccountId, String payeeAccountId, Date gmtTaskOccur) {
+        this.userId = userId;
+        this.amount = amount;
+        this.currency = currency;
+        this.paymentIntentId = paymentIntentId;
+        this.payerAccountId = payerAccountId;
+        this.payeeAccountId = payeeAccountId;
+        this.gmtTaskOccur = gmtTaskOccur;
+    }
 
     public String getUserId() {
         return userId;
@@ -45,11 +58,27 @@ public class EcTopUpEvent {
         this.paymentIntentId = paymentIntentId;
     }
 
-    public long getGmtTaskOccur() {
+    public String getPayerAccountId() {
+        return payerAccountId;
+    }
+
+    public void setPayerAccountId(String payerAccountId) {
+        this.payerAccountId = payerAccountId;
+    }
+
+    public String getPayeeAccountId() {
+        return payeeAccountId;
+    }
+
+    public void setPayeeAccountId(String payeeAccountId) {
+        this.payeeAccountId = payeeAccountId;
+    }
+
+    public Date getGmtTaskOccur() {
         return gmtTaskOccur;
     }
 
-    public void setGmtTaskOccur(long gmtTaskOccur) {
+    public void setGmtTaskOccur(Date gmtTaskOccur) {
         this.gmtTaskOccur = gmtTaskOccur;
     }
 }

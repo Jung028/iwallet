@@ -3,6 +3,7 @@ package com.alipay.business.biz.service.impl.business.impl;
 import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
 import com.alipay.account_center.common.service.facade.enums.AccountResultCode;
 import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
+import com.alipay.account_center.common.service.facade.enums.TxnEventType;
 import com.alipay.account_center.common.service.facade.event.EcTransactionEvent;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.QueryTransactionRecordRequest;
@@ -31,7 +32,7 @@ public class TransactionServiceImpl implements TransactionService {
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
-    public void publishTransfer(String payerAccountNo, String txnId) {
+    public void publishTransfer(String payerAccountNo, String txnId, String txnEventType) {
         // fetch and validate the transaction record
         QueryTransactionRecordRequest queryRequest = new QueryTransactionRecordRequest();
         queryRequest.setAccountId(payerAccountNo);
@@ -57,9 +58,9 @@ public class TransactionServiceImpl implements TransactionService {
                 transactionRecord.getResult().getPayerAccountId(),
                 transactionRecord.getResult().getPayeeAccountId(),
                 amount,
-                transactionRecord.getResult().getCurrency()
+                transactionRecord.getResult().getCurrency(),
+                txnEventType
         );
-        System.out.print("PUBLISH EC START");
         // use payerAccountId as partition key — guarantees ordering per account
         kafkaTemplate.send("EC_TRANSACTION", event.getPayerAccountNo(), event);
         System.out.print("PUBLISH EC_TRANSACTION");

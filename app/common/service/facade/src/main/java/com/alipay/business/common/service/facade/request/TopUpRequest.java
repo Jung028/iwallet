@@ -12,6 +12,7 @@ public class TopUpRequest extends BusinessBaseRequest {
     private CardType cardType; // CREDIT/DEBIT,
     private String uniqueRequestId;
     private boolean isSaveCard;
+    private String passwordPin;
 
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
@@ -48,5 +49,13 @@ public class TopUpRequest extends BusinessBaseRequest {
 
     public void setSaveCard(boolean saveCard) {
         isSaveCard = saveCard;
+    }
+
+    public String getPasswordPin() {
+        return passwordPin;
+    }
+
+    public void setPasswordPin(String passwordPin) {
+        this.passwordPin = passwordPin;
     }
 }
