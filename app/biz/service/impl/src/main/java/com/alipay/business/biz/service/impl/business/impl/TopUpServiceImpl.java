@@ -1,36 +1,20 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
-import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
-import com.alipay.account_center.common.service.facade.enums.TxnEventType;
-import com.alipay.account_center.common.service.facade.event.EcTransactionEvent;
-import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
-import com.alipay.account_center.common.service.facade.request.QueryAccountInfoRequest;
 import com.alipay.business.biz.service.impl.business.TopUpService;
 import com.alipay.business.biz.service.impl.business.TransactionService;
-import com.alipay.business.common.service.facade.enums.BusinessResultCode;
-import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
 import com.alipay.business.common.service.integration.account.AccountServiceClient;
 import com.alipay.business.common.service.integration.user.UserServiceClient;
-import com.alipay.business.core.model.domain.IdempotencyKeys;
-import com.alipay.business.core.model.exception.BusinessException;
 import com.alipay.business.core.service.IdempotencyKeysRepository;
-import com.stripe.exception.EventDataObjectDeserializationException;
-import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.StripeObject;
-import com.stripe.net.Webhook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-
-import static com.alipay.business.biz.service.impl.constant.GlobalBizConstants.*;
 
 /**
  * @author adam

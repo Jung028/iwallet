@@ -58,4 +58,8 @@ public class BusinessRequestChecker {
 //        AssertUtil.notBlank(request.getCardType().toString(), BusinessResultCode.PARAM_ILLEGAL, "card type is required");
 //        AssertUtil.notBlank(request.getAmount().toString(), BusinessResultCode.PARAM_ILLEGAL, "amount is required");
     }
+
+    public static void checkGenerateQrCodeRequest(GenerateQrCodeRequest request) {
+
+    }
 }

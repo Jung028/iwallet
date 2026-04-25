@@ -14,7 +14,8 @@ public enum BusinessActionEnum {
 
     PUBLISH_TOP_UP("PUBLISH_TOP_UP", "publish top up"),
 
-    CREATE_TOP_UP_INTENT("CREATE_TOP_UP_INTENT", "create top up intent"),;
+    CREATE_TOP_UP_INTENT("CREATE_TOP_UP_INTENT", "create top up intent"),
+    GENERATE_QR_CODE("GENERATE_QR_CODE", "generate qr code" ),;
 
     private String code;
     private String desc;

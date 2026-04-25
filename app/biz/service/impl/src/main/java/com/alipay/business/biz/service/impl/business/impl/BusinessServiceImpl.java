@@ -2,7 +2,7 @@ package com.alipay.business.biz.service.impl.business.impl;
 
 import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
 import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
-import com.alipay.account_center.common.service.facade.enums.TransactionTypeEnum;
+import com.alipay.account_center.common.service.facade.enums.TransactionType;
 import com.alipay.account_center.common.service.facade.enums.TxnEventType;
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
@@ -299,7 +299,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             insertRequest.setPayeeAccountNo(payload.getPayeeAccountNo());
                             insertRequest.setAmount(payload.getAmount());
                             insertRequest.setCurrency(payload.getCurrency());
-                            insertRequest.setTxnType(TransactionTypeEnum.TRANSFER);
+                            insertRequest.setTxnType(TransactionType.TRANSFER);
                             insertRequest.setStatus(TransactionStatusEnum.PENDING);
 
                             AccountBizResult<TransactionRecordItem> transactionRecord =
@@ -703,7 +703,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             insertRequest.setPayeeAccountNo(accountInfo.getResult().getAccountId());
                             insertRequest.setAmount(request.getAmount());
                             insertRequest.setCurrency(request.getCurrency());
-                            insertRequest.setTxnType(TransactionTypeEnum.TOP_UP);
+                            insertRequest.setTxnType(TransactionType.TOP_UP);
                             insertRequest.setStatus(TransactionStatusEnum.PENDING);
 
                             AccountBizResult<TransactionRecordItem> transactionRecord =

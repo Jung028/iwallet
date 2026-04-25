@@ -5,7 +5,7 @@ import com.alipay.business.common.service.facade.baseresult.BusinessBaseResult;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class BusinessBalanceResult extends BusinessBaseResult {
+public class BusinessBalanceResult {
     private String accountId;
     private String accountNumber;
     private String accountName;

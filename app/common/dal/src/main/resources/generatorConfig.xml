@@ -30,6 +30,7 @@
 
         <!-- Table(s) to generate -->
         <table tableName="idempotency_keys" domainObjectName="IdempotencyKeysDO" />
+        <table tableName="qr_code" domainObjectName="QrCodeDO" />
 
     </context>
 </generatorConfiguration>

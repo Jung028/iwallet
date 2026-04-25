@@ -2,7 +2,7 @@ package com.alipay.business.common.service.facade.result;
 
 import com.alipay.business.common.service.facade.baseresult.BusinessBaseResult;
 
-public class UpdateIdempotencyKeysResult extends BusinessBaseResult {
+public class UpdateIdempotencyKeysResult {
     private String status;
     private String referenceId;
     private int retryCount;

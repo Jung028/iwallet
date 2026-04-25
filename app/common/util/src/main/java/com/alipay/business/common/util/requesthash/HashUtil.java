@@ -38,10 +38,4 @@ public class HashUtil {
 
 
 
-    public static String generatePublishTopUpRequestHash(Long amount, String currency, String customer) throws NoSuchAlgorithmException {
-        String input = amount.toString() + "." + currency + "." + customer;
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] encodedHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-        return HexFormat.of().formatHex(encodedHash); // Returns 64-char hex string
-    }
 }

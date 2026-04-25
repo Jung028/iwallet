@@ -4,7 +4,9 @@ import com.alipay.business.common.service.facade.baseresult.BusinessBasePageRequ
 
 public class BusinessTransactionHistoryRequest extends BusinessBasePageRequest {
     private String accountId;
-    private String txnId;
+    private String payerAccountId;
+    private String payerName;
+    private String gmtCreate;
 
     public String getAccountId() {
         return this.accountId;
@@ -14,11 +16,27 @@ public class BusinessTransactionHistoryRequest extends BusinessBasePageRequest {
         this.accountId = accountId;
     }
 
-    public String getTxnId() {
-        return this.txnId;
+    public String getPayerAccountId() {
+        return payerAccountId;
     }
 
-    public void setTxnId(String txnId) {
-        this.txnId = txnId;
+    public void setPayerAccountId(String payerAccountId) {
+        this.payerAccountId = payerAccountId;
+    }
+
+    public String getPayerName() {
+        return payerName;
+    }
+
+    public void setPayerName(String payerName) {
+        this.payerName = payerName;
+    }
+
+    public String getGmtCreate() {
+        return gmtCreate;
+    }
+
+    public void setGmtCreate(String gmtCreate) {
+        this.gmtCreate = gmtCreate;
     }
 }

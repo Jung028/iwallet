@@ -7,6 +7,7 @@ import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.result.*;
+import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
 import com.stripe.net.Webhook;
 import org.apache.ibatis.transaction.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;

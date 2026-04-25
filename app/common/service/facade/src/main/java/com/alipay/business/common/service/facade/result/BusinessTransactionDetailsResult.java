@@ -1,13 +1,14 @@
 package com.alipay.business.common.service.facade.result;
 
 import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
-import com.alipay.account_center.common.service.facade.enums.TransactionTypeEnum;
+import com.alipay.account_center.common.service.facade.enums.TransactionType;
 import com.alipay.business.common.service.facade.baseresult.BusinessBaseResult;
+import org.apache.ibatis.transaction.Transaction;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class BusinessTransactionDetailsResult extends BusinessBaseResult {
+public class BusinessTransactionDetailsResult {
     private String txnId;
     private Date gmtCreate;
     private Date gmtModified;
@@ -16,7 +17,7 @@ public class BusinessTransactionDetailsResult extends BusinessBaseResult {
     private String payeeAccountId;
     private BigDecimal amount;
     private String currency;
-    private TransactionTypeEnum txnType;
+    private TransactionType txnType;
     private TransactionStatusEnum txnStatus;
     private String failureReason;
     private String extInfo;
@@ -85,11 +86,11 @@ public class BusinessTransactionDetailsResult extends BusinessBaseResult {
         this.currency = currency;
     }
 
-    public TransactionTypeEnum getTxnType() {
+    public TransactionType getTxnType() {
         return this.txnType;
     }
 
-    public void setTxnType(TransactionTypeEnum txnType) {
+    public void setTxnType(TransactionType txnType) {
         this.txnType = txnType;
     }
 

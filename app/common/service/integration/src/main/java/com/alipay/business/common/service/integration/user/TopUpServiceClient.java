@@ -2,9 +2,7 @@ package com.alipay.business.common.service.integration.user;
 
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
 import com.alipay.usercenter.common.service.facade.item.UserCardDetailItem;
-import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
 import com.alipay.usercenter.common.service.facade.request.QueryDefaultCardRequest;
-import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

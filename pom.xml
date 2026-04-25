@@ -54,7 +54,11 @@
                 <scope>test</scope>
             </dependency>
             <!-- MyBatis -->
-
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+                <version>3.3.2</version>
+            </dependency>
 
             <!-- PostgreSQL JDBC -->
             <dependency>
