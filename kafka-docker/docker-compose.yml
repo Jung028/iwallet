@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  zookeeper-iwallet:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper-iwallet
+    ports:
+      - "2183:2181"   # expose ZK for iWallet on host 2183
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka-iwallet:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka-iwallet
+    depends_on:
+      - zookeeper-iwallet
+    ports:
+      - "9094:9094"   # Map container port 9092 to host 9094
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-iwallet:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9094
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1

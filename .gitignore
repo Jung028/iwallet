@@ -1,0 +1,29 @@
+# -------------------------
+# Maven target directories
+# -------------------------
+target/
+**/target/
+**/maven-status/
+**/maven-archiver/
+**/*.jar
+*.pem
+# -------------------------
+# IDE / editor files
+# -------------------------
+*.iml
+.idea/
+*.ipr
+*.iws
+out/
+# -------------------------
+# OS / temp files
+# -------------------------
+.DS_Store
+Thumbs.db
+*.swp
+
+# -------------------------
+# Keep source code and resources
+# -------------------------
+!**/src/main/java/
+!**/src/main/resources/

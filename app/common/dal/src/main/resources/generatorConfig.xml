@@ -1,0 +1,36 @@
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "https://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <context id="alipay" targetRuntime="MyBatis3">
+
+        <!-- JDBC connection -->
+        <jdbcConnection
+                driverClass="org.postgresql.Driver"
+                connectionURL="jdbc:postgresql://localhost:5432/wallet"
+                userId="adam"
+                password="1234" />
+
+        <!-- Java Model (DO) generation -->
+        <javaModelGenerator
+                targetPackage="com.alipay.business.common.dal.auto.dataobject"
+                targetProject="src/main/java"/>
+
+        <!-- Mapper XML generation -->
+        <sqlMapGenerator
+                targetPackage="sqlmap.iwallet.auto"
+                targetProject="src/main/resources"/>
+
+        <!-- Mapper interface generation -->
+        <javaClientGenerator
+                type="XMLMAPPER"
+                targetPackage="com.alipay.business.common.dal.auto.daointerface"
+                targetProject="src/main/java"/>
+
+        <!-- Table(s) to generate -->
+        <table tableName="idempotency_keys" domainObjectName="IdempotencyKeysDO" />
+        <table tableName="qr_code" domainObjectName="QrCodeDO" />
+
+    </context>
+</generatorConfiguration>

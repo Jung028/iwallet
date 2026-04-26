@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.alipay.business.common.dal.auto.custom.IdempotencyKeysDAO">
+
+    <resultMap id="BaseResultMap" type="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="idempotency_key" jdbcType="VARCHAR" property="idempotencyKey"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="request_hash" jdbcType="VARCHAR" property="requestHash"/>
+        <result column="idempotency_type" jdbcType="VARCHAR" property="idempotencyType" />
+        <result column="reference_id" jdbcType="VARCHAR" property="referenceId" />
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="error_code" jdbcType="VARCHAR" property="errorCode"/>
+        <result column="response_snapshot" jdbcType="VARCHAR" property="responseSnapshot"/>
+        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="retry_count" jdbcType="INTEGER" property="retryCount" />
+    </resultMap>
+
+    <insert id="insertIdempotencyKey" parameterType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
+        insert into idempotency_keys (idempotency_key, user_id,
+        request_hash, reference_id, status,
+        error_code, response_snapshot, created_at,
+        updated_at, retry_count, locked_until,
+        idempotency_type)
+        values (#{idempotencyKey,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
+        #{requestHash,jdbcType=VARCHAR}, #{referenceId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+        #{errorCode,jdbcType=VARCHAR}, #{responseSnapshot,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
+        #{updatedAt,jdbcType=TIMESTAMP}, #{retryCount,jdbcType=INTEGER}, #{lockedUntil,jdbcType=TIMESTAMP},
+        #{idempotencyType,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="queryIdempotencyKeysByIdempotencyKey" resultMap="BaseResultMap">
+        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until, idempotency_type
+        FROM idempotency_keys WHERE idempotency_key = #{idempotencyKey}
+    </select>
+
+    <select id="queryIdempotencyKeysByReferenceId" resultMap="BaseResultMap">
+        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until, idempotency_type
+        FROM idempotency_keys WHERE reference_id = #{referenceId}
+    </select>
+
+    <select id="queryIdempotencyKeysByRequestHash" resultMap="BaseResultMap">
+        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until, idempotency_type
+        FROM idempotency_keys WHERE request_hash = #{requestHash} AND user_id = #{userId}
+        ORDER BY created_at DESC LIMIT 1
+    </select>
+
+    <select id="queryActiveIdempotencyKeyByHash" resultMap="BaseResultMap">
+        SELECT idempotency_key, user_id, request_hash, reference_id, status, error_code, response_snapshot, created_at, updated_at, retry_count, locked_until, idempotency_type
+        FROM idempotency_keys
+        WHERE request_hash = #{requestHash} AND user_id = #{userId}
+        AND status IN ('INIT', 'PENDING', 'OTP_OVER_LIMIT')
+        ORDER BY created_at DESC LIMIT 1
+    </select>
+
+
+    <update id="updateFailedAttempts" parameterType="String">
+        UPDATE idempotency_keys
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="retryCount != null">retry_count = #{retryCount},</if>
+            <if test="lockedUntil != null">locked_until = #{lockedUntil},</if>
+            updated_at = NOW()
+        </set>
+        WHERE idempotency_key = #{idempotencyKey}
+    </update>
+
+    <update id="updateReferenceId">
+        UPDATE idempotency_keys
+        SET reference_id = #{referenceId}
+        WHERE idempotency_key = #{idempotencyKey}
+    </update>
+
+    <update id="updateIdempotencyKeysByReferenceId" parameterType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
+        UPDATE idempotency_keys
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="retryCount != null">retry_count = #{retryCount},</if>
+            <if test="lockedUntil != null">locked_until = #{lockedUntil},</if>
+            updated_at = NOW()
+        </set>
+        WHERE reference_id = #{referenceId}
+    </update>
+
+    <select id="countActiveTransactionsByUserId" resultType="int">
+        SELECT COUNT(1)
+        FROM idempotency_keys
+        WHERE user_id = #{userId}
+        AND status IN ('INIT','PENDING')
+    </select>
+
+    <update id="updateIdempotencyKeys" parameterType="com.alipay.business.common.dal.auto.dataobject.IdempotencyKeysDO">
+        UPDATE idempotency_keys
+        <set>
+            <if test="referenceId != null">reference_id = #{referenceId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="retryCount != null">retry_count = #{retryCount},</if>
+            updated_at = NOW()
+        </set>
+        WHERE idempotency_key = #{idempotencyKey}
+    </update>
+
+</mapper>
