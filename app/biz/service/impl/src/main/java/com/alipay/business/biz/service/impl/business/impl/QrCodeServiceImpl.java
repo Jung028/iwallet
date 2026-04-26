@@ -51,6 +51,7 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
                         //route the intent, create a handler, to handle intent if its
                         // create a handler here.
                         QrCodeGeneratorHandler handler = qrCodeGeneratorFactory.getHandler(request.getQrIntent());
+                        // validate that the owner is a merchant / user and its exists, and active.
                         handler.validate(request);
                         // generate QR Code. insert
                         GenerateQrCodeResult qrCodeResult;

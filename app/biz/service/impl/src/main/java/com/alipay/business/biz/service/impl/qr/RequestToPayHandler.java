@@ -1,10 +1,13 @@
 package com.alipay.business.biz.service.impl.qr;
-import com.alipay.business.biz.service.impl.business.impl.AbstractBusinessBizService;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
+import com.alipay.business.common.service.facade.enums.OwnerType;
 import com.alipay.business.common.service.facade.enums.QrIntent;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
-import com.alipay.business.common.service.facade.result.GenerateQrCodeResult;
 import com.alipay.business.core.model.util.AssertUtil;
+import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
+import com.alipay.usercenter.common.service.facade.enums.UserStatus;
+import com.alipay.usercenter.common.service.facade.item.UserInfoItem;
+import com.alipay.usercenter.common.service.facade.request.QueryUserInfoRequest;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,7 +15,7 @@ import org.springframework.stereotype.Component;
  * @date 24/4/2026 12:08 AM
  */
 @Component
-public class RequestToPayHandler extends AbstractBusinessBizService implements QrCodeGeneratorHandler {
+public class RequestToPayHandler extends AbstractQrHandlerService implements QrCodeGeneratorHandler {
 
     @Override
     public QrIntent getQrIntent() {
@@ -21,15 +24,25 @@ public class RequestToPayHandler extends AbstractBusinessBizService implements Q
 
     @Override
     public void validate(GenerateQrCodeRequest request) {
-        // validate that the merchant id is not blank
+        // only the user is allowed to receive money. user to user.
         AssertUtil.notBlank(request.getUserId(), BusinessResultCode.PARAM_ILLEGAL, "user Id cannot be blank");
-//        UserInfo userInfo = userInfoRepository.queryUserInfoByUserId(request.getUserId());
-//        AssertUtil.notNull(userInfo, BusinessResultCode.PARAM_ILLEGAL, "user not exist");
-
+        QueryUserInfoRequest queryUserInfoRequest = new QueryUserInfoRequest();
+        queryUserInfoRequest.setUserId(request.getUserId());
+        UserBizResult<UserInfoItem> userInfo = userServiceClient.queryUserInfoByUserId(queryUserInfoRequest);
+        AssertUtil.notNull(userInfo, BusinessResultCode.PARAM_ILLEGAL, "user not exist");
+        AssertUtil.isTrue(userInfo.getResult().getStatus() == UserStatus.ACTIVE,
+                BusinessResultCode.PARAM_ILLEGAL, "user not active");
     }
 
     @Override
-    public GenerateQrCodeResult generateQR(GenerateQrCodeRequest request) throws Exception {
-        return new GenerateQrCodeResult("", "", "");
+    public String getOwnerId(GenerateQrCodeRequest request) {
+        return request.getUserId();
     }
+
+
+    @Override
+    public OwnerType getOwnerType() {
+        return OwnerType.USER;
+    }
+
 }

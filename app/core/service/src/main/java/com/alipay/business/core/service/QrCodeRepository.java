@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface QrCodeRepository {
     void insertQrCode(QrCode qrCode);
 
-    void updateQrCode(String qrId, String status);
+    void updateQrCode(String qrId, String signature, String status);
 }
