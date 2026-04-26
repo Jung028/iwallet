@@ -31,6 +31,11 @@
         </dependency>
         <dependency>
             <groupId>org.adam</groupId>
+            <artifactId>merchant-common-service-facade</artifactId>
+            <version>${merchant.common.service.facade.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.adam</groupId>
             <artifactId>business-core-model</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>

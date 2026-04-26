@@ -1,9 +1,11 @@
 package com.alipay.business.biz.service.impl.qr;
 
 
+import com.alipay.business.common.service.facade.enums.OwnerType;
 import com.alipay.business.common.service.facade.enums.QrIntent;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
 import com.alipay.business.common.service.facade.result.GenerateQrCodeResult;
+import com.alipay.business.core.model.domain.QrCode;
 
 /**
  * @author adam
@@ -23,8 +25,21 @@ public interface QrCodeGeneratorHandler {
     void validate(GenerateQrCodeRequest request);
 
     /**
+     * get owner id, either user or merchant
+     * @param request
+     * @return
+     */
+    String getOwnerId(GenerateQrCodeRequest request);
+
+    /**
+     * get owner type, either merchant or user
+     * @return
+     */
+    OwnerType getOwnerType();
+
+    /**
      * used to generate QR code.
      * @param request
      */
-    GenerateQrCodeResult generateQR(GenerateQrCodeRequest request) throws Exception;
+    GenerateQrCodeResult generateQR(GenerateQrCodeRequest request);
 }
