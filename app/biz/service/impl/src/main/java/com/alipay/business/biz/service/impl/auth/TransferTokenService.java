@@ -23,7 +23,7 @@ public class TransferTokenService {
     @Value("${transfer.token.secret}")   // put this in your application.properties
     private String secret;
 
-    public String issue(String uniqueRequestId,
+    public String issueTransferToken(String uniqueRequestId,
                         String payerAccountNo,
                         String payeeAccountNo,
                         BigDecimal amount,
@@ -43,7 +43,7 @@ public class TransferTokenService {
     }
 
     // returns null if the token is expired or tampered with
-    public TransferTokenPayload verify(String token) {
+    public TransferTokenPayload verifyTransferToken(String token) {
         try {
             Claims claims = Jwts.parser()
                     .verifyWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
@@ -60,9 +60,8 @@ public class TransferTokenService {
             payload.setRequiresOtp(    claims.get("requiresOtp", Boolean.class));
             return payload;
 
-        } catch (JwtException e) {
-            // expired or tampered — caller gets null and returns "session expired"
-            return null;
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new RuntimeException(e);
         }
     }
 }

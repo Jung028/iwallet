@@ -8,7 +8,6 @@ import com.alipay.business.biz.service.impl.qr.QrCodeGeneratorHandler;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
-import com.alipay.business.common.service.facade.result.GenerateQrCodeResult;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
 import com.alipay.sofa.runtime.api.annotation.SofaServiceBinding;
@@ -33,11 +32,11 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
     protected QrCodeGeneratorFactory qrCodeGeneratorFactory;
 
     @Override
-    public BusinessBizResult<GenerateQrCodeResult> generateQrCode(GenerateQrCodeRequest request) {
+    public BusinessBizResult<String> generateQrCode(GenerateQrCodeRequest request) {
         return businessServiceTemplate.execute(request, BusinessActionEnum.GENERATE_QR_CODE,
                 new BusinessBizCallback<>() {
                     @Override
-                    protected BusinessBizResult<GenerateQrCodeResult> createDefaultResponse() {
+                    protected BusinessBizResult<String> createDefaultResponse() {
                         return new BusinessBizResult<>();
                     }
 
@@ -47,21 +46,21 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
                     }
 
                     @Override
-                    protected void process(GenerateQrCodeRequest request, BusinessBizResult<GenerateQrCodeResult> response) {
+                    protected void process(GenerateQrCodeRequest request, BusinessBizResult<String> response) {
                         //route the intent, create a handler, to handle intent if its
                         // create a handler here.
                         QrCodeGeneratorHandler handler = qrCodeGeneratorFactory.getHandler(request.getQrIntent());
                         // validate that the owner is a merchant / user and its exists, and active.
                         handler.validate(request);
                         // generate QR Code. insert
-                        GenerateQrCodeResult qrCodeResult;
+                        String qrToken;
                         try {
-                            qrCodeResult = handler.generateQR(request);
+                            qrToken = handler.generateQR(request);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
 
-                        ResponseBuilder.success(response, qrCodeResult,
+                        ResponseBuilder.success(response, qrToken,
                                 BusinessActionEnum.GENERATE_QR_CODE.getCode(),
                                 BusinessActionEnum.GENERATE_QR_CODE.getDesc());
                     }

@@ -35,7 +35,7 @@ public class QrCodeRepositoryImpl implements QrCodeRepository {
     }
 
     @Override
-    public void updateQrCode(String qrId, String signature, String status) {
+    public void updateQrCode(String qrId, String status) {
 
     }
 }

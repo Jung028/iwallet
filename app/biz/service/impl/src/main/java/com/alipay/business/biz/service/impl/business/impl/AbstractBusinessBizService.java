@@ -1,5 +1,6 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
+import com.alipay.business.biz.service.impl.auth.QrTokenService;
 import com.alipay.business.biz.service.impl.auth.TransferTokenService;
 import com.alipay.business.biz.service.impl.business.TransactionService;
 import com.alipay.business.biz.service.impl.template.BusinessServiceTemplate;
@@ -37,4 +38,6 @@ public abstract class AbstractBusinessBizService {
     @Autowired
     protected TransactionService transactionService;
 
+    @Autowired
+    protected QrTokenService qrTokenService;
 }

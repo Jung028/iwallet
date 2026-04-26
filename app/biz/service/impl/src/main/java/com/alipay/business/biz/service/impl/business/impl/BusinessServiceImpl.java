@@ -7,6 +7,7 @@ import com.alipay.account_center.common.service.facade.enums.TxnEventType;
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.*;
+import com.alipay.business.biz.service.impl.auth.QrTokenPayload;
 import com.alipay.business.biz.service.impl.auth.TransferTokenPayload;
 import com.alipay.business.biz.service.impl.checker.BusinessRequestChecker;
 import com.alipay.business.biz.service.impl.helper.ResponseBuilder;
@@ -37,6 +38,7 @@ import com.alipay.usercenter.common.service.facade.item.*;
 import com.alipay.usercenter.common.service.facade.request.*;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Account;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -55,6 +57,8 @@ import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.alipay.business.biz.service.impl.constant.GlobalBizConstants.*;
 
@@ -97,11 +101,41 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                     @Override
                     protected void process(TransferRequest request, BusinessBizResult<String> response) {
 
+                        QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
+                        BigDecimal amount = null;
+                        //et the qrid and the payload and signature here.
+                        if (request.getTransferType().equals(TransferType.QR.getCode())) {
+                            AssertUtil.notBlank(request.getQrToken(), BusinessResultCode.PARAM_ILLEGAL,
+                                    "Qr token cannot be blank");
+                            // verify the token, then return the payload
+                            QrTokenPayload qrTokenPayload = qrTokenService.verifyQrToken(request.getQrToken());
+
+                            // get payee account id, where payee is the QR code owner id account
+                            queryAccountInfoRequest.setUserId(qrTokenPayload.getOwnerId());
+                            AccountBizResult<AccountInfoItem> payeeAccountInfo =
+                                    accountServiceClient.queryAccountInfoByUserId(queryAccountInfoRequest);
+                            AssertUtil.notNull(payeeAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "account not found");
+
+                            // get payer account id
+                            queryAccountInfoRequest.setUserId(userId);
+                            AccountBizResult<AccountInfoItem> payerAccountInfo =
+                                    accountServiceClient.queryAccountInfoByUserId(queryAccountInfoRequest);
+                            AssertUtil.notNull(payerAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "account not found");
+
+                            // override the request which are passed into the
+                            request.setPayeeAccountNo(payeeAccountInfo.getResult().getAccountId());
+                            request.setPayerAccountNo(payerAccountInfo.getResult().getAccountId());
+                            request.setUniqueRequestId(qrTokenPayload.getQrId());
+                            amount = qrTokenPayload.getAmount();
+                        } else {
+                            // else set the Money amount to request amount
+                            amount = request.getAmount().getAmount();
+                        }
+
                         AssertUtil.isTrue(
                                 !request.getPayeeAccountNo().equals(request.getPayerAccountNo()),
                                 BusinessResultCode.PARAM_ILLEGAL, "Cannot send to same account");
 
-                        QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
                         queryAccountInfoRequest.setAccountId(request.getPayerAccountNo());
                         AccountBizResult<AccountInfoItem> payerAccountInfo =
                                 accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
@@ -131,11 +165,11 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                         boolean requiresOtp = requestAmount.isGreaterThan(LIMIT);
 
-                        String transferToken = transferTokenService.issue(
+                        String transferToken = transferTokenService.issueTransferToken(
                                 request.getUniqueRequestId(),
                                 request.getPayerAccountNo(),
                                 request.getPayeeAccountNo(),
-                                request.getAmount().getAmount(),
+                                amount,
                                 request.getAmount().getCurrency().getCurrencyCode(),
                                 requiresOtp
                         );
@@ -171,7 +205,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                     protected void process(TransferConfirmRequest request, BusinessBizResult<String> response) {
 
                         TransferTokenPayload payload =
-                                transferTokenService.verify(request.getTransferToken());
+                                transferTokenService.verifyTransferToken(request.getTransferToken());
 
                         AssertUtil.notNull(payload,
                                 BusinessResultCode.INVALID_REQUEST,
@@ -212,6 +246,10 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                 return;
                             }
                         }
+
+                        //TODO: QR :
+                        // we only need to update the code where payer account id. because when merchant is created, the account created
+                        // is to this payer account with type as merchant instead of user
 
                         // verify user password
                         VerifyUserAuthRequest verifyUserAuthRequest = new VerifyUserAuthRequest();
