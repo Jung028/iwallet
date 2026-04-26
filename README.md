@@ -5,6 +5,7 @@ iWallet Business Service is a high-concurrency, event-driven digital wallet back
 ## System Analysis
 - Business Center [SA] : https://www.notion.so/Business-Center-SA-2acd911b2cdb80829ef7fcc6debde616?source=copy_link
 - Top Up [SA] : https://www.notion.so/Top-Up-SA-32bd911b2cdb80c98103fa9a051de7a6?source=copy_link
+- QR Transaction [SA] : https://www.notion.so/QR-Transaction-and-imerchant-development-SA-342d911b2cdb8067bbefcf0b45db1d18?source=copy_link
 
 ## 🚀 Features
 
