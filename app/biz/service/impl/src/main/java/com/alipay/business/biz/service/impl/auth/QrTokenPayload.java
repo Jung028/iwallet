@@ -1,6 +1,5 @@
 package com.alipay.business.biz.service.impl.auth;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -9,7 +8,7 @@ import java.util.Date;
  */
 public class QrTokenPayload {
     private String qrId;
-    private BigDecimal amount;
+    private Long amount;
     private String currency;
     private String ownerId;
     private String qrIntent;
@@ -23,11 +22,11 @@ public class QrTokenPayload {
         this.qrId = qrId;
     }
 
-    public BigDecimal getAmount() {
+    public Long getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 

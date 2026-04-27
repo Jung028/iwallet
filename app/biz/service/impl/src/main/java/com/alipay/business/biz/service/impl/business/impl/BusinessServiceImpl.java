@@ -126,7 +126,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             request.setPayeeAccountNo(payeeAccountInfo.getResult().getAccountId());
                             request.setPayerAccountNo(payerAccountInfo.getResult().getAccountId());
                             request.setUniqueRequestId(qrTokenPayload.getQrId());
-                            amount = qrTokenPayload.getAmount();
+                            // convert string to big decimal
+                            amount = BigDecimal.valueOf(qrTokenPayload.getAmount());
                         } else {
                             // else set the Money amount to request amount
                             amount = request.getAmount().getAmount();

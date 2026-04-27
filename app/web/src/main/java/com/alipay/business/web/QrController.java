@@ -26,6 +26,7 @@ public class QrController {
     public BusinessBizResult<String> generateQrCode(@RequestBody GenerateQrCodeRequest request) {
         try {
             JwtClaims claims = JwtContextHolder.get();
+            // the user id is pass
             request.setUserId(claims.getSubject());
             // should this be able to change user login password as well?
             return qrCodeService.generateQrCode(request);

@@ -26,12 +26,16 @@ public class ItemConverter {
         //stream
         result.getResult().getTransactionHistoryList().forEach(item -> {
             TransactionHistoryItem transactionHistoryItem = new TransactionHistoryItem();
-            transactionHistoryItem.setAmount(item.getAmount());
-            transactionHistoryItem.setStatus(item.getStatus());
-            transactionHistoryItem.setCurrency(item.getCurrency());
-            transactionHistoryItem.setExtInfo(item.getExtInfo());
             transactionHistoryItem.setTxnId(item.getTxnId());
             transactionHistoryItem.setGmtCreate(item.getGmtCreate());
+            transactionHistoryItem.setPayeeAccountId(item.getPayeeAccountId());
+            transactionHistoryItem.setCompletedAt(item.getCompletedAt());
+            transactionHistoryItem.setTransactionDirection(item.getTransactionDirection());
+            transactionHistoryItem.setTransactionType(item.getTransactionType());
+            transactionHistoryItem.setAmount(item.getAmount());
+            transactionHistoryItem.setCurrency(item.getCurrency());
+            transactionHistoryItem.setStatus(item.getStatus());
+            transactionHistoryItem.setExtInfo(item.getExtInfo());
             items.add(transactionHistoryItem);
         });
         return items;

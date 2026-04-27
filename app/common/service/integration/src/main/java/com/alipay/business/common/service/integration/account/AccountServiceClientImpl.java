@@ -118,7 +118,7 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
     @Override
     public AccountBizResult<AccountInfoItem> queryAccountInfoByUserId(QueryAccountInfoRequest request) {
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "Query account info request cannot be null");
-        AssertUtil.notBlank(request.getUserId(), BusinessResultCode.PARAM_ILLEGAL, "account no cannot be blank");
+        AssertUtil.notBlank(request.getUserId(), BusinessResultCode.PARAM_ILLEGAL, "userId cannot be blank");
 
         // set cross invoke
         AccountBizResult<AccountInfoItem> result = accountService.queryAccountInfoByUserId(request);

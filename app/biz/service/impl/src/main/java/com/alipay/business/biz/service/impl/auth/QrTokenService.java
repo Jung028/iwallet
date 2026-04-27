@@ -5,6 +5,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +15,7 @@ import java.util.Date;
  * @author adam
  * @date 26/4/2026 3:35 PM
  */
+@Service
 public class QrTokenService {
 
     private static final long TTL_MILLIS = 10 * 60 * 1000 ;
@@ -41,7 +43,7 @@ public class QrTokenService {
                 .claim("qrId", qrId)
                 .claim("amount", amount)
                 .claim("currency", currency)
-                .claim("userId", userId)
+                .claim("ownerId", userId)
                 .claim("qrIntent", qrIntent)
                 .claim("expiresAt", expiresAt)
                 .issuedAt(new Date())
@@ -65,7 +67,7 @@ public class QrTokenService {
             QrTokenPayload qrTokenPayload = new QrTokenPayload();
             qrTokenPayload.setQrId(claims.get("qrId", String.class));
             qrTokenPayload.setCurrency(claims.get("currency", String.class));
-            qrTokenPayload.setAmount(claims.get("amount", BigDecimal.class));
+            qrTokenPayload.setAmount(claims.get("amount", Long.class));
             qrTokenPayload.setOwnerId(claims.get("ownerId", String.class));
             qrTokenPayload.setExpiresAt(claims.get("expiresAt", Date.class));
             return qrTokenPayload;
