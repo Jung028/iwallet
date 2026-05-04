@@ -26,9 +26,9 @@
     <properties>
         <ialicore.common.service.facade.version>1.0-SNAPSHOT</ialicore.common.service.facade.version>
         <usercenter.common.service.facade.version>1.0.0.20260317.23-SNAPSHOT</usercenter.common.service.facade.version>
-        <accountcenter.common.service.facade.version>1.0.0.20260317.7-SNAPSHOT</accountcenter.common.service.facade.version>
+        <accountcenter.common.service.facade.version>1.0.0.20260317.9-SNAPSHOT</accountcenter.common.service.facade.version>
         <business.common.service.facade.version>1.0.0.20260317.3-SNAPSHOT</business.common.service.facade.version>
-        <merchant.common.service.facade.version>1.0.0.20260425.5-SNAPSHOT</merchant.common.service.facade.version>
+        <merchant.common.service.facade.version>1.0.0.20260425.6-SNAPSHOT</merchant.common.service.facade.version>
 
     </properties>
     <parent>

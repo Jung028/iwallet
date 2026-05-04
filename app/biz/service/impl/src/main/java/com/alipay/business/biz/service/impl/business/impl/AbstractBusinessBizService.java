@@ -5,6 +5,7 @@ import com.alipay.business.biz.service.impl.auth.TransferTokenService;
 import com.alipay.business.biz.service.impl.business.TransactionService;
 import com.alipay.business.biz.service.impl.template.BusinessServiceTemplate;
 import com.alipay.business.common.service.integration.account.AccountServiceClient;
+import com.alipay.business.common.service.integration.merchant.MerchantServiceClient;
 import com.alipay.business.common.service.integration.user.TopUpServiceClient;
 import com.alipay.business.common.service.integration.user.UserServiceClient;
 import com.alipay.business.core.service.IdempotencyKeysRepository;
@@ -40,4 +41,7 @@ public abstract class AbstractBusinessBizService {
 
     @Autowired
     protected QrTokenService qrTokenService;
+
+    @Autowired
+    protected MerchantServiceClient merchantServiceClient;
 }

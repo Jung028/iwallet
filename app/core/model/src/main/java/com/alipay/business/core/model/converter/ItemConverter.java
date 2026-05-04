@@ -46,6 +46,7 @@ public class ItemConverter {
         if (accountBizResult == null || accountBizResult.getResult() == null) {
             return result;
         }
+        // TODO: add the payer name, so that we can display to the user, what is our
         result.setTxnId(accountBizResult.getResult().getTxnId());
         result.setGmtCreate(accountBizResult.getResult().getGmtCreate());
         result.setGmtModified(accountBizResult.getResult().getGmtModified());

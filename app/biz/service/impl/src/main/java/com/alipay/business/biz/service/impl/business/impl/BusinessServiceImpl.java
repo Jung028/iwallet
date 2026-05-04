@@ -1,6 +1,7 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
 import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
+import com.alipay.account_center.common.service.facade.enums.TransactionCategory;
 import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
 import com.alipay.account_center.common.service.facade.enums.TransactionType;
 import com.alipay.account_center.common.service.facade.enums.TxnEventType;
@@ -14,10 +15,7 @@ import com.alipay.business.biz.service.impl.helper.ResponseBuilder;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.api.BusinessService;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
-import com.alipay.business.common.service.facade.enums.BusinessResultCode;
-import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
-import com.alipay.business.common.service.facade.enums.IdempotencyTypeEnum;
-import com.alipay.business.common.service.facade.enums.TransferType;
+import com.alipay.business.common.service.facade.enums.*;
 import com.alipay.business.common.service.facade.event.EcAutoReloadEvent;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.money.MoneyUtil;
@@ -29,6 +27,9 @@ import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
 import com.alipay.business.core.model.util.AssertUtil;
+import com.alipay.merchant.common.service.facade.baseresult.MerchantBizResult;
+import com.alipay.merchant.common.service.facade.item.MerchantInfoItem;
+import com.alipay.merchant.common.service.facade.result.QueryMerchantInfoRequest;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
 import com.alipay.sofa.runtime.api.annotation.SofaServiceBinding;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
@@ -211,10 +212,10 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         AssertUtil.notNull(payload,
                                 BusinessResultCode.INVALID_REQUEST,
                                 "Transfer session expired or invalid, please start again");
+
                         // TODO: we do not need to do anything to the transaction if it has failed because it was not updated to PROCESSING, meaning
                         //  the trasnsaction has not started to deduct your money, so if it failed in business Center, we do not need to
                         //  re-handle it. just add a scheduler to check where the GMT create is more than a day and status is PENDING.
-
                         if (payload.isRequiresOtp()) {
                             AssertUtil.isTrue(
                                     request.getTransferType().equals(TransferType.OTP.getCode()),
@@ -251,7 +252,6 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         //TODO: QR :
                         // we only need to update the code where payer account id. because when merchant is created, the account created
                         // is to this payer account with type as merchant instead of user
-
                         // verify user password
                         VerifyUserAuthRequest verifyUserAuthRequest = new VerifyUserAuthRequest();
                         verifyUserAuthRequest.setUserId(userId);
@@ -331,11 +331,22 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                         "Insufficient balance, please check your account and try again");
                             }
 
+                            //TODO: determine transaction category
+                            MerchantBizResult<MerchantInfoItem> merchantInfo = new MerchantBizResult<>();
+                            if (payerAccountInfo.getResult().getOwnerType().equals(OwnerType.MERCHANT.getCode())) {
+                                // then query the merchant category, then use this
+                                QueryMerchantInfoRequest queryMerchantInfoRequest = new QueryMerchantInfoRequest();
+                                queryMerchantInfoRequest.setMerchantId(payerAccountInfo.getResult().getAccountRelationId());
+                                merchantInfo = merchantServiceClient.queryMerchantInfo(queryMerchantInfoRequest);
+                            }
+
                             // insert transaction record of pending status
                             InsertTransactionRecordRequest insertRequest =
                                     new InsertTransactionRecordRequest();
                             insertRequest.setPayerAccountNo(payload.getPayerAccountNo());
                             insertRequest.setPayeeAccountNo(payload.getPayeeAccountNo());
+                            // Set transaction category
+                            insertRequest.setCategory(TransactionCategory.valueOf(merchantInfo.getResult().getMerchantCategory()));
                             insertRequest.setAmount(payload.getAmount());
                             insertRequest.setCurrency(payload.getCurrency());
                             insertRequest.setTxnType(TransactionType.TRANSFER);
