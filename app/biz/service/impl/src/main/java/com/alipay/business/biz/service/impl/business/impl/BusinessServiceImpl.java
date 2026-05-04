@@ -331,13 +331,14 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                         "Insufficient balance, please check your account and try again");
                             }
 
-                            //TODO: determine transaction category
-                            MerchantBizResult<MerchantInfoItem> merchantInfo = new MerchantBizResult<>();
+                            // determine transaction category
+                            TransactionCategory category = TransactionCategory.TRANSFER;
                             if (payerAccountInfo.getResult().getOwnerType().equals(OwnerType.MERCHANT.getCode())) {
                                 // then query the merchant category, then use this
                                 QueryMerchantInfoRequest queryMerchantInfoRequest = new QueryMerchantInfoRequest();
                                 queryMerchantInfoRequest.setMerchantId(payerAccountInfo.getResult().getAccountRelationId());
-                                merchantInfo = merchantServiceClient.queryMerchantInfo(queryMerchantInfoRequest);
+                                MerchantBizResult<MerchantInfoItem> merchantInfo = merchantServiceClient.queryMerchantInfo(queryMerchantInfoRequest);
+                                category = TransactionCategory.valueOf(merchantInfo.getResult().getMerchantId());
                             }
 
                             // insert transaction record of pending status
@@ -346,7 +347,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             insertRequest.setPayerAccountNo(payload.getPayerAccountNo());
                             insertRequest.setPayeeAccountNo(payload.getPayeeAccountNo());
                             // Set transaction category
-                            insertRequest.setCategory(TransactionCategory.valueOf(merchantInfo.getResult().getMerchantCategory()));
+                            insertRequest.setCategory(category);
                             insertRequest.setAmount(payload.getAmount());
                             insertRequest.setCurrency(payload.getCurrency());
                             insertRequest.setTxnType(TransactionType.TRANSFER);
