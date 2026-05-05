@@ -52,7 +52,6 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
         AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
         AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL, ", result is null");
         AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
-
         return result;
     }
 

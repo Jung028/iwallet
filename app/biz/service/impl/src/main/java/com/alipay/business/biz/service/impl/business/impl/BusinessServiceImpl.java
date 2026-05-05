@@ -522,8 +522,15 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                            BusinessBizResult<BusinessTransactionHistoryResult> response) {
                         QueryTransactionHistoryRequest queryTransactionHistoryRequest = new QueryTransactionHistoryRequest();
                         queryTransactionHistoryRequest.setAccountId(request.getAccountId());
+                        queryTransactionHistoryRequest.setPayerAccountId(request.getPayerAccountId());
+                        queryTransactionHistoryRequest.setTxnCategory(request.getTxnCategory());
+                        queryTransactionHistoryRequest.setAmountMin(request.getAmountMin());
+                        queryTransactionHistoryRequest.setAmountMax(request.getAmountMax());
+                        queryTransactionHistoryRequest.setTxnType(request.getTxnType());
+                        queryTransactionHistoryRequest.setTxnStatus(request.getTxnStatus());
                         queryTransactionHistoryRequest.setPageNo(request.getPageNo());
                         queryTransactionHistoryRequest.setPageSize(request.getPageSize());
+                        queryTransactionHistoryRequest.setGmtCreate(request.getGmtCreate());
 
                         // query transaction history
                         AccountBizResult<QueryTransactionHistoryResult> result = accountServiceClient

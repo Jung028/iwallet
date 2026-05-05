@@ -9,6 +9,7 @@ public class BusinessRequestChecker {
 
     public static void checkQueryTransactionHistoryRequest(BusinessTransactionHistoryRequest request) {
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "request is null");
+        AssertUtil.notBlank(request.getAccountId(), BusinessResultCode.PARAM_ILLEGAL, " accountId is null");
     }
 
     public static void checkTransferRequest(TransferRequest request) {
