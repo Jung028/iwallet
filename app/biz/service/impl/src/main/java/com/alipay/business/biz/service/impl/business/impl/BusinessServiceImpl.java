@@ -532,6 +532,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         queryTransactionHistoryRequest.setPageSize(request.getPageSize());
                         queryTransactionHistoryRequest.setGmtCreate(request.getGmtCreate());
 
+
                         // query transaction history
                         AccountBizResult<QueryTransactionHistoryResult> result = accountServiceClient
                                 .queryTransactionHistory(queryTransactionHistoryRequest);
