@@ -18,6 +18,7 @@
         <result column="expires_at" jdbcType="TIMESTAMP" property="expiresAt" />
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
         <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+        <result column="qr_type" jdbcType="VARCHAR" property="qrType" />
     </resultMap>
 
     <insert id="insertQrCode" parameterType="com.alipay.business.common.dal.auto.dataobject.QrCodeDO">
@@ -29,10 +30,30 @@
         insert into qr_code (qr_id, owner_id, owner_type,
         intent, amount, currency,
         status, signature, expires_at,
-        created_at, updated_at)
+        created_at, updated_at, qr_type)
         values (#{qrId,jdbcType=VARCHAR}, #{ownerId,jdbcType=VARCHAR}, #{ownerType,jdbcType=VARCHAR},
         #{intent,jdbcType=VARCHAR}, #{amount,jdbcType=NUMERIC}, #{currency,jdbcType=VARCHAR},
         #{status,jdbcType=VARCHAR}, #{signature,jdbcType=VARCHAR}, #{expiresAt,jdbcType=TIMESTAMP},
-        #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP})
+        #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{qrType,jdbcType=TIMESTAMP})
     </insert>
+
+    <update id="toggleQrCode">
+        UPDATE qr_code
+        SET status = IF(#{toggleQr}, 'ACTIVE', 'INACTIVE'),
+            updated_at = NOW()
+        WHERE qr_id = #{qrId}
+    </update>
+
+    <select id="queryQrCodes" resultMap="BaseResultMap">
+        SELECT qr_id, owner_id, owner_type, intent, amount, currency, status, signature, expires_at, created_at, updated_at, qr_type
+        FROM qr_code
+        WHERE owner_id = #{merchantId}
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countQrCodes" resultType="int">
+        SELECT COUNT(*) FROM qr_code WHERE owner_id = #{merchantId}
+    </select>
+
 </mapper>

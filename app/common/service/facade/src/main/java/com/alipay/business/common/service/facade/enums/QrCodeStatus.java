@@ -7,6 +7,7 @@ package com.alipay.business.common.service.facade.enums;
 public enum QrCodeStatus {
     INIT("INIT", "Qr Code intialized"),
     ACTIVE("ACTIVE", "Qr code is active"),
+    INACTIVE("INACTIVE", "Qr code is inactive"),
     ;
     private String code;
     private String desc;

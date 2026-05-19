@@ -299,6 +299,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             QueryAccountInfoRequest queryAccountInfoRequest =
                                     new QueryAccountInfoRequest();
                             queryAccountInfoRequest.setAccountId(payload.getPayerAccountNo());
+                            System.out.println("payer accountID" + queryAccountInfoRequest.getAccountId());
                             AccountBizResult<AccountInfoItem> payerAccountInfo =
                                     accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
 
