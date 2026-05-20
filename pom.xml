@@ -25,10 +25,10 @@
 
     <properties>
         <ialicore.common.service.facade.version>1.0-SNAPSHOT</ialicore.common.service.facade.version>
-        <usercenter.common.service.facade.version>1.0.0.20260317.23-SNAPSHOT</usercenter.common.service.facade.version>
-        <accountcenter.common.service.facade.version>1.0.0.20260317.10-SNAPSHOT</accountcenter.common.service.facade.version>
-        <business.common.service.facade.version>1.0.0.20260317.5-SNAPSHOT</business.common.service.facade.version>
-        <merchant.common.service.facade.version>1.0.0.20260425.6-SNAPSHOT</merchant.common.service.facade.version>
+        <usercenter.common.service.facade.version>1.0.0.20260520</usercenter.common.service.facade.version>
+        <accountcenter.common.service.facade.version>1.0.0.20260520</accountcenter.common.service.facade.version>
+        <business.common.service.facade.version>1.0.0.20260520</business.common.service.facade.version>
+        <merchant.common.service.facade.version>1.0.0.20260520</merchant.common.service.facade.version>
 
     </properties>
     <parent>
@@ -142,8 +142,12 @@
             <distributionManagement>
                 <repository>
                     <id>Alipay_Releases</id>
-                    <url>http://localhost:8081/repository/maven-snapshots/</url>
+                    <url>http://localhost:8081/repository/maven-releases/</url>
                 </repository>
+                <snapshotRepository>
+                    <id>Alipay_Snapshots</id>
+                    <url>http://localhost:8081/repository/maven-snapshots/</url>
+                </snapshotRepository>
             </distributionManagement>
         </profile>
 
