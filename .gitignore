@@ -27,3 +27,5 @@ Thumbs.db
 # -------------------------
 !**/src/main/java/
 !**/src/main/resources/
+
+*.log

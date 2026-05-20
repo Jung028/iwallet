@@ -24,6 +24,16 @@ public class TransferRequest extends BusinessBaseRequest {
     private String uniqueRequestId;
 
     /**
+     * transfer type, need to know if its QR.
+     */
+    private String transferType;
+
+    /**
+     * qr token
+     */
+    private String qrToken;
+
+    /**
      * get payer account number
      *
      * @return
@@ -91,6 +101,38 @@ public class TransferRequest extends BusinessBaseRequest {
      */
     public void setUniqueRequestId(String uniqueRequestId) {
         this.uniqueRequestId = uniqueRequestId;
+    }
+
+    /**
+     * get transfer type
+     * @return
+     */
+    public String getTransferType() {
+        return transferType;
+    }
+
+    /**
+     * set transfer type
+     * @param transferType
+     */
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
+    }
+
+    /**
+     * get qr token
+     * @return
+     */
+    public String getQrToken() {
+        return qrToken;
+    }
+
+    /**
+     * set qr token
+     * @param qrToken
+     */
+    public void setQrToken(String qrToken) {
+        this.qrToken = qrToken;
     }
 }
 

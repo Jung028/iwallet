@@ -1,22 +1,21 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
 import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
+import com.alipay.account_center.common.service.facade.enums.TransactionCategory;
 import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
 import com.alipay.account_center.common.service.facade.enums.TransactionType;
 import com.alipay.account_center.common.service.facade.enums.TxnEventType;
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.*;
+import com.alipay.business.biz.service.impl.auth.QrTokenPayload;
 import com.alipay.business.biz.service.impl.auth.TransferTokenPayload;
 import com.alipay.business.biz.service.impl.checker.BusinessRequestChecker;
 import com.alipay.business.biz.service.impl.helper.ResponseBuilder;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.api.BusinessService;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
-import com.alipay.business.common.service.facade.enums.BusinessResultCode;
-import com.alipay.business.common.service.facade.enums.IdempotencyKeysStatusEnum;
-import com.alipay.business.common.service.facade.enums.IdempotencyTypeEnum;
-import com.alipay.business.common.service.facade.enums.TransferType;
+import com.alipay.business.common.service.facade.enums.*;
 import com.alipay.business.common.service.facade.event.EcAutoReloadEvent;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.money.MoneyUtil;
@@ -28,6 +27,9 @@ import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
 import com.alipay.business.core.model.util.AssertUtil;
+import com.alipay.merchant.common.service.facade.baseresult.MerchantBizResult;
+import com.alipay.merchant.common.service.facade.item.MerchantInfoItem;
+import com.alipay.merchant.common.service.facade.result.QueryMerchantInfoRequest;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
 import com.alipay.sofa.runtime.api.annotation.SofaServiceBinding;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
@@ -37,6 +39,7 @@ import com.alipay.usercenter.common.service.facade.item.*;
 import com.alipay.usercenter.common.service.facade.request.*;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Account;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -55,6 +58,8 @@ import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.alipay.business.biz.service.impl.constant.GlobalBizConstants.*;
 
@@ -97,11 +102,42 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                     @Override
                     protected void process(TransferRequest request, BusinessBizResult<String> response) {
 
+                        QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
+                        BigDecimal amount = null;
+                        //et the qrid and the payload and signature here.
+                        if (request.getTransferType().equals(TransferType.QR.getCode())) {
+                            AssertUtil.notBlank(request.getQrToken(), BusinessResultCode.PARAM_ILLEGAL,
+                                    "Qr token cannot be blank");
+                            // verify the token, then return the payload
+                            QrTokenPayload qrTokenPayload = qrTokenService.verifyQrToken(request.getQrToken());
+
+                            // get payee account id, where payee is the QR code owner id account
+                            queryAccountInfoRequest.setUserId(qrTokenPayload.getOwnerId());
+                            AccountBizResult<AccountInfoItem> payeeAccountInfo =
+                                    accountServiceClient.queryAccountInfoByUserId(queryAccountInfoRequest);
+                            AssertUtil.notNull(payeeAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "account not found");
+
+                            // get payer account id
+                            queryAccountInfoRequest.setUserId(userId);
+                            AccountBizResult<AccountInfoItem> payerAccountInfo =
+                                    accountServiceClient.queryAccountInfoByUserId(queryAccountInfoRequest);
+                            AssertUtil.notNull(payerAccountInfo, BusinessResultCode.ACCOUNT_NOT_FOUND, "account not found");
+
+                            // override the request which are passed into the
+                            request.setPayeeAccountNo(payeeAccountInfo.getResult().getAccountId());
+                            request.setPayerAccountNo(payerAccountInfo.getResult().getAccountId());
+                            request.setUniqueRequestId(qrTokenPayload.getQrId());
+                            // convert string to big decimal
+                            amount = BigDecimal.valueOf(qrTokenPayload.getAmount());
+                        } else {
+                            // else set the Money amount to request amount
+                            amount = request.getAmount().getAmount();
+                        }
+
                         AssertUtil.isTrue(
                                 !request.getPayeeAccountNo().equals(request.getPayerAccountNo()),
                                 BusinessResultCode.PARAM_ILLEGAL, "Cannot send to same account");
 
-                        QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
                         queryAccountInfoRequest.setAccountId(request.getPayerAccountNo());
                         AccountBizResult<AccountInfoItem> payerAccountInfo =
                                 accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
@@ -131,11 +167,11 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                         boolean requiresOtp = requestAmount.isGreaterThan(LIMIT);
 
-                        String transferToken = transferTokenService.issue(
+                        String transferToken = transferTokenService.issueTransferToken(
                                 request.getUniqueRequestId(),
                                 request.getPayerAccountNo(),
                                 request.getPayeeAccountNo(),
-                                request.getAmount().getAmount(),
+                                amount,
                                 request.getAmount().getCurrency().getCurrencyCode(),
                                 requiresOtp
                         );
@@ -171,15 +207,15 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                     protected void process(TransferConfirmRequest request, BusinessBizResult<String> response) {
 
                         TransferTokenPayload payload =
-                                transferTokenService.verify(request.getTransferToken());
+                                transferTokenService.verifyTransferToken(request.getTransferToken());
 
                         AssertUtil.notNull(payload,
                                 BusinessResultCode.INVALID_REQUEST,
                                 "Transfer session expired or invalid, please start again");
+
                         // TODO: we do not need to do anything to the transaction if it has failed because it was not updated to PROCESSING, meaning
                         //  the trasnsaction has not started to deduct your money, so if it failed in business Center, we do not need to
                         //  re-handle it. just add a scheduler to check where the GMT create is more than a day and status is PENDING.
-
                         if (payload.isRequiresOtp()) {
                             AssertUtil.isTrue(
                                     request.getTransferType().equals(TransferType.OTP.getCode()),
@@ -213,6 +249,9 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             }
                         }
 
+                        //TODO: QR :
+                        // we only need to update the code where payer account id. because when merchant is created, the account created
+                        // is to this payer account with type as merchant instead of user
                         // verify user password
                         VerifyUserAuthRequest verifyUserAuthRequest = new VerifyUserAuthRequest();
                         verifyUserAuthRequest.setUserId(userId);
@@ -260,6 +299,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             QueryAccountInfoRequest queryAccountInfoRequest =
                                     new QueryAccountInfoRequest();
                             queryAccountInfoRequest.setAccountId(payload.getPayerAccountNo());
+                            System.out.println("payer accountID" + queryAccountInfoRequest.getAccountId());
                             AccountBizResult<AccountInfoItem> payerAccountInfo =
                                     accountServiceClient.queryAccountInfo(queryAccountInfoRequest);
 
@@ -292,11 +332,23 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                         "Insufficient balance, please check your account and try again");
                             }
 
+                            // determine transaction category
+                            TransactionCategory category = TransactionCategory.TRANSFER;
+                            if (payerAccountInfo.getResult().getOwnerType().equals(OwnerType.MERCHANT.getCode())) {
+                                // then query the merchant category, then use this
+                                QueryMerchantInfoRequest queryMerchantInfoRequest = new QueryMerchantInfoRequest();
+                                queryMerchantInfoRequest.setMerchantId(payerAccountInfo.getResult().getAccountRelationId());
+                                MerchantBizResult<MerchantInfoItem> merchantInfo = merchantServiceClient.queryMerchantInfo(queryMerchantInfoRequest);
+                                category = TransactionCategory.valueOf(merchantInfo.getResult().getMerchantId());
+                            }
+
                             // insert transaction record of pending status
                             InsertTransactionRecordRequest insertRequest =
                                     new InsertTransactionRecordRequest();
                             insertRequest.setPayerAccountNo(payload.getPayerAccountNo());
                             insertRequest.setPayeeAccountNo(payload.getPayeeAccountNo());
+                            // Set transaction category
+                            insertRequest.setCategory(category);
                             insertRequest.setAmount(payload.getAmount());
                             insertRequest.setCurrency(payload.getCurrency());
                             insertRequest.setTxnType(TransactionType.TRANSFER);
@@ -471,8 +523,16 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                            BusinessBizResult<BusinessTransactionHistoryResult> response) {
                         QueryTransactionHistoryRequest queryTransactionHistoryRequest = new QueryTransactionHistoryRequest();
                         queryTransactionHistoryRequest.setAccountId(request.getAccountId());
+                        queryTransactionHistoryRequest.setPayerAccountId(request.getPayerAccountId());
+                        queryTransactionHistoryRequest.setTxnCategory(request.getTxnCategory());
+                        queryTransactionHistoryRequest.setAmountMin(request.getAmountMin());
+                        queryTransactionHistoryRequest.setAmountMax(request.getAmountMax());
+                        queryTransactionHistoryRequest.setTxnType(request.getTxnType());
+                        queryTransactionHistoryRequest.setTxnStatus(request.getTxnStatus());
                         queryTransactionHistoryRequest.setPageNo(request.getPageNo());
                         queryTransactionHistoryRequest.setPageSize(request.getPageSize());
+                        queryTransactionHistoryRequest.setGmtCreate(request.getGmtCreate());
+
 
                         // query transaction history
                         AccountBizResult<QueryTransactionHistoryResult> result = accountServiceClient

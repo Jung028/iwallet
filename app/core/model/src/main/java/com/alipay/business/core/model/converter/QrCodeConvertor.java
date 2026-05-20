@@ -23,6 +23,7 @@ public class QrCodeConvertor {
         qrCodeDO.setOwnerId(qrCode.getOwnerId());
         qrCodeDO.setOwnerType(qrCode.getOwnerType());
         qrCodeDO.setSignature(qrCode.getSignature());
+        qrCodeDO.setQrType(qrCode.getQrType());
         return qrCodeDO;
     }
 }

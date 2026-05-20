@@ -8,8 +8,11 @@ import com.alipay.business.biz.service.impl.qr.QrCodeGeneratorHandler;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
-import com.alipay.business.common.service.facade.result.GenerateQrCodeResult;
+import com.alipay.business.common.service.facade.request.QueryQrCodesRequest;
+import com.alipay.business.common.service.facade.request.ToggleQrRequest;
+import com.alipay.business.common.service.facade.result.QueryQrCodesResult;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
+import com.alipay.business.core.service.QrCodeRepository;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
 import com.alipay.sofa.runtime.api.annotation.SofaServiceBinding;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +35,15 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
     @Autowired
     protected QrCodeGeneratorFactory qrCodeGeneratorFactory;
 
+    @Autowired
+    protected QrCodeRepository qrCodeRepository;
+
     @Override
-    public BusinessBizResult<GenerateQrCodeResult> generateQrCode(GenerateQrCodeRequest request) {
+    public BusinessBizResult<String> generateQrCode(GenerateQrCodeRequest request) {
         return businessServiceTemplate.execute(request, BusinessActionEnum.GENERATE_QR_CODE,
                 new BusinessBizCallback<>() {
                     @Override
-                    protected BusinessBizResult<GenerateQrCodeResult> createDefaultResponse() {
+                    protected BusinessBizResult<String> createDefaultResponse() {
                         return new BusinessBizResult<>();
                     }
 
@@ -47,25 +53,76 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
                     }
 
                     @Override
-                    protected void process(GenerateQrCodeRequest request, BusinessBizResult<GenerateQrCodeResult> response) {
+                    protected void process(GenerateQrCodeRequest request, BusinessBizResult<String> response) {
                         //route the intent, create a handler, to handle intent if its
                         // create a handler here.
                         QrCodeGeneratorHandler handler = qrCodeGeneratorFactory.getHandler(request.getQrIntent());
                         // validate that the owner is a merchant / user and its exists, and active.
                         handler.validate(request);
                         // generate QR Code. insert
-                        GenerateQrCodeResult qrCodeResult;
+                        String qrToken;
                         try {
-                            qrCodeResult = handler.generateQR(request);
+                            qrToken = handler.generateQR(request);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
 
-                        ResponseBuilder.success(response, qrCodeResult,
+                        ResponseBuilder.success(response, qrToken,
                                 BusinessActionEnum.GENERATE_QR_CODE.getCode(),
                                 BusinessActionEnum.GENERATE_QR_CODE.getDesc());
                     }
                 });
     }
+
+    @Override
+    public BusinessBizResult<QueryQrCodesResult> queryQrCodes(QueryQrCodesRequest request) {
+        return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_MERCHANT_QRS,
+                new BusinessBizCallback<>() {
+
+                    @Override
+                    protected BusinessBizResult<QueryQrCodesResult> createDefaultResponse() {
+                        return new BusinessBizResult<>();
+                    }
+
+                    @Override
+                    protected void checkParams(QueryQrCodesRequest request) {
+
+                    }
+
+                    @Override
+                    protected void process(QueryQrCodesRequest request, BusinessBizResult<QueryQrCodesResult> response) {
+                        QueryQrCodesResult result = qrCodeRepository.queryQrCodes(request);
+                        ResponseBuilder.success(response, result,
+                                BusinessActionEnum.QUERY_MERCHANT_QRS.getCode(),
+                                BusinessActionEnum.QUERY_MERCHANT_QRS.getDesc());
+                    }
+                });
+    }
+
+    @Override
+    public BusinessBizResult<String> toggleQrCode(ToggleQrRequest request) {
+        return businessServiceTemplate.execute(request, BusinessActionEnum.TOGGLE_QR_CODE,
+                new BusinessBizCallback<>() {
+                    @Override
+                    protected BusinessBizResult<String> createDefaultResponse() {
+                        return new BusinessBizResult<>();
+                    }
+
+                    @Override
+                    protected void checkParams(ToggleQrRequest request) {
+
+                    }
+
+                    @Override
+                    protected void process(ToggleQrRequest request, BusinessBizResult<String> response) {
+                        qrCodeRepository.toggleQrCode(request);
+                        ResponseBuilder.success(response, null,
+                                BusinessActionEnum.TOGGLE_QR_CODE.getCode(),
+                                BusinessActionEnum.TOGGLE_QR_CODE.getDesc());
+                    }
+                });
+    }
+
+
 
 }

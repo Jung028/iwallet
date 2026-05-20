@@ -5,7 +5,6 @@ import com.alipay.business.biz.service.impl.auth.JwtContextHolder;
 import com.alipay.business.common.service.facade.api.QrCodeService;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
-import com.alipay.business.common.service.facade.result.GenerateQrCodeResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,9 +23,10 @@ public class QrController {
     private QrCodeService qrCodeService;
 
     @PostMapping("/generateQrCode.json")
-    public BusinessBizResult<GenerateQrCodeResult> generateQrCode(@RequestBody GenerateQrCodeRequest request) {
+    public BusinessBizResult<String> generateQrCode(@RequestBody GenerateQrCodeRequest request) {
         try {
             JwtClaims claims = JwtContextHolder.get();
+            // the user id is pass
             request.setUserId(claims.getSubject());
             // should this be able to change user login password as well?
             return qrCodeService.generateQrCode(request);

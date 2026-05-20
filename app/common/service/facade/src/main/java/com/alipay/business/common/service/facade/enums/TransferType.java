@@ -6,6 +6,7 @@ package com.alipay.business.common.service.facade.enums;
  */
 public enum TransferType {
     OTP("OTP", "requires OTP"),
+    QR("QR", "requires validation of qr"),
     AUTH_TRANSFER("AUTH_TRANSFER", "requires auth");
 
     private String code;

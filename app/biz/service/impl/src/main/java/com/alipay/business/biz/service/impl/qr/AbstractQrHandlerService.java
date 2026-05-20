@@ -1,11 +1,9 @@
 package com.alipay.business.biz.service.impl.qr;
 
-import com.alipay.business.biz.service.impl.qr.utils.SignUtils;
-import com.alipay.business.common.service.facade.enums.OwnerType;
+import com.alipay.business.biz.service.impl.auth.QrTokenService;
 import com.alipay.business.common.service.facade.enums.QrCodeStatus;
-import com.alipay.business.common.service.facade.enums.QrIntent;
+import com.alipay.business.common.service.facade.enums.QrType;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
-import com.alipay.business.common.service.facade.result.GenerateQrCodeResult;
 import com.alipay.business.common.service.integration.merchant.MerchantServiceClient;
 import com.alipay.business.common.service.integration.user.UserServiceClient;
 import com.alipay.business.core.model.domain.QrCode;
@@ -35,12 +33,16 @@ public abstract class AbstractQrHandlerService implements QrCodeGeneratorHandler
     @Autowired
     protected MerchantServiceClient merchantServiceClient;
 
+    @Autowired
+    protected QrTokenService qrTokenService;
+
     @Override
-    public GenerateQrCodeResult generateQR(GenerateQrCodeRequest request) {
+    public String generateQR(GenerateQrCodeRequest request) {
         // first check if it exists first, then only try insert, idempotency.
         // insert QR code.
         QrCode qrCode = new QrCode();
         try {
+            // TODO: we need to know if its dynamic or static qr, then handle it.
             // set expiry time, signature, qr_id, currency, amount, receiver_id, into a QR instance
             qrCode.setQrId(UUID.randomUUID().toString());
             qrCode.setAmount(BigDecimal.valueOf(Long.parseLong(request.getAmount())));
@@ -52,7 +54,15 @@ public abstract class AbstractQrHandlerService implements QrCodeGeneratorHandler
             qrCode.setOwnerType(getOwnerType().getCode());
             qrCode.setUpdatedAt(new Date());
             // Set expiry to 1 minute, then QR is expired.
-            qrCode.setExpiresAt(new Date(System.currentTimeMillis() + 60 * 1000));
+
+            if (request.getQrType().equals(QrType.STATIC.getCode())) {
+                qrCode.setExpiresAt(null);
+                qrCode.setQrType(QrType.STATIC.getCode());
+            } else if (request.getQrType().equals(QrType.DYNAMIC.getCode())) {
+                qrCode.setExpiresAt(new Date(System.currentTimeMillis() + 60 * 1000));
+                qrCode.setQrType(QrType.DYNAMIC.getCode());
+            }
+
 
             qrCodeRepository.insertQrCode(qrCode);
         } catch (DuplicateKeyException e) {
@@ -60,23 +70,18 @@ public abstract class AbstractQrHandlerService implements QrCodeGeneratorHandler
         }
 
         // Build payload differently depending on the QR intent
-        String payload = qrCode.getQrId()
-                + "|" + qrCode.getAmount()
-                + "|" + qrCode.getCurrency()
-                + "|" + request.getUserId()
-                + "|" + request.getQrIntent()
-                + "|" + qrCode.getExpiresAt();
-
-        // sign
-        String signature = SignUtils.sign(payload, KEY);
-
-        // store it
-        qrCode.setSignature(signature);
+        String qrToken = qrTokenService.issueQrToken(
+                qrCode.getQrId(),
+                qrCode.getAmount(),
+                qrCode.getCurrency(),
+                getOwnerId(request),
+                getQrIntent().getCode(),
+                qrCode.getExpiresAt());
 
         // the update status to ACTIVE
-        qrCodeRepository.updateQrCode(qrCode.getQrId(), signature, QrCodeStatus.ACTIVE.getCode());
+        qrCodeRepository.updateQrCode(qrCode.getQrId(), QrCodeStatus.ACTIVE.getCode());
 
-        // return the signature for the qr to be return to frontend.
-        return new GenerateQrCodeResult(qrCode.getQrId(), payload, qrCode.getSignature());
+        // return the token, so that when the user scans this token, transferInit can verify it.
+        return qrToken;
     }
 }

@@ -15,7 +15,9 @@ public enum BusinessActionEnum {
     PUBLISH_TOP_UP("PUBLISH_TOP_UP", "publish top up"),
 
     CREATE_TOP_UP_INTENT("CREATE_TOP_UP_INTENT", "create top up intent"),
-    GENERATE_QR_CODE("GENERATE_QR_CODE", "generate qr code" ),;
+    GENERATE_QR_CODE("GENERATE_QR_CODE", "generate qr code" ),
+    QUERY_MERCHANT_QRS("QUERY_MERCHANT_QRS", "query merchant QRS" ),
+    TOGGLE_QR_CODE("TOGGLE_QR_CODE", "toggle qr code");
 
     private String code;
     private String desc;

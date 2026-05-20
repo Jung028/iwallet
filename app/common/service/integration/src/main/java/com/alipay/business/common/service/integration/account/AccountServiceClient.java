@@ -7,12 +7,12 @@ import com.alipay.account_center.common.service.facade.item.TransactionRecordIte
 import com.alipay.account_center.common.service.facade.request.*;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import java.util.List;
 
 @Service
 public interface AccountServiceClient {
-
-    AccountBizResult<String> createAccount(CreateAccountRequest createAccountRequest);
 
     AccountBizResult<AccountInfoItem> queryAccountInfo(QueryAccountInfoRequest request);
 

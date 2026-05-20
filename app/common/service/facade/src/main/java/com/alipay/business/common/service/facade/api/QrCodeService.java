@@ -2,7 +2,9 @@ package com.alipay.business.common.service.facade.api;
 
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
-import com.alipay.business.common.service.facade.result.GenerateQrCodeResult;
+import com.alipay.business.common.service.facade.request.QueryQrCodesRequest;
+import com.alipay.business.common.service.facade.request.ToggleQrRequest;
+import com.alipay.business.common.service.facade.result.QueryQrCodesResult;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
@@ -17,5 +19,26 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public interface QrCodeService {
-    BusinessBizResult<GenerateQrCodeResult> generateQrCode(GenerateQrCodeRequest request);
+
+    /**
+     * generate qr code
+     * @param request
+     * @return
+     */
+    BusinessBizResult<String> generateQrCode(GenerateQrCodeRequest request);
+
+    /**
+     * query merchant qrds
+     * @param request
+     * @return
+     */
+    BusinessBizResult<QueryQrCodesResult> queryQrCodes(QueryQrCodesRequest request);
+
+    /**
+     * disable qr
+     * @param request
+     * @return
+     */
+    BusinessBizResult<String> toggleQrCode(ToggleQrRequest request);
+
 }
