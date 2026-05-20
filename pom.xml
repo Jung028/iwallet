@@ -151,6 +151,34 @@
             </distributionManagement>
         </profile>
 
+        <profile>
+            <id>production</id>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo1.maven.org/maven2/</url>
+                </repository>
+                <repository>
+                    <id>github-iuser</id>
+                    <url>https://maven.pkg.github.com/Jung028/iuser</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>github-iaccount</id>
+                    <url>https://maven.pkg.github.com/Jung028/iaccount</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+            </repositories>
+            <distributionManagement>
+                <repository>
+                    <id>github-iwallet</id>
+                    <url>https://maven.pkg.github.com/Jung028/iwallet</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+
     </profiles>
 
 </project>
