@@ -170,6 +170,12 @@
                     <releases><enabled>true</enabled></releases>
                     <snapshots><enabled>true</enabled></snapshots>
                 </repository>
+                <repository>
+                    <id>github-imerchant</id>
+                    <url>https://maven.pkg.github.com/Jung028/imerchant</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
             </repositories>
             <distributionManagement>
                 <repository>
