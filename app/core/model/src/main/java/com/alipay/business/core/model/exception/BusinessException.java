@@ -1,28 +1,28 @@
 package com.alipay.business.core.model.exception;
 
 
-import com.alipay.business.common.service.facade.enums.BusinessResultCode;
+import com.alipay.business.common.service.facade.enums.ResultCode;
 
 public class BusinessException extends RuntimeException {
 
   private static final long seralVersionUID = 9187623791824214L;
 
-  private BusinessResultCode resultCode;
+  private ResultCode resultCode;
 
-  public BusinessException(BusinessResultCode resultCode, String message) {
+  public BusinessException(ResultCode resultCode, String message) {
     super(message);
     this.resultCode = resultCode;
   }
 
-  public BusinessException(BusinessResultCode resultCode) {
+  public BusinessException(ResultCode resultCode) {
     this(resultCode, resultCode.getDescription());
   }
 
-  public BusinessResultCode getResultCode() {
+  public ResultCode getResultCode() {
     return resultCode;
   }
 
-  public void setResultCode(BusinessResultCode resultCode) {
+  public void setResultCode(ResultCode resultCode) {
     this.resultCode = resultCode;
   }
 }

@@ -2,15 +2,12 @@ package com.alipay.business.common.service.integration.account;
 
 import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
-import com.alipay.account_center.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.integration.AbstractServiceClient;
 import com.alipay.business.core.model.util.AssertUtil;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class AccountServiceClientImpl extends AbstractServiceClient implements AccountServiceClient {
@@ -72,7 +69,7 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
     }
 
     @Override
-    public AccountBizResult<TransactionRecordItem> updateTransactionRecord(UpdateTransactionRecordRequest request) {
+    public void updateTransactionRecord(UpdateTransactionRecordRequest request) {
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, "Update transaction record request cannot be null");
         AssertUtil.notBlank(request.getTxnId(), BusinessResultCode.PARAM_ILLEGAL, "txnId cannot be blank");
         AssertUtil.notBlank(request.getStatus(),  BusinessResultCode.PARAM_ILLEGAL, "status cannot be blank");
@@ -82,7 +79,6 @@ public class AccountServiceClientImpl extends AbstractServiceClient implements A
         AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
         AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL, ", result is null");
         AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
-        return result;
     }
 
     @Override

@@ -1,21 +1,20 @@
 package com.alipay.business.core.model.exception;
 
-import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.facade.enums.BusinessResultEnum;
+import com.alipay.business.common.service.facade.enums.ResultCode;
 
 public class BaseSlipException extends RuntimeException {
 
-    public BaseSlipException(BusinessResultCode BusinessResultCode) {
-        super(BusinessResultCode.getCode());
+    public BaseSlipException(ResultCode resultCode) {
+        super(resultCode.getCode());
+    }
 
+    public BaseSlipException(ResultCode resultCode, String resultMsg) {
+        super(resultCode.getDescription() + ":" + resultMsg);
     }
 
     public BaseSlipException(BusinessResultEnum businessResultEnum, String resultMsg) {
         super(businessResultEnum.getResultMsg() + ":" + resultMsg);
-    }
-
-    public BaseSlipException(BusinessResultCode businessResultCode, String resultMsg) {
-        super(businessResultCode.getDescription() + ":" + resultMsg);
     }
 
     public BaseSlipException(BusinessResultEnum businessResultEnum) {

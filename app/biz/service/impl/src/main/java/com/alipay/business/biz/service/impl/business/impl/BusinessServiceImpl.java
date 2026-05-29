@@ -39,11 +39,9 @@ import com.alipay.usercenter.common.service.facade.item.*;
 import com.alipay.usercenter.common.service.facade.request.*;
 import com.stripe.exception.CardException;
 import com.stripe.exception.StripeException;
-import com.stripe.model.Account;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.PaymentIntentCreateParams;
-import net.sf.jsqlparser.statement.select.Top;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +56,6 @@ import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.alipay.business.biz.service.impl.constant.GlobalBizConstants.*;
 
@@ -261,6 +257,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                 userServiceClient.verifyUserAuth(verifyUserAuthRequest);
 
                         if (!authInfo.isSuccess()) {
+                            // Insert a idempotency record in INIT status to track incorrect attempts
                             handleFailedPinAttempt(payload.getUniqueRequestId(), response);
                             return;
                         }
@@ -378,10 +375,66 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                         // Only runs if the transaction block above succeeded
                         if (response.isSuccess() && response.getResult() != null) {
+                            // TODO: Add evaluation in iriskops, later use facade mvn.
+                            RiskDecision riskDecision = riskOpsServiceClient.evaluateTransferRisk
+                                    (buildTransferRiskRequest(payload, referenceId, request, userId));
+
+                            // if is block
+                            UpdateTransactionRecordRequest updateRequest = new UpdateTransactionRecordRequest();
+                            UpdateIdempotencyKeysRequest updateIdempotencyKeysRequest = new UpdateIdempotencyKeysRequest();
+                            if (riskDecision.isBlock()) {
+                                // mark the transaction as BLOCKED, and idempotency result FAILED with reason. then return
+                                updateRequest.setStatus(TransactionStatusEnum.FAILED.getCode());
+                                accountServiceClient.updateTransactionRecord(updateRequest);
+
+                                IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
+                                idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.FAILED.getCode());
+                                idempotencyKeysRepository.updateIdempotencyKeys(idempotencyKeys);
+
+                                //TODO: add publish EC_TRANSFER_BLOCKED
+                            }
+                            // if is step up
+                            if (riskDecision.isStepUp()) {
+                                updateRequest.setStatus(TransactionStatusEnum.PENDING_CONFIRMATION.getCode());
+                                accountServiceClient.updateTransactionRecord(updateRequest);
+
+                                //TODO: add publish EC_TRANSFER_STEP_UP_REQUIRED
+                            }
+
                             transactionService.publishTransfer(payload.getPayerAccountNo(), referenceId, TxnEventType.TRANSFER.getCode());
                         }
                     }
                 });
+    }
+
+    private TransferRiskAssessmentRequest buildTransferRiskRequest(
+            TransferTokenPayload payload,
+            String referenceId,
+            TransferConfirmRequest request,
+            String userId
+    ) {
+        TransferRiskAssessmentRequest riskRequest = new TransferRiskAssessmentRequest();
+
+        riskRequest.setBusinessId(referenceId); // txnId
+        riskRequest.setBusinessType("TRANSFER");
+
+        riskRequest.setUserId(userId);
+
+        riskRequest.setPayerAccountNo(payload.getPayerAccountNo());
+        riskRequest.setPayeeAccountNo(payload.getPayeeAccountNo());
+
+        riskRequest.setAmount(payload.getAmount());
+        riskRequest.setCurrency(payload.getCurrency());
+
+        riskRequest.setUniqueRequestId(payload.getUniqueRequestId());
+        riskRequest.setOccurredAt(new Date());
+
+        // Optional but useful for future strategies
+        riskRequest.setDeviceId(request.getDeviceId());
+        riskRequest.setIpAddress(request.getIpAddress());
+        riskRequest.setTraceId(request.getTraceId());
+
+        return riskRequest;
     }
 
     /**

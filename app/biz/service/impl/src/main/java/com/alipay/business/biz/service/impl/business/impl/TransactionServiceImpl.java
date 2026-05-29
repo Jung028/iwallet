@@ -1,9 +1,7 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
 import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
-import com.alipay.account_center.common.service.facade.enums.AccountResultCode;
 import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
-import com.alipay.account_center.common.service.facade.enums.TxnEventType;
 import com.alipay.account_center.common.service.facade.event.EcTransactionEvent;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.QueryTransactionRecordRequest;

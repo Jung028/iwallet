@@ -3,7 +3,7 @@ package com.alipay.business.common.service.facade.enums;
 
 import static com.alipay.business.common.service.facade.enums.ErrorCodeConstants.PREFIX;
 
-public enum BusinessResultCode {
+public enum BusinessResultCode implements ResultCode {
 
 
     EXECUTE_SUCCESS(GlobalResultCodes.EXECUTE_SUCCESS, "Success"),

@@ -2,14 +2,9 @@ package com.alipay.business.common.service.integration.account;
 
 import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
-import com.alipay.account_center.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.*;
 import org.springframework.stereotype.Service;
-
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import java.util.List;
 
 @Service
 public interface AccountServiceClient {
@@ -22,7 +17,7 @@ public interface AccountServiceClient {
 
     AccountBizResult<TransactionRecordItem> insertTransactionRecord(InsertTransactionRecordRequest request);
 
-    AccountBizResult<TransactionRecordItem> updateTransactionRecord(UpdateTransactionRecordRequest request);
+    void updateTransactionRecord(UpdateTransactionRecordRequest request);
 
     AccountBizResult<TransactionRecordItem> queryTransactionByStatus(QueryTransactionRecordRequest transactionRecordRequest);
 
