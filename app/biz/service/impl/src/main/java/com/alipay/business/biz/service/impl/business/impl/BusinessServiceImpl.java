@@ -30,6 +30,9 @@ import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.merchant.common.service.facade.baseresult.MerchantBizResult;
 import com.alipay.merchant.common.service.facade.item.MerchantInfoItem;
 import com.alipay.merchant.common.service.facade.result.QueryMerchantInfoRequest;
+import com.alipay.riskops.common.service.facade.baseresult.RiskOpsBizResult;
+import com.alipay.riskops.common.service.facade.request.RiskDecisionRequest;
+import com.alipay.riskops.common.service.facade.result.RiskDecisionResult;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
 import com.alipay.sofa.runtime.api.annotation.SofaServiceBinding;
 import com.alipay.usercenter.common.service.facade.baseresult.UserBizResult;
@@ -375,31 +378,31 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                         // Only runs if the transaction block above succeeded
                         if (response.isSuccess() && response.getResult() != null) {
-                            // TODO: Add evaluation in iriskops, later use facade mvn.
-                            RiskDecision riskDecision = riskOpsServiceClient.evaluateTransferRisk
-                                    (buildTransferRiskRequest(payload, referenceId, request, userId));
-
-                            // if is block
-                            UpdateTransactionRecordRequest updateRequest = new UpdateTransactionRecordRequest();
-                            UpdateIdempotencyKeysRequest updateIdempotencyKeysRequest = new UpdateIdempotencyKeysRequest();
-                            if (riskDecision.isBlock()) {
-                                // mark the transaction as BLOCKED, and idempotency result FAILED with reason. then return
-                                updateRequest.setStatus(TransactionStatusEnum.FAILED.getCode());
-                                accountServiceClient.updateTransactionRecord(updateRequest);
-
-                                IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
-                                idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.FAILED.getCode());
-                                idempotencyKeysRepository.updateIdempotencyKeys(idempotencyKeys);
-
-                                //TODO: add publish EC_TRANSFER_BLOCKED
-                            }
-                            // if is step up
-                            if (riskDecision.isStepUp()) {
-                                updateRequest.setStatus(TransactionStatusEnum.PENDING_CONFIRMATION.getCode());
-                                accountServiceClient.updateTransactionRecord(updateRequest);
-
-                                //TODO: add publish EC_TRANSFER_STEP_UP_REQUIRED
-                            }
+//                            // TODO: Add evaluation in iriskops, later use facade mvn.
+//                            RiskOpsBizResult<RiskDecisionResult> riskDecision = riskOpsServiceClient.evaluateTransferRisk
+//                                    (buildTransferRiskRequest(payload, referenceId, request, userId));
+//
+//                            // if is block
+//                            UpdateTransactionRecordRequest updateRequest = new UpdateTransactionRecordRequest();
+//                            UpdateIdempotencyKeysRequest updateIdempotencyKeysRequest = new UpdateIdempotencyKeysRequest();
+//                            if (riskDecision.getResult().isBlock()) {
+//                                // mark the transaction as BLOCKED, and idempotency result FAILED with reason. then return
+//                                updateRequest.setStatus(TransactionStatusEnum.FAILED.getCode());
+//                                accountServiceClient.updateTransactionRecord(updateRequest);
+//
+//                                IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
+//                                idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.FAILED.getCode());
+//                                idempotencyKeysRepository.updateIdempotencyKeys(idempotencyKeys);
+//
+//                                //TODO: add publish EC_TRANSFER_BLOCKED
+//                            }
+//                            // if is step up
+//                            if (riskDecision.getResult().isStepUp()) {
+//                                updateRequest.setStatus(TransactionStatusEnum.PENDING.getCode());
+//                                accountServiceClient.updateTransactionRecord(updateRequest);
+//
+//                                //TODO: add publish EC_TRANSFER_STEP_UP_REQUIRED
+//                            }
 
                             transactionService.publishTransfer(payload.getPayerAccountNo(), referenceId, TxnEventType.TRANSFER.getCode());
                         }
@@ -407,13 +410,13 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                 });
     }
 
-    private TransferRiskAssessmentRequest buildTransferRiskRequest(
-            TransferTokenPayload payload,
-            String referenceId,
-            TransferConfirmRequest request,
-            String userId
+    private RiskDecisionRequest buildTransferRiskRequest(
+                                                         TransferTokenPayload payload,
+                                                         String referenceId,
+                                                         TransferConfirmRequest request,
+                                                         String userId
     ) {
-        TransferRiskAssessmentRequest riskRequest = new TransferRiskAssessmentRequest();
+        RiskDecisionRequest riskRequest = new RiskDecisionRequest();
 
         riskRequest.setBusinessId(referenceId); // txnId
         riskRequest.setBusinessType("TRANSFER");
@@ -428,11 +431,6 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
         riskRequest.setUniqueRequestId(payload.getUniqueRequestId());
         riskRequest.setOccurredAt(new Date());
-
-        // Optional but useful for future strategies
-        riskRequest.setDeviceId(request.getDeviceId());
-        riskRequest.setIpAddress(request.getIpAddress());
-        riskRequest.setTraceId(request.getTraceId());
 
         return riskRequest;
     }

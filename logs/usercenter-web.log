@@ -1,3 +1,466 @@
-2026-05-24 00:04:07 WARN  traceId= com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=32m31s886ms).
-2026-05-24 00:28:45 WARN  traceId= com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=24m8s112ms).
-2026-05-24 00:40:12 WARN  traceId= com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10m56s797ms).
+2026-06-02 21:33:02 INFO  traceId= com.alipay.business.web.Main - Starting Main v1.0-SNAPSHOT using Java 21.0.9 with PID 72113 (/Users/adam/IdeaProjects/iwallet/app/web/target/business-web-1.0-SNAPSHOT.jar started by adam in /Users/adam/IdeaProjects/iwallet)
+2026-06-02 21:33:02 INFO  traceId= com.alipay.business.web.Main - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 21:33:05 WARN  traceId= org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'asyncInitMethodManager' of type [com.alipay.sofa.runtime.async.AsyncInitMethodManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected/applied to a currently created BeanPostProcessor [asyncProxyBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies/advisors. If this bean does not have to be post-processed, declare it with ROLE_INFRASTRUCTURE.
+2026-06-02 21:33:07 INFO  traceId= com.alipay.usercenter.web.controller.Main - Starting Main v1.0-SNAPSHOT using Java 21.0.9 with PID 72120 (/Users/adam/IdeaProjects/iuser/app/web/target/usercenter-web-1.0-SNAPSHOT.jar started by adam in /Users/adam/IdeaProjects/iwallet)
+2026-06-02 21:33:08 INFO  traceId= com.alipay.usercenter.web.controller.Main - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 21:33:08 INFO  traceId= org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8180 (http)
+2026-06-02 21:33:08 INFO  traceId= org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-8180"]
+2026-06-02 21:33:08 INFO  traceId= com.alipay.account_center.web.Main - Starting Main v1.0-SNAPSHOT using Java 21.0.9 with PID 72134 (/Users/adam/IdeaProjects/iaccount/app/web/target/account_center-web-1.0-SNAPSHOT.jar started by adam in /Users/adam/IdeaProjects/iwallet)
+2026-06-02 21:33:09 INFO  traceId= com.alipay.account_center.web.Main - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 21:33:09 INFO  traceId= org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-02 21:33:09 INFO  traceId= org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2026-06-02 21:33:09 INFO  traceId= org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-06-02 21:33:09 INFO  traceId= org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 6160 ms
+2026-06-02 21:33:09 INFO  traceId= org.javamoney.moneta.DefaultMonetaryContextFactory - Using custom MathContext: precision=256, roundingMode=HALF_EVEN
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 5 ms. Found 0 JPA repository interfaces.
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 0 ms. Found 0 Redis repository interfaces.
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 10 ms. Found 0 JPA repository interfaces.
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-06-02 21:33:10 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 0 ms. Found 0 Redis repository interfaces.
+2026-06-02 21:33:10 WARN  traceId= org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'asyncInitMethodManager' of type [com.alipay.sofa.runtime.async.AsyncInitMethodManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [asyncProxyBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-06-02 21:33:11 WARN  traceId= org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'asyncInitMethodManager' of type [com.alipay.sofa.runtime.async.AsyncInitMethodManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected/applied to a currently created BeanPostProcessor [asyncProxyBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies/advisors. If this bean does not have to be post-processed, declare it with ROLE_INFRASTRUCTURE.
+2026-06-02 21:33:11 INFO  traceId= org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8887 (http)
+2026-06-02 21:33:11 INFO  traceId= org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-8887"]
+2026-06-02 21:33:11 INFO  traceId= org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-02 21:33:11 INFO  traceId= org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2026-06-02 21:33:11 INFO  traceId= org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-06-02 21:33:11 INFO  traceId= org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2662 ms
+2026-06-02 21:33:12 INFO  traceId= org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-02 21:33:12 INFO  traceId= org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
+2026-06-02 21:33:12 INFO  traceId= org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8085 (http)
+2026-06-02 21:33:12 INFO  traceId= org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-8085"]
+2026-06-02 21:33:12 INFO  traceId= org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-02 21:33:12 INFO  traceId= org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2026-06-02 21:33:12 INFO  traceId= org.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-06-02 21:33:13 INFO  traceId= org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-06-02 21:33:13 INFO  traceId= org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 4459 ms
+2026-06-02 21:33:13 INFO  traceId= org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-02 21:33:13 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-02 21:33:13 INFO  traceId= org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-02 21:33:14 INFO  traceId= org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
+2026-06-02 21:33:14 INFO  traceId= org.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-06-02 21:33:14 INFO  traceId= org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-02 21:33:15 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-02 21:33:15 INFO  traceId= com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@f5d20d8
+2026-06-02 21:33:15 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-02 21:33:15 INFO  traceId= com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@68017525
+2026-06-02 21:33:15 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-02 21:33:16 WARN  traceId= org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-02 21:33:16 WARN  traceId= org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-02 21:33:16 INFO  traceId= org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-02 21:33:16 INFO  traceId= org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-02 21:33:17 INFO  traceId= org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-02 21:33:17 INFO  traceId= org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-02 21:33:17 INFO  traceId= org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-06-02 21:33:17 INFO  traceId= org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-02 21:33:17 INFO  traceId= org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-02 21:33:18 WARN  traceId= org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.business.common.service.facade.api.BusinessService:businessServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.business.common.service.facade.api.BusinessService]
+2026-06-02 21:33:18 INFO  traceId= org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2026-06-02 21:33:18 INFO  traceId= org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-06-02 21:33:18 ERROR traceId= org.springframework.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.business.common.service.facade.api.BusinessService:businessServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.business.common.service.facade.api.BusinessService]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1215)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1187)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.alipay.business.web.Main.main(Main.java:11)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:91)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53)
+	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58)
+Caused by: com.alipay.sofa.runtime.api.ServiceRuntimeException: SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.business.common.service.facade.api.BusinessService]
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.doRegister(ComponentManagerImpl.java:212)
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.register(ComponentManagerImpl.java:159)
+	at com.alipay.sofa.runtime.spring.factory.ServiceFactoryBean.afterPropertiesSet(ServiceFactoryBean.java:88)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 23 common frames omitted
+2026-06-02 21:33:36 INFO  traceId= com.alipay.account_center.web.LoggingAspect - Entering: TopUpHandler.getType()
+2026-06-02 21:33:36 INFO  traceId= com.alipay.account_center.web.LoggingAspect - Exiting: TopUpHandler.getType() (0ms)
+2026-06-02 21:33:36 INFO  traceId= com.alipay.account_center.web.LoggingAspect - Entering: TransactionHandler.getType()
+2026-06-02 21:33:36 INFO  traceId= com.alipay.account_center.web.LoggingAspect - Exiting: TransactionHandler.getType() (0ms)
+2026-06-02 21:33:37 WARN  traceId= org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-02 21:33:37 WARN  traceId= org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-02 21:33:37 INFO  traceId= com.alipay.usercenter.web.aspect.LoggingAspect - Entering: .addCorsMappings(..)
+2026-06-02 21:33:37 INFO  traceId= com.alipay.usercenter.web.aspect.LoggingAspect - Exiting: .addCorsMappings(..) (1ms)
+2026-06-02 21:33:37 INFO  traceId= org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoints beneath base path '/actuator'
+2026-06-02 21:33:37 INFO  traceId= org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-06-02 21:33:37 INFO  traceId= org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver - Exposing 3 endpoints beneath base path '/actuator'
+2026-06-02 21:33:37 INFO  traceId= org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-06-02 21:33:39 WARN  traceId= org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.account_center.common.service.facade.api.AccountService:accountServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.account_center.common.service.facade.api.AccountService]
+2026-06-02 21:33:39 INFO  traceId= org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-02 21:33:39 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-06-02 21:33:39 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-06-02 21:33:39 INFO  traceId= org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2026-06-02 21:33:39 INFO  traceId= org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-06-02 21:33:39 WARN  traceId= org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.usercenter.common.service.facade.api.TopUpService:topUpServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.usercenter.common.service.facade.api.TopUpService]
+2026-06-02 21:33:39 ERROR traceId= org.springframework.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.account_center.common.service.facade.api.AccountService:accountServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.account_center.common.service.facade.api.AccountService]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1215)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1187)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:971)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.alipay.account_center.web.Main.main(Main.java:11)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:91)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53)
+	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58)
+Caused by: com.alipay.sofa.runtime.api.ServiceRuntimeException: SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.account_center.common.service.facade.api.AccountService]
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.doRegister(ComponentManagerImpl.java:212)
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.register(ComponentManagerImpl.java:159)
+	at com.alipay.sofa.runtime.spring.factory.ServiceFactoryBean.afterPropertiesSet(ServiceFactoryBean.java:88)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 23 common frames omitted
+2026-06-02 21:33:39 INFO  traceId= org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-02 21:33:39 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-06-02 21:33:39 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-06-02 21:33:39 INFO  traceId= org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2026-06-02 21:33:39 INFO  traceId= org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-06-02 21:33:39 ERROR traceId= org.springframework.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.usercenter.common.service.facade.api.TopUpService:topUpServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.usercenter.common.service.facade.api.TopUpService]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1215)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1187)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.alipay.usercenter.web.controller.Main.main(Main.java:13)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:91)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53)
+	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58)
+Caused by: com.alipay.sofa.runtime.api.ServiceRuntimeException: SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.usercenter.common.service.facade.api.TopUpService]
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.doRegister(ComponentManagerImpl.java:212)
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.register(ComponentManagerImpl.java:159)
+	at com.alipay.sofa.runtime.spring.factory.ServiceFactoryBean.afterPropertiesSet(ServiceFactoryBean.java:88)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 23 common frames omitted
+2026-06-02 21:57:41 INFO  traceId= com.alipay.business.web.Main - Starting Main v1.0-SNAPSHOT using Java 21.0.9 with PID 78377 (/Users/adam/IdeaProjects/iwallet/app/web/target/business-web-1.0-SNAPSHOT.jar started by adam in /Users/adam/IdeaProjects/iwallet)
+2026-06-02 21:57:41 INFO  traceId= com.alipay.business.web.Main - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 21:57:41 INFO  traceId= com.alipay.usercenter.web.controller.Main - Starting Main v1.0-SNAPSHOT using Java 21.0.9 with PID 78414 (/Users/adam/IdeaProjects/iuser/app/web/target/usercenter-web-1.0-SNAPSHOT.jar started by adam in /Users/adam/IdeaProjects/iwallet)
+2026-06-02 21:57:41 INFO  traceId= com.alipay.usercenter.web.controller.Main - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 21:57:44 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:57:47 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-02 21:57:47 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 6 ms. Found 0 JPA repository interfaces.
+2026-06-02 21:57:47 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:57:47 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-06-02 21:57:47 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 0 ms. Found 0 Redis repository interfaces.
+2026-06-02 21:57:47 WARN  traceId= org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'asyncInitMethodManager' of type [com.alipay.sofa.runtime.async.AsyncInitMethodManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected/applied to a currently created BeanPostProcessor [asyncProxyBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies/advisors. If this bean does not have to be post-processed, declare it with ROLE_INFRASTRUCTURE.
+2026-06-02 21:57:47 WARN  traceId= org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'asyncInitMethodManager' of type [com.alipay.sofa.runtime.async.AsyncInitMethodManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected/applied to a currently created BeanPostProcessor [asyncProxyBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies/advisors. If this bean does not have to be post-processed, declare it with ROLE_INFRASTRUCTURE.
+2026-06-02 21:57:48 INFO  traceId= org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8180 (http)
+2026-06-02 21:57:48 INFO  traceId= org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-8180"]
+2026-06-02 21:57:48 INFO  traceId= org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-02 21:57:48 INFO  traceId= org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2026-06-02 21:57:48 INFO  traceId= org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-06-02 21:57:48 INFO  traceId= org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 7492 ms
+2026-06-02 21:57:48 INFO  traceId= org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8085 (http)
+2026-06-02 21:57:48 INFO  traceId= org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-8085"]
+2026-06-02 21:57:48 INFO  traceId= org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-02 21:57:48 INFO  traceId= org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2026-06-02 21:57:48 INFO  traceId= org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-06-02 21:57:48 INFO  traceId= org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 6950 ms
+2026-06-02 21:57:48 INFO  traceId= org.javamoney.moneta.DefaultMonetaryContextFactory - Using custom MathContext: precision=256, roundingMode=HALF_EVEN
+2026-06-02 21:57:49 INFO  traceId= org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-02 21:57:49 INFO  traceId= org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
+2026-06-02 21:57:49 INFO  traceId= org.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-06-02 21:57:50 INFO  traceId= org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-02 21:57:50 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-02 21:57:50 INFO  traceId= com.alipay.account_center.web.Main - Starting Main v1.0-SNAPSHOT using Java 21.0.9 with PID 78487 (/Users/adam/IdeaProjects/iaccount/app/web/target/account_center-web-1.0-SNAPSHOT.jar started by adam in /Users/adam/IdeaProjects/iwallet)
+2026-06-02 21:57:50 INFO  traceId= com.alipay.account_center.web.Main - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 21:57:50 INFO  traceId= com.alipay.riskops.web.Main - Starting Main v1.0-SNAPSHOT using Java 21.0.9 with PID 78490 (/Users/adam/IdeaProjects/iriskops/app/web/target/riskops-web-1.0-SNAPSHOT.jar started by adam in /Users/adam/IdeaProjects/iwallet)
+2026-06-02 21:57:50 INFO  traceId= com.alipay.riskops.web.Main - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 21:57:50 INFO  traceId= com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1898593
+2026-06-02 21:57:50 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-02 21:57:50 WARN  traceId= org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-02 21:57:50 INFO  traceId= org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-02 21:57:51 INFO  traceId= org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-02 21:57:51 INFO  traceId= org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-02 21:57:51 WARN  traceId= org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'asyncInitMethodManager' of type [com.alipay.sofa.runtime.async.AsyncInitMethodManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected/applied to a currently created BeanPostProcessor [asyncProxyBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies/advisors. If this bean does not have to be post-processed, declare it with ROLE_INFRASTRUCTURE.
+2026-06-02 21:57:51 INFO  traceId= org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2026-06-02 21:57:51 INFO  traceId= org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-8181"]
+2026-06-02 21:57:51 INFO  traceId= org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-02 21:57:51 INFO  traceId= org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2026-06-02 21:57:52 INFO  traceId= org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-06-02 21:57:52 INFO  traceId= org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1324 ms
+2026-06-02 21:57:52 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:57:52 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-02 21:57:52 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 14 ms. Found 0 JPA repository interfaces.
+2026-06-02 21:57:52 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:57:52 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-06-02 21:57:52 INFO  traceId= org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 1 ms. Found 0 Redis repository interfaces.
+2026-06-02 21:57:52 WARN  traceId= org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'asyncInitMethodManager' of type [com.alipay.sofa.runtime.async.AsyncInitMethodManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [asyncProxyBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-06-02 21:57:56 INFO  traceId= org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8887 (http)
+2026-06-02 21:57:56 INFO  traceId= org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-8887"]
+2026-06-02 21:57:56 INFO  traceId= org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-06-02 21:57:56 INFO  traceId= org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
+2026-06-02 21:57:56 INFO  traceId= org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-06-02 21:57:56 INFO  traceId= org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 5997 ms
+2026-06-02 21:57:57 INFO  traceId= org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-02 21:58:02 INFO  traceId= org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
+2026-06-02 21:58:02 INFO  traceId= org.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-06-02 21:58:03 INFO  traceId= org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-02 21:58:03 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-02 21:58:03 WARN  traceId= org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.riskops.common.service.facade.api.RiskOpsService:riskOpsServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.riskops.common.service.facade.api.RiskOpsService]
+2026-06-02 21:58:03 INFO  traceId= org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2026-06-02 21:58:03 INFO  traceId= org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-06-02 21:58:03 ERROR traceId= org.springframework.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.riskops.common.service.facade.api.RiskOpsService:riskOpsServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.riskops.common.service.facade.api.RiskOpsService]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1215)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1187)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.alipay.riskops.web.Main.main(Main.java:14)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:91)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53)
+	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58)
+Caused by: com.alipay.sofa.runtime.api.ServiceRuntimeException: SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.riskops.common.service.facade.api.RiskOpsService]
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.doRegister(ComponentManagerImpl.java:212)
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.register(ComponentManagerImpl.java:159)
+	at com.alipay.sofa.runtime.spring.factory.ServiceFactoryBean.afterPropertiesSet(ServiceFactoryBean.java:88)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 23 common frames omitted
+2026-06-02 21:58:04 INFO  traceId= com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6f8aecd3
+2026-06-02 21:58:04 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-02 21:58:04 WARN  traceId= org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-02 21:58:04 INFO  traceId= org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-02 21:58:04 INFO  traceId= org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-02 21:58:04 INFO  traceId= org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-02 21:58:08 WARN  traceId= org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-02 21:58:08 WARN  traceId= com.baomidou.mybatisplus.core.toolkit.Sequence - Initialization Sequence Very Slow! Get datacenterId:22 workerId:18
+2026-06-02 21:58:08 INFO  traceId= com.alipay.usercenter.web.aspect.LoggingAspect - Entering: .addCorsMappings(..)
+2026-06-02 21:58:08 INFO  traceId= com.alipay.usercenter.web.aspect.LoggingAspect - Exiting: .addCorsMappings(..) (7ms)
+2026-06-02 21:58:09 INFO  traceId= org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver - Exposing 3 endpoints beneath base path '/actuator'
+2026-06-02 21:58:10 INFO  traceId= org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-06-02 21:58:12 INFO  traceId= org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-06-02 21:58:13 INFO  traceId= com.alipay.account_center.web.LoggingAspect - Entering: TopUpHandler.getType()
+2026-06-02 21:58:13 INFO  traceId= com.alipay.account_center.web.LoggingAspect - Exiting: TopUpHandler.getType() (1ms)
+2026-06-02 21:58:13 INFO  traceId= com.alipay.account_center.web.LoggingAspect - Entering: TransactionHandler.getType()
+2026-06-02 21:58:13 INFO  traceId= com.alipay.account_center.web.LoggingAspect - Exiting: TransactionHandler.getType() (0ms)
+2026-06-02 21:58:13 WARN  traceId= org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-02 21:58:13 WARN  traceId= org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.usercenter.common.service.facade.api.TopUpService:topUpServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.usercenter.common.service.facade.api.TopUpService]
+2026-06-02 21:58:13 INFO  traceId= org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-02 21:58:13 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-06-02 21:58:13 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-06-02 21:58:13 INFO  traceId= org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2026-06-02 21:58:13 INFO  traceId= org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-06-02 21:58:13 ERROR traceId= org.springframework.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.usercenter.common.service.facade.api.TopUpService:topUpServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.usercenter.common.service.facade.api.TopUpService]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1215)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1187)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.alipay.usercenter.web.controller.Main.main(Main.java:13)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:91)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53)
+	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58)
+Caused by: com.alipay.sofa.runtime.api.ServiceRuntimeException: SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.usercenter.common.service.facade.api.TopUpService]
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.doRegister(ComponentManagerImpl.java:212)
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.register(ComponentManagerImpl.java:159)
+	at com.alipay.sofa.runtime.spring.factory.ServiceFactoryBean.afterPropertiesSet(ServiceFactoryBean.java:88)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 23 common frames omitted
+2026-06-02 21:58:14 INFO  traceId= org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver - Exposing 2 endpoints beneath base path '/actuator'
+2026-06-02 21:58:14 INFO  traceId= org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-06-02 21:58:15 WARN  traceId= org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.business.common.service.facade.api.BusinessService:businessServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.business.common.service.facade.api.BusinessService]
+2026-06-02 21:58:15 INFO  traceId= org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2026-06-02 21:58:15 INFO  traceId= org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-06-02 21:58:15 ERROR traceId= org.springframework.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.business.common.service.facade.api.BusinessService:businessServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.business.common.service.facade.api.BusinessService]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1215)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1187)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.alipay.business.web.Main.main(Main.java:11)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:91)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53)
+	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58)
+Caused by: com.alipay.sofa.runtime.api.ServiceRuntimeException: SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.business.common.service.facade.api.BusinessService]
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.doRegister(ComponentManagerImpl.java:212)
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.register(ComponentManagerImpl.java:159)
+	at com.alipay.sofa.runtime.spring.factory.ServiceFactoryBean.afterPropertiesSet(ServiceFactoryBean.java:88)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 23 common frames omitted
+2026-06-02 21:58:15 WARN  traceId= org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.account_center.common.service.facade.api.AccountService:accountServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.account_center.common.service.facade.api.AccountService]
+2026-06-02 21:58:15 INFO  traceId= org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-02 21:58:15 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-06-02 21:58:15 INFO  traceId= com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-06-02 21:58:15 INFO  traceId= org.apache.catalina.core.StandardService - Stopping service [Tomcat]
+2026-06-02 21:58:15 INFO  traceId= org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-06-02 21:58:15 ERROR traceId= org.springframework.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'ServiceFactoryBean#com.alipay.account_center.common.service.facade.api.AccountService:accountServiceImpl': SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.account_center.common.service.facade.api.AccountService]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1215)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1187)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:971)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.alipay.account_center.web.Main.main(Main.java:11)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:91)
+	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:53)
+	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:58)
+Caused by: com.alipay.sofa.runtime.api.ServiceRuntimeException: SOFA-BOOT-01-03004: Failed to resolve and active component [service:com.alipay.account_center.common.service.facade.api.AccountService]
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.doRegister(ComponentManagerImpl.java:212)
+	at com.alipay.sofa.runtime.impl.ComponentManagerImpl.register(ComponentManagerImpl.java:159)
+	at com.alipay.sofa.runtime.spring.factory.ServiceFactoryBean.afterPropertiesSet(ServiceFactoryBean.java:88)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	... 23 common frames omitted

@@ -51,6 +51,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.alipay</groupId>
+            <artifactId>riskops-common-service-facade</artifactId>
+            <version>${iriskops.common.service.facade.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

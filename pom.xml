@@ -29,7 +29,7 @@
         <accountcenter.common.service.facade.version>1.0.0.20260520</accountcenter.common.service.facade.version>
         <business.common.service.facade.version>1.0.0.20260520</business.common.service.facade.version>
         <merchant.common.service.facade.version>1.0.0.20260520</merchant.common.service.facade.version>
-
+        <iriskops.common.service.facade.version>1.0.0.20260603-SNAPSHOT</iriskops.common.service.facade.version>
     </properties>
     <parent>
         <groupId>com.alipay.sofa</groupId>
@@ -78,6 +78,12 @@
                 <groupId>com.alipay</groupId>
                 <artifactId>merchant-common-service-facade</artifactId>
                 <version>${merchant.common.service.facade.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alipay</groupId>
+                <artifactId>riskops-common-service-facade</artifactId>
+                <version>${iriskops.common.service.facade.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -185,6 +191,12 @@
                 <repository>
                     <id>github-imerchant</id>
                     <url>https://Jung028:${env.GITHUB_TOKEN}@maven.pkg.github.com/Jung028/imerchant</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                </repository>
+                <repository>
+                    <id>github-iriskops</id>
+                    <url>https://Jung028:${env.GITHUB_TOKEN}@maven.pkg.github.com/Jung028/iriskops</url>
                     <releases><enabled>true</enabled></releases>
                     <snapshots><enabled>true</enabled></snapshots>
                 </repository>

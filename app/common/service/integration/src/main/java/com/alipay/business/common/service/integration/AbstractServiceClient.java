@@ -2,6 +2,7 @@ package com.alipay.business.common.service.integration;
 
 import com.alipay.account_center.common.service.facade.api.AccountService;
 import com.alipay.merchant.common.service.facade.api.MerchantService;
+import com.alipay.riskops.common.service.facade.api.RiskOpsService;
 import com.alipay.sofa.runtime.api.annotation.SofaReference;
 import com.alipay.sofa.runtime.api.annotation.SofaReferenceBinding;
 import com.alipay.usercenter.common.service.facade.api.TopUpService;
@@ -46,4 +47,11 @@ public class AbstractServiceClient {
     protected MerchantService merchantService;
 
 
+    /**
+     * merchant service
+     */
+    @SofaReference(interfaceType = RiskOpsService.class,
+            binding = @SofaReferenceBinding(bindingType = "rest", directUrl = "http://127.0.0.1:8345"),
+            jvmFirst = true)
+    protected RiskOpsService riskOpsService;
 }

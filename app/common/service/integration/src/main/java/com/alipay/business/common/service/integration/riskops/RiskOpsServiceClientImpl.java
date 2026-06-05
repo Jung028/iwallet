@@ -1,17 +1,28 @@
 package com.alipay.business.common.service.integration.riskops;
 
+import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.facade.enums.RiskOpsResultCode;
+import com.alipay.business.common.service.integration.AbstractServiceClient;
 import com.alipay.business.core.model.util.AssertUtil;
+import com.alipay.riskops.common.service.facade.api.RiskOpsService;
+import com.alipay.riskops.common.service.facade.baseresult.RiskOpsBizResult;
+import com.alipay.riskops.common.service.facade.request.RiskDecisionRequest;
+import com.alipay.riskops.common.service.facade.result.RiskDecisionResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author adam
  * @date 25/5/2026 11:25 PM
  */
-public class RiskOpsServiceClientImpl implements RiskOpsServiceClient {
+@Service
+public class RiskOpsServiceClientImpl extends AbstractServiceClient implements RiskOpsServiceClient {
 
     @Override
-    public RiskDecision evaluateTransferRisk(RiskDecision riskDecision) {
-        AssertUtil.notNull(riskDecision, RiskOpsResultCode.PARAM_ILLEGAL, "RiskDecision can not be null");
-        return null;
+    public RiskOpsBizResult<RiskDecisionResult> evaluateTransferRisk(RiskDecisionRequest riskDecision) {
+        AssertUtil.notNull(riskDecision, BusinessResultCode.PARAM_ILLEGAL, "Risk decision request cannot be null");
+        RiskOpsBizResult<RiskDecisionResult> result = riskOpsService.evaluateTransferRisk(riskDecision);
+        AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, "Risk decision result cannot be null");
+        return result;
     }
 }

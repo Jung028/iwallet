@@ -22,16 +22,6 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>com.alipay.sofa</groupId>
-            <artifactId>sofa-rpc-all</artifactId>
-            <version>5.13.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.nacos</groupId>
-            <artifactId>nacos-client</artifactId>
-            <version>2.1.2</version>
-        </dependency>
         <!-- Business Layer -->
         <dependency>
             <groupId>org.adam</groupId>
@@ -73,6 +63,12 @@
             <groupId>com.alibaba.nacos</groupId>
             <artifactId>nacos-client</artifactId>
             <version>2.3.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.alipay.sofa</groupId>
@@ -82,6 +78,12 @@
             <groupId>com.alipay.sofa</groupId>
             <artifactId>sofa-rpc-all</artifactId>
             <version>5.12.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     
         <dependency>

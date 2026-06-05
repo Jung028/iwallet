@@ -3,6 +3,7 @@ package com.alipay.business.common.util;
 import com.alipay.business.common.service.facade.baseresult.BusinessBaseRequest;
 import com.alipay.business.common.service.facade.baseresult.BusinessBaseResult;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
+import com.alipay.business.common.service.facade.enums.ResultCode;
 import com.alipay.business.core.model.exception.BusinessException;
 import org.slf4j.Logger;
 
@@ -83,5 +84,9 @@ public class LogUtil {
     }
 
     public static void info(Logger logger, BusinessResultCode businessResultCode, String s) {
+    }
+
+    public static <T extends BusinessBaseRequest> void warn(Logger logger, BusinessException e, String s, T request, String s1, String s2, ResultCode resultCode, String s3, String message) {
+        
     }
 }

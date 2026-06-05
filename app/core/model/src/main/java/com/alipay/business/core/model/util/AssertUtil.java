@@ -1,6 +1,7 @@
 package com.alipay.business.core.model.util;
 
 
+import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.facade.enums.ResultCode;
 import com.alipay.business.core.model.exception.BaseSlipException;
 import io.micrometer.common.util.StringUtils;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class AssertUtil {
 
-    public static void notNull(final Object object, final ResultCode resultCode, final String resultMsg) {
+    public static void notNull(final Object object, final BusinessResultCode resultCode, final String resultMsg) {
         check(new AssertTemplate() {
             @Override
             public void doAssert() {
@@ -19,18 +20,18 @@ public class AssertUtil {
         }, resultCode, resultMsg);
     }
 
-    public static void notBlank(final String str, final ResultCode resultCode,
+    public static void notBlank(final String str, final BusinessResultCode resultCode,
                                 final String resultMsg) {
         check(() -> Assert.isTrue(StringUtils.isNotBlank(str),"is true"),
                 resultCode, resultMsg);
     }
 
-    public static void isTrue(final boolean expression, final ResultCode resultCode,
+    public static void isTrue(final boolean expression, final BusinessResultCode resultCode,
                               final String resultMsg) {
         check(() -> Assert.isTrue(expression,"is true"), resultCode, resultMsg);
     }
 
-    public static void notEmpty(List<String> txnStatusList, ResultCode resultCode, String s) {
+    public static void notEmpty(List<String> txnStatusList, BusinessResultCode resultCode, String s) {
         check(() -> Assert.notEmpty((txnStatusList),"is true"),
                 resultCode, s);
     }
@@ -40,7 +41,7 @@ public class AssertUtil {
         public void doAssert();
     }
 
-    private static void check(AssertTemplate assertTemplate, ResultCode resultCode, String resultMsg) {
+    private static void check(AssertTemplate assertTemplate, BusinessResultCode resultCode, String resultMsg) {
         try {
             assertTemplate.doAssert();
         } catch (IllegalArgumentException e) {
