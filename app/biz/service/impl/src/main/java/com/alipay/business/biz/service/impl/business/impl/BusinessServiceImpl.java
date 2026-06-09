@@ -261,7 +261,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                 userServiceClient.verifyUserAuth(verifyUserAuthRequest);
 
                         if (!authInfo.isSuccess()) {
-                            handleFailedPinAttempt(payload.getUniqueRequestId(), response);
+                            handleFailedPinAttempt(payload.getUniqueRequestId(), userId, response);
                             return;
                         }
 
@@ -389,7 +389,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
      * @param uniqueRequestId
      * @param response
      */
-    private void handleFailedPinAttempt(String uniqueRequestId, BusinessBizResult<String> response) {
+    private void handleFailedPinAttempt(String uniqueRequestId, String userId, BusinessBizResult<String> response) {
         IdempotencyKeys idempotencyKeys = idempotencyKeysRepository
                 .queryIdempotencyKeysByIdempotencyKey(uniqueRequestId);
 
@@ -397,6 +397,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
         if (idempotencyKeys == null) {
             idempotencyKeys = new IdempotencyKeys();
             idempotencyKeys.setIdempotencyKey(uniqueRequestId);
+            idempotencyKeys.setUserId(Long.valueOf(userId));
             idempotencyKeys.setStatus(String.valueOf(IdempotencyKeysStatusEnum.INIT));
             idempotencyKeys.setIdempotencyType(IdempotencyTypeEnum.TRANSFER_INCORRECT_PIN.getCode());
             idempotencyKeys.setRetryCount(0);
