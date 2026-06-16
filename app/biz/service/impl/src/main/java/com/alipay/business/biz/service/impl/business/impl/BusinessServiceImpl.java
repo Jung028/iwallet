@@ -420,6 +420,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
         } else if (newRetryCount >= 3) {
             update.setStatus(String.valueOf(IdempotencyKeysStatusEnum.TIMED_LOCKOUT));
             update.setLockedUntil(new Date(System.currentTimeMillis() + 30 * 60 * 1000L));
+            update.setRequestHash(RequestHashUtil.hash(request));
             idempotencyKeysRepository.updateFailedAttempts(update);
             ResponseBuilder.fail(response, BusinessActionEnum.CONFIRM_TRANSFER.getCode(),
                     "Too many attempts, locked for 30 minutes");
