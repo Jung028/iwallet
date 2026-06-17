@@ -4,6 +4,18 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
                               http://maven.apache.org/xsd/settings-1.0.0.xsd">
   <servers>
+    <!-- Local Nexus (maven-releases / maven-snapshots @ localhost:8081). Added to stop
+         facade re-downloads from 401-ing. Creds via env: NEXUS_USERNAME / NEXUS_PASSWORD. -->
+    <server>
+      <id>Alipay_Releases</id>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
+    <server>
+      <id>Alipay_Snapshots</id>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
     <server>
       <id>github-iuser</id>
       <username>${env.GITHUB_USERNAME}</username>

@@ -31,6 +31,7 @@ import com.alipay.merchant.common.service.facade.baseresult.MerchantBizResult;
 import com.alipay.merchant.common.service.facade.item.MerchantInfoItem;
 import com.alipay.merchant.common.service.facade.result.QueryMerchantInfoRequest;
 import com.alipay.riskops.common.service.facade.baseresult.RiskOpsBizResult;
+import com.alipay.riskops.common.service.facade.enums.RiskDecisionOutcome;
 import com.alipay.riskops.common.service.facade.request.RiskDecisionRequest;
 import com.alipay.riskops.common.service.facade.result.RiskDecisionResult;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
@@ -48,6 +49,7 @@ import com.stripe.param.PaymentIntentCreateParams;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -59,6 +61,8 @@ import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.alipay.business.biz.service.impl.constant.GlobalBizConstants.*;
 
@@ -205,6 +209,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                     @Override
                     protected void process(TransferConfirmRequest request, BusinessBizResult<String> response) {
 
+                        System.out.println("userId: " + userId);
                         TransferTokenPayload payload =
                                 transferTokenService.verifyTransferToken(request.getTransferToken());
 
@@ -259,9 +264,9 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                         UserBizResult<String> authInfo =
                                 userServiceClient.verifyUserAuth(verifyUserAuthRequest);
 
-                        if (!authInfo.isSuccess()) {
+                        if (!authInfo.isSuccess() || authInfo.getResult() == null) {
                             // Insert a idempotency record in INIT status to track incorrect attempts
-                            handleFailedPinAttempt(payload.getUniqueRequestId(), response);
+                            handleFailedPinAttempt(payload.getUniqueRequestId(), response, userId);
                             return;
                         }
 
@@ -318,8 +323,10 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             queryAutoReloadConfigRequest.setUserId(userId);
                             UserBizResult<AutoReloadConfigItem> autoReloadConfig =
                                     userServiceClient.queryAutoReloadConfig(queryAutoReloadConfigRequest);
-                            System.out.println(autoReloadConfig.getResult().getConfigId());
-                            if (autoReloadConfig.getResult().getIsActive().equals(true) && !freshBalance.isLessThan(requestAmount)) {
+                            // we should not throw an error saying that the user should add the config,
+                            if (autoReloadConfig.getResult() != null &&
+                                    autoReloadConfig.getResult().getIsActive().equals(true)
+                                    && freshBalance.isLessThan(requestAmount)) {
                                 // publish auto reload event
                                 EcAutoReloadEvent ecAutoReloadEvent = new EcAutoReloadEvent();
                                 ecAutoReloadEvent.setAmount(payload.getAmount());
@@ -376,34 +383,20 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             return txnId;
                         });
 
+                        IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
+                        idempotencyKeys.setIdempotencyKey(payload.getUniqueRequestId());
                         // Only runs if the transaction block above succeeded
                         if (response.isSuccess() && response.getResult() != null) {
-//                            // TODO: Add evaluation in iriskops, later use facade mvn.
-//                            RiskOpsBizResult<RiskDecisionResult> riskDecision = riskOpsServiceClient.evaluateTransferRisk
-//                                    (buildTransferRiskRequest(payload, referenceId, request, userId));
-//
-//                            // if is block
-//                            UpdateTransactionRecordRequest updateRequest = new UpdateTransactionRecordRequest();
-//                            UpdateIdempotencyKeysRequest updateIdempotencyKeysRequest = new UpdateIdempotencyKeysRequest();
-//                            if (riskDecision.getResult().isBlock()) {
-//                                // mark the transaction as BLOCKED, and idempotency result FAILED with reason. then return
-//                                updateRequest.setStatus(TransactionStatusEnum.FAILED.getCode());
-//                                accountServiceClient.updateTransactionRecord(updateRequest);
-//
-//                                IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
-//                                idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.FAILED.getCode());
-//                                idempotencyKeysRepository.updateIdempotencyKeys(idempotencyKeys);
-//
-//                                //TODO: add publish EC_TRANSFER_BLOCKED
-//                            }
-//                            // if is step up
-//                            if (riskDecision.getResult().isStepUp()) {
-//                                updateRequest.setStatus(TransactionStatusEnum.PENDING.getCode());
-//                                accountServiceClient.updateTransactionRecord(updateRequest);
-//
-//                                //TODO: add publish EC_TRANSFER_STEP_UP_REQUIRED
-//                            }
 
+                            // Evaluate transfer
+                            RiskOpsBizResult<RiskDecisionResult> riskDecision = riskOpsServiceClient.evaluateTransferRisk
+                                    (buildTransferRiskRequest(payload, referenceId, request, userId));
+
+                            // increment redis into the cache the moment that the transfer is completed? only completed transfers reifght?
+                            // publish the decision to inotify center
+                            publishRiskDecision(riskDecision, idempotencyKeys, TxnEventType.TRANSFER);
+
+                            // publish transfer payload
                             transactionService.publishTransfer(payload.getPayerAccountNo(), referenceId, TxnEventType.TRANSFER.getCode());
                         }
                     }
@@ -440,13 +433,14 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
      * @param uniqueRequestId
      * @param response
      */
-    private void handleFailedPinAttempt(String uniqueRequestId, BusinessBizResult<String> response) {
+    private void handleFailedPinAttempt(String uniqueRequestId, BusinessBizResult<String> response, String userId) {
         IdempotencyKeys idempotencyKeys = idempotencyKeysRepository
                 .queryIdempotencyKeysByIdempotencyKey(uniqueRequestId);
 
         // insert a lightweight tracking row if this is the first wrong attempt
         if (idempotencyKeys == null) {
             idempotencyKeys = new IdempotencyKeys();
+            idempotencyKeys.setUserId(Long.valueOf(userId));
             idempotencyKeys.setIdempotencyKey(uniqueRequestId);
             idempotencyKeys.setStatus(String.valueOf(IdempotencyKeysStatusEnum.INIT));
             idempotencyKeys.setIdempotencyType(IdempotencyTypeEnum.TRANSFER_INCORRECT_PIN.getCode());
@@ -816,6 +810,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             insertRequest.setCurrency(request.getCurrency());
                             insertRequest.setTxnType(TransactionType.TOP_UP);
                             insertRequest.setStatus(TransactionStatusEnum.PENDING);
+                            // Add category
+                            insertRequest.setCategory(TransactionCategory.TOP_UP);
 
                             AccountBizResult<TransactionRecordItem> transactionRecord =
                                     accountServiceClient.insertTransactionRecord(insertRequest);
@@ -878,7 +874,10 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             }
                             // then we pass the client secret which is result of create and return to frontend to
                             // pass into payment using the card
+                            RiskOpsBizResult<RiskDecisionResult> riskDecision = riskOpsServiceClient.evaluateTransferRisk
+                                    (buildTopUpRiskRequest(request, userId));
 
+                            publishRiskDecision(riskDecision, idempotencyKeys, TxnEventType.TOP_UP);
 
                             // --- build TopUpResult to return both ---
                             TopUpResult finalResult = new TopUpResult();
@@ -888,6 +887,11 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                             return finalResult;
                         });
+
+                        // TODO :  cant I publish directly from iriskops ? sinc e the logic is the same, if the result is blocked,
+                        // check whether tis a transfer or a top up, then publish specific email.
+
+
 
                         AssertUtil.notNull(topUpResult, BusinessResultCode.PARAM_ILLEGAL, "payment intent is null");
                         AssertUtil.notNull(topUpResult.getTxnId(), BusinessResultCode.PARAM_ILLEGAL, "txnId is null");
@@ -903,6 +907,72 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                     }
                 });
+    }
+
+    private void publishRiskDecision(RiskOpsBizResult<RiskDecisionResult> riskDecision,
+                                     IdempotencyKeys idempotencyKeys,
+                                     TxnEventType txnEventType
+    ) {
+        // if is block
+        String eventType = txnEventType.getCode();
+
+        UpdateTransactionRecordRequest updateRequest = new UpdateTransactionRecordRequest();
+        if (riskDecision.getResult().getOutcome().equals(RiskDecisionOutcome.BLOCK.getCode())) {
+            // mark the transaction as BLOCKED, and idempotency result FAILED with reason. then return
+            updateRequest.setTxnId(idempotencyKeys.getReferenceId());
+            updateRequest.setStatus(TransactionStatusEnum.FAILED.getCode());
+            accountServiceClient.updateTransactionRecord(updateRequest);
+
+            idempotencyKeys.setReferenceId(idempotencyKeys.getReferenceId());
+            idempotencyKeys.setStatus(IdempotencyKeysStatusEnum.FAILED.getCode());
+            idempotencyKeysRepository.updateIdempotencyKeys(idempotencyKeys);
+            if (txnEventType.equals(TxnEventType.TRANSFER)) {
+                kafkaTemplate.send("EC_TRANSFER_BLOCKED", riskDecision.getResult().getUserId(), eventType);
+            } else if (txnEventType.equals(TxnEventType.TOP_UP)) {
+                kafkaTemplate.send("EC_TRANSFER_BLOCKED", riskDecision.getResult().getUserId(), eventType);
+            }
+
+        }
+        // if is step up
+        if (riskDecision.getResult().getOutcome().equals(RiskDecisionOutcome.STEP_UP.getCode())) {
+            //TODO: in notify, its just sending an email saying suspicious behaviour, to contact bank if not him.
+            // Add userId, accountId, to send notification, we need to the user gmail or phone no.
+            if (txnEventType.equals(TxnEventType.TRANSFER)) {
+                kafkaTemplate.send("EC_TRANSFER_STEP_UP_REQUIRED", riskDecision.getResult().getUserId(), eventType);
+            } else if (txnEventType.equals(TxnEventType.TOP_UP)) {
+                kafkaTemplate.send("EC_TRANSFER_STEP_UP_REQUIRED", riskDecision.getResult().getUserId(), eventType);
+            }
+        }
+    }
+
+    private RiskDecisionRequest buildTopUpRiskRequest(TopUpRequest request, String userId) {
+        RiskDecisionRequest riskRequest = new RiskDecisionRequest();
+
+        riskRequest.setBusinessId(request.getUniqueRequestId());
+        riskRequest.setBusinessType("TOP_UP");
+        riskRequest.setUserId(userId);
+
+        QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
+        queryAccountInfoRequest.setUserId(userId);
+        AccountBizResult<AccountInfoItem> accountInfo = accountServiceClient.queryAccountInfoByUserId(queryAccountInfoRequest);
+        if (accountInfo != null && accountInfo.getResult() != null) {
+            riskRequest.setAccountNo(accountInfo.getResult().getAccountId());
+            riskRequest.setPayeeAccountNo(accountInfo.getResult().getAccountId());
+        }
+        riskRequest.setPayerAccountNo(STRIPE_CLEARING_ACCOUNT);
+
+        riskRequest.setAmount(request.getAmount());
+        riskRequest.setCurrency(request.getCurrency());
+        riskRequest.setUniqueRequestId(request.getUniqueRequestId());
+
+        riskRequest.setTraceId(MDC.get("traceId"));
+        riskRequest.setOccurredAt(new Date());
+
+        if (request.getCardType() != null) {
+            riskRequest.getAttributes().put("cardType", request.getCardType().name());
+        }
+
+        return riskRequest;
     }
 
     @Override

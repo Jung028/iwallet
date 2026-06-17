@@ -42,7 +42,6 @@ public abstract class AbstractQrHandlerService implements QrCodeGeneratorHandler
         // insert QR code.
         QrCode qrCode = new QrCode();
         try {
-            // TODO: we need to know if its dynamic or static qr, then handle it.
             // set expiry time, signature, qr_id, currency, amount, receiver_id, into a QR instance
             qrCode.setQrId(UUID.randomUUID().toString());
             qrCode.setAmount(BigDecimal.valueOf(Long.parseLong(request.getAmount())));
@@ -62,7 +61,6 @@ public abstract class AbstractQrHandlerService implements QrCodeGeneratorHandler
                 qrCode.setExpiresAt(new Date(System.currentTimeMillis() + 60 * 1000));
                 qrCode.setQrType(QrType.DYNAMIC.getCode());
             }
-
 
             qrCodeRepository.insertQrCode(qrCode);
         } catch (DuplicateKeyException e) {

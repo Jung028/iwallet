@@ -23,6 +23,10 @@
 
     <logger name="org.apache.kafka" level="WARN" />
     <logger name="org.springframework.kafka.listener" level="WARN" />
+    <!-- Suppress OTEL exporter timeout spam when the collector is not running.
+         Only active when OTEL_JAVAAGENT_LOGGING=application is set in the JVM env. -->
+    <logger name="io.opentelemetry.exporter" level="WARN" />
+    <logger name="io.opentelemetry.sdk.trace" level="WARN" />
 
     <root level="INFO">
         <appender-ref ref="CONSOLE" />

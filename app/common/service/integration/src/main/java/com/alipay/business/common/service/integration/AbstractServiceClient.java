@@ -47,11 +47,8 @@ public class AbstractServiceClient {
     protected MerchantService merchantService;
 
 
-    /**
-     * merchant service
-     */
     @SofaReference(interfaceType = RiskOpsService.class,
-            binding = @SofaReferenceBinding(bindingType = "rest", directUrl = "http://127.0.0.1:8345"),
+            binding = @SofaReferenceBinding(bindingType = "rest", directUrl = "http://127.0.0.1:8346"),
             jvmFirst = true)
     protected RiskOpsService riskOpsService;
 }

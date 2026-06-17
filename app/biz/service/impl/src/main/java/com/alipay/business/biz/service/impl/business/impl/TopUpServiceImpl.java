@@ -71,7 +71,7 @@ public class TopUpServiceImpl implements TopUpService {
             throw new IllegalStateException("Event is not PaymentIntent");
         }
 
-        String paymentIntentId = intent.getId(); // ✅ pi_xxx
+        String paymentIntentId = intent.getId();
         // push to Kafka (event-driven)
         kafkaTemplate.send("TOP_UP_SUCCESS", paymentIntentId);
 

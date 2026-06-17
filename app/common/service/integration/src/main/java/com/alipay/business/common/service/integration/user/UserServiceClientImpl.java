@@ -83,8 +83,6 @@ public class UserServiceClientImpl extends AbstractServiceClient implements User
         // TODO: setCrossInvoke for different region database, pass in paymentId, region
         UserBizResult<String> result = userService.verifyUserAuth(request);
         AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
-        AssertUtil.notNull(result.getResult(), BusinessResultCode.PARAM_ILLEGAL, ", result is null");
-        AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
         return result;
     }
 
@@ -103,10 +101,7 @@ public class UserServiceClientImpl extends AbstractServiceClient implements User
         AssertUtil.notNull(request, BusinessResultCode.PARAM_ILLEGAL, ", verify verified token request is null");
         AssertUtil.notBlank(request.getUserId(), BusinessResultCode.PARAM_ILLEGAL, ", userId cannot be blank");
 
-        UserBizResult<AutoReloadConfigItem> result = topUpService.queryAutoReloadConfig(request);
-        AssertUtil.notNull(result, BusinessResultCode.PARAM_ILLEGAL, ", result is null");
-        AssertUtil.isTrue(result.isSuccess(), BusinessResultCode.PARAM_ILLEGAL, ", result is not success");
-        return result;
+        return topUpService.queryAutoReloadConfig(request);
     }
 
     @Override
