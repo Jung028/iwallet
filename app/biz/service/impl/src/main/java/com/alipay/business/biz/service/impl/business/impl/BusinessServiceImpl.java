@@ -270,6 +270,14 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             return;
                         }
 
+                        // ownerType is static — safe to check before the transaction
+                        QueryAccountInfoRequest feeCheckRequest = new QueryAccountInfoRequest();
+                        feeCheckRequest.setAccountId(payload.getPayerAccountNo());
+                        AccountBizResult<AccountInfoItem> feeCheckAccount =
+                                accountServiceClient.queryAccountInfo(feeCheckRequest);
+                        boolean feeIsActive = feeCheckAccount.getResult() != null &&
+                                OwnerType.MERCHANT.getCode().equals(feeCheckAccount.getResult().getOwnerType());
+
                         String referenceId = transactionTemplate.execute(status -> {
 
                             // insert idempotency record of pending status
@@ -341,6 +349,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                             // determine transaction category
                             TransactionCategory category = TransactionCategory.TRANSFER;
+                            // Check if merchant account
+
                             if (payerAccountInfo.getResult().getOwnerType().equals(OwnerType.MERCHANT.getCode())) {
                                 // then query the merchant category, then use this
                                 QueryMerchantInfoRequest queryMerchantInfoRequest = new QueryMerchantInfoRequest();
@@ -397,7 +407,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             publishRiskDecision(riskDecision, idempotencyKeys, TxnEventType.TRANSFER);
 
                             // publish transfer payload
-                            transactionService.publishTransfer(payload.getPayerAccountNo(), referenceId, TxnEventType.TRANSFER.getCode());
+                            transactionService.publishTransfer(payload.getPayerAccountNo(), referenceId,
+                                    TxnEventType.TRANSFER.getCode(), feeIsActive);
                         }
                     }
                 });

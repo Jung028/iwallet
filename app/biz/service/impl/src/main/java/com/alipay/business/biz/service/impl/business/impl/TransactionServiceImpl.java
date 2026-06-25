@@ -30,7 +30,7 @@ public class TransactionServiceImpl implements TransactionService {
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
-    public void publishTransfer(String payerAccountNo, String txnId, String txnEventType) {
+    public void publishTransfer(String payerAccountNo, String txnId, String txnEventType, boolean feeActive) {
         // fetch and validate the transaction record
         QueryTransactionRecordRequest queryRequest = new QueryTransactionRecordRequest();
         queryRequest.setAccountId(payerAccountNo);
@@ -57,7 +57,8 @@ public class TransactionServiceImpl implements TransactionService {
                 transactionRecord.getResult().getPayeeAccountId(),
                 amount,
                 transactionRecord.getResult().getCurrency(),
-                txnEventType
+                txnEventType,
+                feeActive
         );
         // use payerAccountId as partition key — guarantees ordering per account
         kafkaTemplate.send("EC_TRANSACTION", event.getPayerAccountNo(), event);

@@ -98,7 +98,7 @@ public class TopUpConsumer {
             String accountId = accountInfo.getResult().getAccountId();
 
             // --- 5. Credit account ---
-            transactionService.publishTransfer(accountId, txnId, TxnEventType.TOP_UP.getCode());
+            transactionService.publishTransfer(accountId, txnId, TxnEventType.TOP_UP.getCode(), false);
 
             logger.info("Top-up SUCCESS for txnId={}, accountId={}", txnId, accountId);
 

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.alipay.business.common.dal.auto.custom.ReceiptDAO">
+    <resultMap id="BaseResultMap" type="com.alipay.business.common.dal.auto.dataobject.ReceiptDO">
+        <id column="receipt_id" jdbcType="OTHER" property="receiptId" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="object_key" jdbcType="VARCHAR" property="objectKey" />
+        <result column="bucket_name" jdbcType="VARCHAR" property="bucketName" />
+        <result column="file_url" jdbcType="VARCHAR" property="fileUrl" />
+        <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+        <result column="content_type" jdbcType="VARCHAR" property="contentType" />
+        <result column="file_size" jdbcType="BIGINT" property="fileSize" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="total_amount" jdbcType="NUMERIC" property="totalAmount" />
+        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+        <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+    </resultMap>
+
+    <insert id="insertReceipt" parameterType="com.alipay.business.common.dal.auto.dataobject.ReceiptDO">
+        insert into receipt (receipt_id, user_id, object_key,
+        bucket_name, file_url, file_name,
+        content_type, file_size, status,
+        total_amount, created_at, updated_at
+        )
+        values (#{receiptId,jdbcType=OTHER}, #{userId,jdbcType=VARCHAR}, #{objectKey,jdbcType=VARCHAR},
+        #{bucketName,jdbcType=VARCHAR}, #{fileUrl,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR},
+        #{contentType,jdbcType=VARCHAR}, #{fileSize,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR},
+        #{totalAmount,jdbcType=NUMERIC}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}
+        )
+    </insert>
+</mapper>

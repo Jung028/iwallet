@@ -34,4 +34,19 @@ public class QrController {
             throw new RuntimeException(e);
         }
     }
+
+    @PostMapping("/uploadReceiptAndGenerateGroupQR.json")
+    public BusinessBizResult<String> uploadReceiptAndGenerateGroupQR(@RequestBody GenerateQrCodeRequest request, String receiptUrl) {
+        try {
+            JwtClaims claims = JwtContextHolder.get();
+            request.setUserId(claims.getSubject());
+
+            // generate the qr code.
+            return qrCodeService.generateQrCode(request);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
