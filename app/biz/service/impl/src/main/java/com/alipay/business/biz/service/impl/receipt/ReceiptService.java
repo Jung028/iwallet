@@ -2,9 +2,9 @@ package com.alipay.business.biz.service.impl.receipt;
 
 import com.alipay.business.common.service.facade.request.ConfirmUploadRequest;
 
-public interface ReceiptUploadService {
+public interface ReceiptService {
 
     UploadUrlResponse generatePresignedUrl(String userId);
 
-    ReceiptFileMetadata validateAndPersist(ConfirmUploadRequest request, String userId);
+    ReceiptUploadResult validateAndPersist(ConfirmUploadRequest request, String userId);
 }

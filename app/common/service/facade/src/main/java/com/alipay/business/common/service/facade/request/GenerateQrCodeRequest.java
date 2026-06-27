@@ -15,6 +15,7 @@ public class GenerateQrCodeRequest extends BusinessBaseRequest {
     private String amount;
     private String qrIntent;
     private String qrType;
+    private String sessionId;
 
     public String getQrId() {
         return qrId;
@@ -70,5 +71,13 @@ public class GenerateQrCodeRequest extends BusinessBaseRequest {
 
     public void setQrType(String qrType) {
         this.qrType = qrType;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

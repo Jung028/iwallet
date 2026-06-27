@@ -7,7 +7,8 @@ package com.alipay.business.common.service.facade.enums;
 public enum QrIntent {
     P2P("P2P", "Payer to Payee, or Person to Person"),
     P2M("P2M", "Payer to Merchant"),
-    R2P("R2P", "Request to Pay")
+    R2P("R2P", "Request to Pay"),
+    GROUP_RECEIPT("GROUP_RECEIPT", "Group receipt split session")
     ;
 
     private String code;

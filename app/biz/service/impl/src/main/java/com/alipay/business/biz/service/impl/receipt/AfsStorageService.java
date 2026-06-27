@@ -88,6 +88,21 @@ public class AfsStorageService {
         }
     }
 
+    public String generatePresignedGetUrl(String objectKey) {
+        requireClient();
+        try {
+            return minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.GET)
+                            .bucket(bucketName)
+                            .object(objectKey)
+                            .expiry(300, TimeUnit.SECONDS)
+                            .build());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate presigned GET URL for " + objectKey, e);
+        }
+    }
+
     public String getObjectUrl(String objectKey) {
         return endpoint + "/" + bucketName + "/" + objectKey;
     }

@@ -7,18 +7,20 @@ import com.alipay.business.core.service.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
 @Service
-public class ReceiptUploadServiceImpl implements ReceiptUploadService {
+public class ReceipServiceImpl implements ReceiptService {
 
     @Autowired
     private AfsStorageService afsStorageService;
 
     @Autowired
     private ReceiptRepository receiptRepository;
+
+    @Autowired
+    private ReceiptOcrService receiptOcrService;
 
     @Override
     public UploadUrlResponse generatePresignedUrl(String userId) {
@@ -34,13 +36,16 @@ public class ReceiptUploadServiceImpl implements ReceiptUploadService {
     }
 
     @Override
-    public ReceiptFileMetadata validateAndPersist(ConfirmUploadRequest request, String userId) {
+    public ReceiptUploadResult validateAndPersist(ConfirmUploadRequest request, String userId) {
         AfsObjectMetadata objectMetadata = afsStorageService.headObject(request.getObjectKey());
         if (objectMetadata == null) {
-            throw new IllegalArgumentException("Receipt file not found");
+            throw new IllegalArgumentException("Receipt file not found in storage");
         }
 
+        OcrResult ocrResult = receiptOcrService.extractReceipt(request.getObjectKey());
+
         UUID receiptId = UUID.randomUUID();
+        String receiptUrl = afsStorageService.getObjectUrl(request.getObjectKey());
 
         Receipt receipt = new Receipt();
         receipt.setReceiptId(receiptId);
@@ -52,21 +57,16 @@ public class ReceiptUploadServiceImpl implements ReceiptUploadService {
         receipt.setFileSize(Long.valueOf(objectMetadata.getContentLength()));
         receipt.setStatus(ReceiptStatus.UPLOADED.name());
         receipt.setCreatedAt(new Date());
-        receipt.setTotalAmount(BigDecimal.valueOf(0));
-        receipt.setFileUrl("");
+        receipt.setTotalAmount(ocrResult.getTotalAmount());
+        receipt.setFileUrl(receiptUrl);
         receipt.setUpdatedAt(new Date());
 
         receiptRepository.insertReceipt(receipt);
 
-        ReceiptFileMetadata metadata = new ReceiptFileMetadata();
-        metadata.setReceiptId(receiptId.toString());
-        metadata.setObjectKey(receipt.getObjectKey());
-        metadata.setBucketName("receipt-bucket");
-        metadata.setReceiptUrl(afsStorageService.getObjectUrl(receipt.getObjectKey()));
-        metadata.setOriginalFileName(receipt.getFileName());
-        metadata.setFileSize(String.valueOf(receipt.getFileSize()));
-        metadata.setStatus(ReceiptStatus.UPLOADED.getCode());
-        metadata.setCreatedTime(receipt.getCreatedAt());
-        return metadata;
+        ReceiptUploadResult result = new ReceiptUploadResult();
+        result.setReceiptId(receiptId.toString());
+        result.setReceiptUrl(receiptUrl);
+        result.setItems(ocrResult.getItems());
+        return result;
     }
 }
