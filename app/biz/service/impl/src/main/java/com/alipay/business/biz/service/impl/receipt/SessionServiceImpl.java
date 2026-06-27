@@ -1,5 +1,6 @@
 package com.alipay.business.biz.service.impl.receipt;
 
+import com.alipay.business.common.service.integration.agent.OcrResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

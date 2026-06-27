@@ -1,6 +1,7 @@
 package com.alipay.business.biz.service.impl.receipt;
 
 import com.alipay.business.common.service.facade.request.ConfirmUploadRequest;
+import com.alipay.business.common.service.integration.agent.OcrResult;
 import com.alipay.business.core.model.domain.Receipt;
 import com.alipay.business.core.model.enums.ReceiptStatus;
 import com.alipay.business.core.service.ReceiptRepository;
@@ -42,7 +43,7 @@ public class ReceipServiceImpl implements ReceiptService {
             throw new IllegalArgumentException("Receipt file not found in storage");
         }
 
-        OcrResult ocrResult = receiptOcrService.extractReceipt(request.getObjectKey());
+        OcrResult ocrResult = receiptOcrService.extractReceipt(request.getObjectKey(), objectMetadata.getContentType());
 
         UUID receiptId = UUID.randomUUID();
         String receiptUrl = afsStorageService.getObjectUrl(request.getObjectKey());

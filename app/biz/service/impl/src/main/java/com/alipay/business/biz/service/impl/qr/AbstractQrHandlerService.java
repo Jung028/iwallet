@@ -4,6 +4,7 @@ import com.alipay.business.biz.service.impl.auth.QrTokenService;
 import com.alipay.business.common.service.facade.enums.QrCodeStatus;
 import com.alipay.business.common.service.facade.enums.QrType;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
+import com.alipay.business.common.service.integration.agent.AgentServiceClient;
 import com.alipay.business.common.service.integration.merchant.MerchantServiceClient;
 import com.alipay.business.common.service.integration.user.UserServiceClient;
 import com.alipay.business.core.model.domain.QrCode;
@@ -35,6 +36,7 @@ public abstract class AbstractQrHandlerService implements QrCodeGeneratorHandler
 
     @Autowired
     protected QrTokenService qrTokenService;
+
 
     @Override
     public String generateQR(GenerateQrCodeRequest request) {

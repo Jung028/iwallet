@@ -1,5 +1,7 @@
 package com.alipay.business.biz.service.impl.receipt;
 
+import com.alipay.business.common.service.integration.agent.OcrResult;
+
 import java.util.List;
 
 public interface SessionService {

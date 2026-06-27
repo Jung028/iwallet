@@ -1,5 +1,7 @@
 package com.alipay.business.biz.service.impl.receipt;
 
+import com.alipay.business.common.service.integration.agent.AgentServiceClient;
+import com.alipay.business.common.service.integration.agent.OcrResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,11 +12,11 @@ public class ReceiptOcrServiceImpl implements ReceiptOcrService {
     private AfsStorageService afsStorageService;
 
     @Autowired
-    private IAgentClient iAgentClient;
+    private AgentServiceClient agentServiceClient;
 
     @Override
-    public OcrResult extractReceipt(String objectKey) {
+    public OcrResult extractReceipt(String objectKey, String mimeType) {
         String presignedGetUrl = afsStorageService.generatePresignedGetUrl(objectKey);
-        return iAgentClient.extractReceipt(presignedGetUrl);
+        return agentServiceClient.extractReceipt(presignedGetUrl, mimeType);
     }
 }
