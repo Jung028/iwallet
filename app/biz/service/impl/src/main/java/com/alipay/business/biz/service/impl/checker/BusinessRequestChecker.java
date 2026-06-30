@@ -67,4 +67,8 @@ public class BusinessRequestChecker {
     public static void checkQueryReceiptsHistoryRequest(QueryReceiptsHistoryRequest request) {
 
     }
+
+    public static void checkQueryReceiptItemsRequest(QueryReceiptItemsRequest request) {
+
+    }
 }

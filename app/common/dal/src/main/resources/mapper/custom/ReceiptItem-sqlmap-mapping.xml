@@ -42,8 +42,16 @@
         quantity, unit_price, total_price,
         selected_by, status, created_at, updated_at, qr_reference_id
         FROM receipt_item
-        WHERE receipt_id = #{referenceId}::uuid
+        WHERE qr_reference_id = #{referenceId}
         FOR UPDATE
     </select>
+
+    <update id="updateReceiptItem" parameterType="map">
+        UPDATE receipt_item
+        SET status      = #{itemStatus,jdbcType=VARCHAR},
+            selected_by = #{selectedBy,jdbcType=VARCHAR},
+            updated_at  = #{updatedAt,jdbcType=TIMESTAMP}
+        WHERE item_id = #{receiptItemId}::uuid
+    </update>
 
 </mapper>

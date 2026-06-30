@@ -5,7 +5,9 @@ import com.alipay.business.biz.service.impl.auth.JwtContextHolder;
 import com.alipay.business.common.service.facade.api.QrCodeService;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
+import com.alipay.business.common.service.facade.request.QueryReceiptItemsRequest;
 import com.alipay.business.common.service.facade.request.QueryReceiptsHistoryRequest;
+import com.alipay.business.common.service.facade.result.QueryReceiptItemsResult;
 import com.alipay.business.common.service.facade.result.QueryReceiptsHistoryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,5 +63,13 @@ public class QrController {
         }
     }
 
+    @PostMapping("/queryReceiptItems.json")
+    public BusinessBizResult<QueryReceiptItemsResult> queryReceiptItems(@RequestBody QueryReceiptItemsRequest request) {
+        try {
+            return qrCodeService.queryReceiptItems(request);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

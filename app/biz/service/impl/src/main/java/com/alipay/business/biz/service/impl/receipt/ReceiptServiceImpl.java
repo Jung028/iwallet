@@ -1,24 +1,32 @@
 package com.alipay.business.biz.service.impl.receipt;
 
+import com.alipay.business.common.service.facade.item.ReceiptItem;
+import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.common.service.facade.request.ConfirmUploadRequest;
 import com.alipay.business.common.service.integration.agent.OcrResult;
 import com.alipay.business.core.model.domain.Receipt;
 import com.alipay.business.core.model.enums.ReceiptStatus;
+import com.alipay.business.core.service.ReceiptItemRepository;
 import com.alipay.business.core.service.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.alipay.business.common.service.facade.result.UploadUrlResponse;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
-public class ReceipServiceImpl implements ReceiptService {
+public class ReceiptServiceImpl implements ReceiptService {
 
     @Autowired
     private AfsStorageService afsStorageService;
 
     @Autowired
     private ReceiptRepository receiptRepository;
+
+    @Autowired
+    private ReceiptItemRepository receiptItemRepository;
 
     @Autowired
     private ReceiptOcrService receiptOcrService;
@@ -61,13 +69,27 @@ public class ReceipServiceImpl implements ReceiptService {
         receipt.setTotalAmount(ocrResult.getTotalAmount());
         receipt.setFileUrl(receiptUrl);
         receipt.setUpdatedAt(new Date());
-
         receiptRepository.insertReceipt(receipt);
+
+        List<ReceiptSubItem> lineItems = new ArrayList<>();
+        if (ocrResult.getItems() != null) {
+            for (OcrResult.OcrLineItem ocr : ocrResult.getItems()) {
+                ReceiptSubItem li = new ReceiptSubItem();
+                li.setName(ocr.getName());
+                li.setQuantity(ocr.getQuantity());
+                li.setUnitPrice(ocr.getUnitPrice());
+                receiptItemRepository.insertReceiptItem(li);
+                lineItems.add(li);
+            }
+        }
+
+
+
 
         ReceiptUploadResult result = new ReceiptUploadResult();
         result.setReceiptId(receiptId.toString());
         result.setReceiptUrl(receiptUrl);
-        result.setItems(ocrResult.getItems());
+        result.setItems(lineItems);
         return result;
     }
 }

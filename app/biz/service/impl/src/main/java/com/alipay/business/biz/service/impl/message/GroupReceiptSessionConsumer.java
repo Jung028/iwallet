@@ -12,12 +12,12 @@ import com.alipay.account_center.common.service.facade.request.QueryTransactionR
 import com.alipay.business.biz.service.impl.event.ReceiptItemPaidEvent;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
 import com.alipay.business.common.service.facade.enums.ReceiptItemStatus;
-import com.alipay.business.common.service.facade.item.ReceiptItem;
 import com.alipay.business.common.service.facade.request.QueryReceiptRequest;
 import com.alipay.business.common.service.facade.request.UpdateReceiptItemRequest;
 import com.alipay.business.common.service.facade.request.UpdateReceiptRequest;
 import com.alipay.business.common.service.integration.account.AccountServiceClient;
 import com.alipay.business.core.model.domain.Receipt;
+import com.alipay.business.core.model.domain.ReceiptItemDomain;
 import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.business.core.service.ReceiptItemRepository;
 import com.alipay.business.core.service.ReceiptRepository;
@@ -83,11 +83,11 @@ public class GroupReceiptSessionConsumer {
             String referenceId = transactionRecord.getResult().getReferenceId();
 
             // rollback if any exception thrown
-            ReceiptItem receiptItemResult =
+            ReceiptItemDomain receiptItemResult =
                     transactionTemplate.execute(String -> {
                 // check that the receipt item exists, retrieve it
                 //we need to lock item, to prevent race condition update
-                ReceiptItem receiptItem = receiptItemRepository.lockReceiptItemByQrId(referenceId);
+                ReceiptItemDomain receiptItem = receiptItemRepository.lockReceiptItemByQrId(referenceId);
                 AssertUtil.notNull(receiptItem, BusinessResultCode.SYSTEM_EXCEPTION, "receipt item not found for transaction");
 
                 // add idempotency guard. We set PAID first so we don't get a null exception for receiptItem
@@ -109,6 +109,7 @@ public class GroupReceiptSessionConsumer {
 
                     // update the total amount paid
                     UpdateReceiptRequest updateReceiptRequest = new UpdateReceiptRequest();
+                    updateReceiptRequest.setReceiptId(receiptItem.getReceiptId().toString());
                     updateReceiptRequest.setTotalAmountPaid(BigDecimal.valueOf(totalPaid));
                     receiptRepository.updateReceipt(updateReceiptRequest);
                 }
@@ -127,10 +128,10 @@ public class GroupReceiptSessionConsumer {
      * @return
      */
     private double calculateTotalPaid(Receipt receipt) {
-        List<ReceiptItem> allItems = receiptItemRepository.queryReceiptItemsByReceiptId(receipt.getReceiptId().toString());
+        List<ReceiptItemDomain> allItems = receiptItemRepository.queryReceiptItemsByReceiptId(receipt.getReceiptId().toString());
         return allItems.stream()
                 .filter(item -> ReceiptItemStatus.PAID.getCode().equals(item.getStatus()))
-                .map(ReceiptItem::getTotalPrice)
+                .map(ReceiptItemDomain::getTotalPrice)
                 .filter(Objects::nonNull)
                 .mapToDouble(BigDecimal::doubleValue)
                 .sum();

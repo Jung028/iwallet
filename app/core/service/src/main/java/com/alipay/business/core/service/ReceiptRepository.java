@@ -16,4 +16,6 @@ public interface ReceiptRepository {
     Receipt queryReceiptByReceiptId(QueryReceiptRequest queryReceiptRequest);
 
     void updateReceipt(UpdateReceiptRequest updateReceiptRequest);
+
+    void updateReceiptReferenceId(String qrToken);
 }

@@ -2,10 +2,10 @@ package com.alipay.business.core.service.repository;
 
 import com.alipay.business.common.dal.auto.custom.QrCodeDAO;
 import com.alipay.business.common.dal.auto.dataobject.QrCodeDO;
-import com.alipay.business.common.service.facade.item.QrCodeItem;
 import com.alipay.business.common.service.facade.request.QueryQrCodesRequest;
 import com.alipay.business.common.service.facade.request.ToggleQrRequest;
 import com.alipay.business.common.service.facade.result.QueryQrCodesResult;
+import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.converter.QrCodeConvertor;
 import com.alipay.business.core.model.domain.QrCode;
 import com.alipay.business.core.model.exception.RepositoryException;
@@ -66,23 +66,10 @@ public class QrCodeRepositoryImpl implements QrCodeRepository {
                 request.getMerchantId(), request.getPageSize(), request.getOffset());
         int total = qrCodeDAO.countQrCodes(request.getMerchantId());
 
-        List<QrCodeItem> items = doList.stream().map(do_ -> {
-            QrCodeItem item = new QrCodeItem();
-            item.setQrId(do_.getQrId());
-            item.setOwnerId(do_.getOwnerId());
-            item.setOwnerType(do_.getOwnerType());
-            item.setIntent(do_.getIntent());
-            item.setAmount(do_.getAmount());
-            item.setCurrency(do_.getCurrency());
-            item.setStatus(do_.getStatus());
-            item.setExpiresAt(do_.getExpiresAt());
-            item.setCreatedAt(do_.getCreatedAt());
-            return item;
-        }).collect(Collectors.toList());
+        List<QrCode> qrCodes = doList.stream()
+                .map(QrCodeConvertor::convertToDomain)
+                .collect(Collectors.toList());
 
-        QueryQrCodesResult result = new QueryQrCodesResult();
-        result.setQrCodes(items);
-        result.setTotalCount(total);
-        return result;
+        return ItemConverter.convertToQrCodes(qrCodes, total);
     }
 }

@@ -1,10 +1,8 @@
 package com.alipay.business.common.service.facade.api;
 
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
-import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
-import com.alipay.business.common.service.facade.request.QueryReceiptsHistoryRequest;
-import com.alipay.business.common.service.facade.request.QueryQrCodesRequest;
-import com.alipay.business.common.service.facade.request.ToggleQrRequest;
+import com.alipay.business.common.service.facade.request.*;
+import com.alipay.business.common.service.facade.result.QueryReceiptItemsResult;
 import com.alipay.business.common.service.facade.result.QueryReceiptsHistoryResult;
 import com.alipay.business.common.service.facade.result.QueryQrCodesResult;
 
@@ -50,4 +48,10 @@ public interface QrCodeService {
      */
     BusinessBizResult<QueryReceiptsHistoryResult> queryReceiptsHistory(QueryReceiptsHistoryRequest request);
 
+    /**
+     * query receipt items
+     * @param request
+     * @return
+     */
+    BusinessBizResult<QueryReceiptItemsResult> queryReceiptItems(QueryReceiptItemsRequest request);
 }

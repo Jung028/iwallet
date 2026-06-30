@@ -55,8 +55,22 @@
         SELECT receipt_id, user_id, object_key,
                bucket_name, file_url, file_name,
                content_type, file_size, status,
-               total_amount, created_at, updated_at, reference_id
+               total_amount, created_at, updated_at, reference_id, total_amount_paid
         FROM receipt
         WHERE receipt_id = #{receiptId}::uuid
     </select>
+
+    <update id="updateReceipt" parameterType="map">
+        UPDATE receipt
+        SET total_amount_paid = #{totalAmountPaid,jdbcType=NUMERIC},
+            updated_at        = NOW()
+        WHERE receipt_id = #{receiptId}::uuid
+    </update>
+
+    <update id="updateReceiptReferenceId" parameterType="map">
+        UPDATE receipt
+        SET reference_id = #{referenceId,jdbcType=VARCHAR},
+            updated_at   = NOW()
+        WHERE receipt_id = #{receiptId}::uuid
+    </update>
 </mapper>

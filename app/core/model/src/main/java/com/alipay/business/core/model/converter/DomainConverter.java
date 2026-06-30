@@ -4,7 +4,9 @@ import com.alipay.business.common.dal.auto.dataobject.ReceiptDO;
 import com.alipay.business.common.dal.auto.dataobject.ReceiptItemDO;
 import com.alipay.business.common.service.facade.item.ReceiptItem;
 import com.alipay.business.common.service.facade.item.ReceiptSession;
+import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.core.model.domain.Receipt;
+import com.alipay.business.core.model.domain.ReceiptItemDomain;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 
 import java.util.Collections;
@@ -41,47 +43,48 @@ public class DomainConverter {
         receipt.setFileSize(receiptDO.getFileSize());
         receipt.setStatus(receiptDO.getStatus());
         receipt.setTotalAmount(receiptDO.getTotalAmount());
+        receipt.setTotalAmountPaid(receiptDO.getTotalAmountPaid());
         receipt.setCreatedAt(receiptDO.getCreatedAt());
         receipt.setUpdatedAt(receiptDO.getUpdatedAt());
-        receipt.setReferenceId(receipt.getReferenceId());
+        receipt.setReferenceId(receiptDO.getReferenceId());
         return receipt;
     }
 
-    public static ReceiptItemDO convertToDO(ReceiptItem receiptItem) {
-        if (receiptItem == null) {
+    public static ReceiptItemDO convertToDO(ReceiptSubItem receiptSubItem) {
+        if (receiptSubItem == null) {
             return null;
         }
         ReceiptItemDO receiptItemDO = new ReceiptItemDO();
-        receiptItemDO.setItemId(receiptItem.getItemId());
-        receiptItemDO.setReceiptId(receiptItem.getReceiptId());
-        receiptItemDO.setName(receiptItem.getName());
-        receiptItemDO.setQuantity(receiptItem.getQuantity());
-        receiptItemDO.setUnitPrice(receiptItem.getUnitPrice());
-        receiptItemDO.setTotalPrice(receiptItem.getTotalPrice());
-        receiptItemDO.setSelectedBy(receiptItem.getSelectedBy());
-        receiptItemDO.setStatus(receiptItem.getStatus());
-        receiptItemDO.setQrReferenceId(receiptItem.getQrReferenceId());
-        receiptItemDO.setCreatedAt(receiptItem.getCreatedAt());
-        receiptItemDO.setUpdatedAt(receiptItem.getUpdatedAt());
+        receiptItemDO.setItemId(receiptSubItem.getItemId());
+        receiptItemDO.setReceiptId(receiptSubItem.getReceiptId());
+        receiptItemDO.setName(receiptSubItem.getName());
+        receiptItemDO.setQuantity(receiptSubItem.getQuantity());
+        receiptItemDO.setUnitPrice(receiptSubItem.getUnitPrice());
+        receiptItemDO.setTotalPrice(receiptSubItem.getTotalPrice());
+        receiptItemDO.setSelectedBy(receiptSubItem.getSelectedBy());
+        receiptItemDO.setStatus(receiptSubItem.getStatus());
+        receiptItemDO.setQrReferenceId(receiptSubItem.getQrReferenceId());
+        receiptItemDO.setCreatedAt(receiptSubItem.getCreatedAt());
+        receiptItemDO.setUpdatedAt(receiptSubItem.getUpdatedAt());
         return receiptItemDO;
     }
 
-    public static ReceiptItem convertToModel(ReceiptItemDO receiptItemDO) {
+    public static ReceiptItemDomain convertToModel(ReceiptItemDO receiptItemDO) {
         if (receiptItemDO == null) {
             return null;
         }
-        ReceiptItem receiptItem = new ReceiptItem();
-        receiptItem.setItemId(receiptItemDO.getItemId());
-        receiptItem.setReceiptId(receiptItemDO.getReceiptId());
-        receiptItem.setName(receiptItemDO.getName());
-        receiptItem.setQuantity(receiptItemDO.getQuantity());
-        receiptItem.setUnitPrice(receiptItemDO.getUnitPrice());
-        receiptItem.setTotalPrice(receiptItemDO.getTotalPrice());
-        receiptItem.setSelectedBy(receiptItemDO.getSelectedBy());
-        receiptItem.setStatus(receiptItemDO.getStatus());
-        receiptItem.setQrReferenceId(receiptItemDO.getQrReferenceId());
-        receiptItem.setCreatedAt(receiptItemDO.getCreatedAt());
-        receiptItem.setUpdatedAt(receiptItemDO.getUpdatedAt());
-        return receiptItem;
+        ReceiptItemDomain domain = new ReceiptItemDomain();
+        domain.setItemId(receiptItemDO.getItemId());
+        domain.setReceiptId(receiptItemDO.getReceiptId());
+        domain.setName(receiptItemDO.getName());
+        domain.setQuantity(receiptItemDO.getQuantity());
+        domain.setUnitPrice(receiptItemDO.getUnitPrice());
+        domain.setTotalPrice(receiptItemDO.getTotalPrice());
+        domain.setSelectedBy(receiptItemDO.getSelectedBy());
+        domain.setStatus(receiptItemDO.getStatus());
+        domain.setQrReferenceId(receiptItemDO.getQrReferenceId());
+        domain.setCreatedAt(receiptItemDO.getCreatedAt());
+        domain.setUpdatedAt(receiptItemDO.getUpdatedAt());
+        return domain;
     }
 }

@@ -6,12 +6,17 @@ import com.alipay.account_center.common.service.facade.item.TransactionHistoryIt
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.QueryTransactionHistoryResult;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
+import com.alipay.business.common.service.facade.item.QrCodeItem;
 import com.alipay.business.common.service.facade.item.ReceiptItem;
-import com.alipay.business.common.service.facade.item.ReceiptSession;
+import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
 import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
+import com.alipay.business.common.service.facade.result.QueryQrCodesResult;
+import com.alipay.business.common.service.facade.result.QueryReceiptItemsResult;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
+import com.alipay.business.core.model.domain.QrCode;
 import com.alipay.business.core.model.domain.Receipt;
+import com.alipay.business.core.model.domain.ReceiptItemDomain;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -100,14 +105,58 @@ public class ItemConverter {
             ReceiptItem receiptItem = new ReceiptItem();
             receiptItem.setReceiptId(receipt.getReceiptId());
             receiptItem.setStatus(receipt.getStatus() != null ? receipt.getStatus() : null);
-            receiptItem.setTotalPaid(receipt.getTotalAmountPaid());
-            receiptItem.setTotalUnpaid(
-                    receipt.getTotalAmount().subtract(receipt.getTotalAmountPaid())
-            );
-            receiptItem.setGmtCreate(receipt.getCreatedAt());
-            receiptItem.setReceiptName(receipt.getFileName());
+            BigDecimal totalAmount = receipt.getTotalAmount() != null ? receipt.getTotalAmount() : BigDecimal.ZERO;
+            BigDecimal totalPaid = receipt.getTotalAmountPaid() != null ? receipt.getTotalAmountPaid() : BigDecimal.ZERO;
+            receiptItem.setTotalAmountPaid(totalPaid);
+            receiptItem.setTotalAmountUnpaid(totalAmount.subtract(totalPaid));
+            receiptItem.setCreatedAt(receipt.getCreatedAt());
+            receiptItem.setFileName(receipt.getFileName());
+            receiptItem.setReferenceId(receipt.getReferenceId());
             receiptItems.add(receiptItem);
         }
         return receiptItems;
+    }
+
+    public static QueryReceiptItemsResult convertToReceiptItem(List<ReceiptItemDomain> domains) {
+        List<ReceiptSubItem> items = new ArrayList<>();
+        for (ReceiptItemDomain domain : domains) {
+            ReceiptSubItem item = new ReceiptSubItem();
+            item.setItemId(domain.getItemId());
+            item.setReceiptId(domain.getReceiptId());
+            item.setName(domain.getName());
+            item.setQuantity(domain.getQuantity());
+            item.setUnitPrice(domain.getUnitPrice());
+            item.setTotalPrice(domain.getTotalPrice());
+            item.setSelectedBy(domain.getSelectedBy());
+            item.setStatus(domain.getStatus());
+            item.setQrReferenceId(domain.getQrReferenceId());
+            item.setCreatedAt(domain.getCreatedAt());
+            item.setUpdatedAt(domain.getUpdatedAt());
+            items.add(item);
+        }
+        QueryReceiptItemsResult result = new QueryReceiptItemsResult();
+        result.setReceiptItems(items);
+        return result;
+    }
+
+    public static QueryQrCodesResult convertToQrCodes(List<QrCode> qrCodes, int total) {
+        List<QrCodeItem> items = new ArrayList<>();
+        for (QrCode qrCode : qrCodes) {
+            QrCodeItem item = new QrCodeItem();
+            item.setQrId(qrCode.getQrId());
+            item.setOwnerId(qrCode.getOwnerId());
+            item.setOwnerType(qrCode.getOwnerType());
+            item.setIntent(qrCode.getIntent());
+            item.setAmount(qrCode.getAmount());
+            item.setCurrency(qrCode.getCurrency());
+            item.setStatus(qrCode.getStatus());
+            item.setExpiresAt(qrCode.getExpiresAt());
+            item.setCreatedAt(qrCode.getCreatedAt());
+            items.add(item);
+        }
+        QueryQrCodesResult result = new QueryQrCodesResult();
+        result.setQrCodes(items);
+        result.setTotalCount(total);
+        return result;
     }
 }

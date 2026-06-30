@@ -17,4 +17,10 @@ public interface ReceiptDAO {
                                          @Param("pageNo") int pageNo);
 
     ReceiptDO queryReceiptByReceiptId(@Param("receiptId") String receiptId);
+
+    int updateReceipt(@Param("receiptId") String receiptId,
+                      @Param("totalAmountPaid") java.math.BigDecimal totalAmountPaid);
+
+    int updateReceiptReferenceId(@Param("receiptId") String receiptId,
+                                 @Param("referenceId") String referenceId);
 }

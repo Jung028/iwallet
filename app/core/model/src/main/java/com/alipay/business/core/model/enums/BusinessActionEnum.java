@@ -18,7 +18,9 @@ public enum BusinessActionEnum {
     GENERATE_QR_CODE("GENERATE_QR_CODE", "generate qr code" ),
     QUERY_MERCHANT_QRS("QUERY_MERCHANT_QRS", "query merchant QRS" ),
     TOGGLE_QR_CODE("TOGGLE_QR_CODE", "toggle qr code"),
-    QUERY_GROUP_RECEIPT_SESSION_HISTORY("QUERY_GROUP_RECEIPT_SESSION_HISTORY", "");
+    QUERY_RECEIPT_ITEMS("QUERY_RECEIPT_ITEMS", "query receipt items"),
+    QUERY_RECEIPT_HISTORY("QUERY_RECEIPT_HISTORY", "Query receipt history"),;
+
 
     private String code;
     private String desc;

@@ -1,4 +1,4 @@
-package com.alipay.business.biz.service.impl.receipt;
+package com.alipay.business.common.service.facade.result;
 
 public class UploadUrlResponse {
     private String objectKey;

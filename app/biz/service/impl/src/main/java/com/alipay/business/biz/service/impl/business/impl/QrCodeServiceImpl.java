@@ -10,14 +10,13 @@ import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.enums.ReceiptSessionStatus;
 import com.alipay.business.common.service.facade.item.ReceiptItem;
 import com.alipay.business.common.service.facade.item.ReceiptSession;
-import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
-import com.alipay.business.common.service.facade.request.QueryReceiptsHistoryRequest;
-import com.alipay.business.common.service.facade.request.QueryQrCodesRequest;
-import com.alipay.business.common.service.facade.request.ToggleQrRequest;
+import com.alipay.business.common.service.facade.request.*;
+import com.alipay.business.common.service.facade.result.QueryReceiptItemsResult;
 import com.alipay.business.common.service.facade.result.QueryReceiptsHistoryResult;
 import com.alipay.business.common.service.facade.result.QueryQrCodesResult;
 import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.Receipt;
+import com.alipay.business.core.model.domain.ReceiptItemDomain;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
 import com.alipay.business.core.service.QrCodeRepository;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
@@ -137,7 +136,7 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
 
     @Override
     public BusinessBizResult<QueryReceiptsHistoryResult> queryReceiptsHistory(QueryReceiptsHistoryRequest request) {
-        return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_GROUP_RECEIPT_SESSION_HISTORY,
+        return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_RECEIPT_HISTORY,
                 new BusinessBizCallback<>() {
 
                     @Override
@@ -159,8 +158,32 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
                         result.setReceiptItems(receiptItems);
 
                         ResponseBuilder.success(response, result,
-                                BusinessActionEnum.QUERY_GROUP_RECEIPT_SESSION_HISTORY.getCode(),
-                                BusinessActionEnum.QUERY_GROUP_RECEIPT_SESSION_HISTORY.getDesc());
+                                BusinessActionEnum.QUERY_RECEIPT_HISTORY.getCode(),
+                                BusinessActionEnum.QUERY_RECEIPT_HISTORY.getDesc());
+                    }
+                });
+    }
+
+    @Override
+    public BusinessBizResult<QueryReceiptItemsResult> queryReceiptItems(QueryReceiptItemsRequest request) {
+        return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_RECEIPT_ITEMS,
+                new BusinessBizCallback<>() {
+                    @Override
+                    protected BusinessBizResult<QueryReceiptItemsResult> createDefaultResponse() {
+                        return new BusinessBizResult<>();
+                    }
+
+                    @Override
+                    protected void checkParams(QueryReceiptItemsRequest request) {
+                        BusinessRequestChecker.checkQueryReceiptItemsRequest(request);
+                    }
+
+                    @Override
+                    protected void process(QueryReceiptItemsRequest request, BusinessBizResult<QueryReceiptItemsResult> response) {
+                        List<ReceiptItemDomain> domains = receiptItemRepository.queryReceiptItemsByReceiptId(request.getReceiptId());
+                        ResponseBuilder.success(response, ItemConverter.convertToReceiptItem(domains),
+                                BusinessActionEnum.QUERY_RECEIPT_ITEMS.getCode(),
+                                BusinessActionEnum.QUERY_RECEIPT_ITEMS.getDesc());
                     }
                 });
     }

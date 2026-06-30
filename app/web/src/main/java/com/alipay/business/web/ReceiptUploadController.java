@@ -2,17 +2,23 @@ package com.alipay.business.web;
 
 import com.alipay.business.biz.service.impl.auth.JwtClaims;
 import com.alipay.business.biz.service.impl.auth.JwtContextHolder;
-import com.alipay.business.biz.service.impl.receipt.ConfirmUploadResponse;
+import com.alipay.business.common.service.facade.item.ReceiptSubItem;
+import com.alipay.business.common.service.facade.result.CommitSessionResponse;
+import com.alipay.business.common.service.facade.result.ConfirmUploadResponse;
 import com.alipay.business.biz.service.impl.receipt.ReceiptSessionData;
 import com.alipay.business.biz.service.impl.receipt.ReceiptService;
 import com.alipay.business.biz.service.impl.receipt.ReceiptUploadResult;
 import com.alipay.business.biz.service.impl.receipt.SelectItemsRequest;
 import com.alipay.business.biz.service.impl.receipt.SessionService;
-import com.alipay.business.biz.service.impl.receipt.UploadUrlResponse;
+import com.alipay.business.common.service.facade.result.UploadUrlResponse;
 import com.alipay.business.common.service.facade.api.QrCodeService;
 import com.alipay.business.common.service.facade.enums.QrIntent;
+import com.alipay.business.common.service.facade.item.ReceiptItem;
+import com.alipay.business.common.service.facade.item.SessionItem;
 import com.alipay.business.common.service.facade.request.ConfirmUploadRequest;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
+import com.alipay.business.core.service.ReceiptItemRepository;
+import com.alipay.business.core.service.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +26,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Group payment feature. Allows multiple users to live interact and select the order
@@ -37,6 +47,12 @@ public class ReceiptUploadController {
 
     @Autowired
     private QrCodeService qrCodeService;
+
+    @Autowired
+    private ReceiptRepository receiptRepository;
+
+    @Autowired
+    private ReceiptItemRepository receiptItemRepository;
 
     @PostMapping("/upload-url")
     public UploadUrlResponse generatePresignedUrl() {
@@ -66,6 +82,9 @@ public class ReceiptUploadController {
 
         String qrToken = qrCodeService.generateQrCode(qrRequest).getResult();
 
+        // store sessionId as referenceId so history page can navigate back to session
+        receiptRepository.updateReceiptReferenceId(sessionId);
+
         return new ConfirmUploadResponse(sessionId, qrToken);
     }
 
@@ -79,5 +98,50 @@ public class ReceiptUploadController {
                             @RequestBody SelectItemsRequest request) {
         JwtClaims claims = JwtContextHolder.get();
         sessionService.updateSelection(sessionId, claims.getSubject(), request.getItemIds());
+    }
+
+    @PostMapping("/session/{sessionId}/commit")
+    public CommitSessionResponse commitSession(@PathVariable String sessionId) {
+        JwtClaims claims = JwtContextHolder.get();
+        String userId = claims.getSubject();
+
+        ReceiptSessionData session = sessionService.getReceiptSession(sessionId);
+        List<SessionItem> myItems = session.getItems().stream()
+                .filter(item -> userId.equals(item.getSelectedBy()))
+                .toList();
+        if (myItems.isEmpty()) {
+            throw new IllegalStateException("No items selected for user " + userId);
+        }
+
+        String receiptId = session.getReceiptId();
+        // per-user scoped QR reference: enables lockReceiptItemByQrId to identify this user's items
+        String qrReferenceId = userId + ":" + sessionId;
+
+        //
+        for (SessionItem si : myItems) {
+            ReceiptSubItem item = new ReceiptSubItem();
+            item.setItemId(UUID.randomUUID());
+            item.setReceiptId(UUID.fromString(receiptId));
+            item.setName(si.getName());
+            item.setTotalPrice(si.getPrice());
+            item.setSelectedBy(userId);
+            item.setStatus("UNPAID");
+            item.setQrReferenceId(qrReferenceId);
+            item.setCreatedAt(new Date());
+            item.setUpdatedAt(new Date());
+            receiptItemRepository.insertReceiptItem(item);
+        }
+
+        GenerateQrCodeRequest payQrRequest = new GenerateQrCodeRequest();
+        payQrRequest.setUserId(userId);
+        payQrRequest.setQrIntent(QrIntent.GROUP_RECEIPT.name());
+        payQrRequest.setSessionId(qrReferenceId);
+        payQrRequest.setAmount("0");
+        payQrRequest.setCurrency("SGD");
+        payQrRequest.setQrType("DYNAMIC");
+
+        // TTL token for transfer Init
+        String payQrToken = qrCodeService.generateQrCode(payQrRequest).getResult();
+        return new CommitSessionResponse(payQrToken);
     }
 }
