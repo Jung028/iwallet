@@ -66,6 +66,9 @@ public class SessionServiceImpl implements SessionService {
             if (itemIds.contains(item.getItemId())) {
                 item.setSelectedBy(userId);
                 item.setStatus("SELECTED");
+            } else if (userId.equals(item.getSelectedBy())) {
+                item.setSelectedBy(null);
+                item.setStatus("AVAILABLE");
             }
         }
 

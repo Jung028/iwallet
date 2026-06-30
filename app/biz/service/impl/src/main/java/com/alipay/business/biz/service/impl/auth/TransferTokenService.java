@@ -24,6 +24,8 @@ public class TransferTokenService {
     private String secret;
 
     public String issueTransferToken(String uniqueRequestId,
+                        String referenceId,
+                        String referenceType,
                         String payerAccountNo,
                         String payeeAccountNo,
                         BigDecimal amount,
@@ -31,6 +33,8 @@ public class TransferTokenService {
                         boolean requiresOtp) {
         return Jwts.builder()
                 .claim("uid",         uniqueRequestId)
+                .claim("referenceId", referenceId)
+                .claim("referenceTyp",referenceType)
                 .claim("payer",       payerAccountNo)
                 .claim("payee",       payeeAccountNo)
                 .claim("amount",      amount.toPlainString())
@@ -52,12 +56,13 @@ public class TransferTokenService {
                     .getPayload();
 
             TransferTokenPayload payload = new TransferTokenPayload();
-            payload.setUniqueRequestId(claims.get("uid",         String.class));
-            payload.setPayerAccountNo( claims.get("payer",       String.class));
-            payload.setPayeeAccountNo( claims.get("payee",       String.class));
+            payload.setUniqueRequestId(claims.get("uid",          String.class));
+            payload.setReferenceId(    claims.get("referenceId",  String.class));
+            payload.setReferenceType(  claims.get("referenceType",String.class));
+            payload.setPayeeAccountNo( claims.get("payee",        String.class));
             payload.setAmount(         new BigDecimal(claims.get("amount", String.class)));
-            payload.setCurrency(       claims.get("currency",    String.class));
-            payload.setRequiresOtp(    claims.get("requiresOtp", Boolean.class));
+            payload.setCurrency(       claims.get("currency",     String.class));
+            payload.setRequiresOtp(    claims.get("requiresOtp",  Boolean.class));
             return payload;
 
         } catch (JwtException | IllegalArgumentException e) {

@@ -98,4 +98,6 @@ public interface BusinessService {
     @POST
     @Path("chargeCard")
     BusinessBizResult<String> chargeCard(ChargeCardRequest request, String userId);
+
+
 }

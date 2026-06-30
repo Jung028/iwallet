@@ -34,6 +34,16 @@ public class TransferRequest extends BusinessBaseRequest {
     private String qrToken;
 
     /**
+     * reference type
+     */
+    private String referenceType;
+
+    /**
+     * reference id
+     */
+    private String referenceId;
+
+    /**
      * get payer account number
      *
      * @return
@@ -133,6 +143,26 @@ public class TransferRequest extends BusinessBaseRequest {
      */
     public void setQrToken(String qrToken) {
         this.qrToken = qrToken;
+    }
+
+    /**
+     * get refernece type
+     * @return
+     */
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
     }
 }
 

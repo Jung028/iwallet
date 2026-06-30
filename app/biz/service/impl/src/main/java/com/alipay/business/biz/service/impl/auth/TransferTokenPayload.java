@@ -1,5 +1,7 @@
 package com.alipay.business.biz.service.impl.auth;
 
+import com.alipay.account_center.common.service.facade.enums.TransactionCategory;
+
 import java.math.BigDecimal;
 
 /**
@@ -13,6 +15,9 @@ public class TransferTokenPayload {
     private BigDecimal amount;
     private String currency;       // ISO code e.g. "MYR"
     private boolean requiresOtp;
+    private TransactionCategory transactionCategory;
+    private String referenceType;
+    private String referenceId;
 
     public String getUniqueRequestId() {
         return uniqueRequestId;
@@ -60,5 +65,29 @@ public class TransferTokenPayload {
 
     public void setRequiresOtp(boolean requiresOtp) {
         this.requiresOtp = requiresOtp;
+    }
+
+    public TransactionCategory getTransactionCategory() {
+        return transactionCategory;
+    }
+
+    public void setTransactionCategory(TransactionCategory transactionCategory) {
+        this.transactionCategory = transactionCategory;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
     }
 }

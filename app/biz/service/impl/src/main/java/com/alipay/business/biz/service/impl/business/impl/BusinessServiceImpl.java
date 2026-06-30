@@ -1,10 +1,7 @@
 package com.alipay.business.biz.service.impl.business.impl;
 
 import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
-import com.alipay.account_center.common.service.facade.enums.TransactionCategory;
-import com.alipay.account_center.common.service.facade.enums.TransactionStatusEnum;
-import com.alipay.account_center.common.service.facade.enums.TransactionType;
-import com.alipay.account_center.common.service.facade.enums.TxnEventType;
+import com.alipay.account_center.common.service.facade.enums.*;
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.*;
@@ -129,6 +126,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             // override the request which are passed into the
                             request.setPayeeAccountNo(payeeAccountInfo.getResult().getAccountId());
                             request.setPayerAccountNo(payerAccountInfo.getResult().getAccountId());
+                            // the idempotency key unique request id stores the qrId.
                             request.setUniqueRequestId(qrTokenPayload.getQrId());
                             // convert string to big decimal
                             amount = BigDecimal.valueOf(qrTokenPayload.getAmount());
@@ -172,6 +170,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                         String transferToken = transferTokenService.issueTransferToken(
                                 request.getUniqueRequestId(),
+                                request.getReferenceId(),
+                                request.getReferenceType(),
                                 request.getPayerAccountNo(),
                                 request.getPayeeAccountNo(),
                                 amount,
@@ -253,10 +253,6 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             }
                         }
 
-                        //TODO: QR :
-                        // we only need to update the code where payer account id. because when merchant is created, the account created
-                        // is to this payer account with type as merchant instead of user
-                        // verify user password
                         VerifyUserAuthRequest verifyUserAuthRequest = new VerifyUserAuthRequest();
                         verifyUserAuthRequest.setUserId(userId);
                         verifyUserAuthRequest.setAuthType(String.valueOf(AuthType.TRANSFER_PIN));
@@ -356,7 +352,13 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                 QueryMerchantInfoRequest queryMerchantInfoRequest = new QueryMerchantInfoRequest();
                                 queryMerchantInfoRequest.setMerchantId(payerAccountInfo.getResult().getAccountRelationId());
                                 MerchantBizResult<MerchantInfoItem> merchantInfo = merchantServiceClient.queryMerchantInfo(queryMerchantInfoRequest);
-                                category = TransactionCategory.valueOf(merchantInfo.getResult().getMerchantId());
+                                category = TransactionCategory.valueOf(merchantInfo.getResult().getMerchantCategory());
+                            }
+
+                            // check if the transfer category is a group receipt, then update
+                            if (payload.getTransactionCategory().equals(TransactionCategory.GROUP_RECEIPT)) {
+                                // set category to group receipt
+                                category = payload.getTransactionCategory();
                             }
 
                             // insert transaction record of pending status
@@ -370,6 +372,12 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             insertRequest.setCurrency(payload.getCurrency());
                             insertRequest.setTxnType(TransactionType.TRANSFER);
                             insertRequest.setStatus(TransactionStatusEnum.PENDING);
+
+                            // only if its receipt item, then we set the reference id for transaction for consumer
+                            if (payload.getReferenceType().equals(ReferenceType.RECEIPT_ITEM.name())) {
+                                insertRequest.setReferenceType(payload.getReferenceType());
+                                insertRequest.setReferenceId(payload.getReferenceId());
+                            }
 
                             AccountBizResult<TransactionRecordItem> transactionRecord =
                                     accountServiceClient.insertTransactionRecord(insertRequest);

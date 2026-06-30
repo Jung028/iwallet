@@ -63,4 +63,8 @@ public class BusinessRequestChecker {
     public static void checkGenerateQrCodeRequest(GenerateQrCodeRequest request) {
 
     }
+
+    public static void checkQueryReceiptsHistoryRequest(QueryReceiptsHistoryRequest request) {
+
+    }
 }

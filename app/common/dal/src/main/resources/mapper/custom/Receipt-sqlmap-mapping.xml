@@ -16,18 +16,47 @@
         <result column="total_amount" jdbcType="NUMERIC" property="totalAmount" />
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
         <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+        <result column="reference_id" jdbcType="VARCHAR" property="referenceId" />
     </resultMap>
 
     <insert id="insertReceipt" parameterType="com.alipay.business.common.dal.auto.dataobject.ReceiptDO">
         insert into receipt (receipt_id, user_id, object_key,
         bucket_name, file_url, file_name,
         content_type, file_size, status,
-        total_amount, created_at, updated_at
+        total_amount, created_at, updated_at, reference_id
         )
         values (#{receiptId,jdbcType=OTHER}, #{userId,jdbcType=VARCHAR}, #{objectKey,jdbcType=VARCHAR},
         #{bucketName,jdbcType=VARCHAR}, #{fileUrl,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR},
         #{contentType,jdbcType=VARCHAR}, #{fileSize,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR},
-        #{totalAmount,jdbcType=NUMERIC}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}
+        #{totalAmount,jdbcType=NUMERIC}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP},
+        #{referenceId,jdbcType=VARCHAR}
         )
     </insert>
+
+    <select id="queryReceiptsHistory" parameterType="map" resultMap="BaseResultMap">
+        SELECT receipt_id, user_id, object_key,
+               bucket_name, file_url, file_name,
+               content_type, file_size, status,
+               total_amount, created_at, updated_at, reference_id
+        FROM receipt
+        <where>
+            <if test="userId != null and userId != ''">
+                AND user_id = #{userId}
+            </if>
+            <if test="receiptId != null and receiptId != ''">
+                AND receipt_id = #{receiptId}::uuid
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{pageNo}
+    </select>
+
+    <select id="queryReceiptByReceiptId" parameterType="map" resultMap="BaseResultMap">
+        SELECT receipt_id, user_id, object_key,
+               bucket_name, file_url, file_name,
+               content_type, file_size, status,
+               total_amount, created_at, updated_at, reference_id
+        FROM receipt
+        WHERE receipt_id = #{receiptId}::uuid
+    </select>
 </mapper>

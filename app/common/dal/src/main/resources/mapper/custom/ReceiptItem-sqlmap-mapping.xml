@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.alipay.business.common.dal.auto.custom.ReceiptItemDAO">
+    <resultMap id="BaseResultMap" type="com.alipay.business.common.dal.auto.dataobject.ReceiptItemDO">
+        <id column="item_id" jdbcType="OTHER" property="itemId" />
+        <result column="receipt_id" jdbcType="OTHER" property="receiptId" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="quantity" jdbcType="INTEGER" property="quantity" />
+        <result column="unit_price" jdbcType="NUMERIC" property="unitPrice" />
+        <result column="total_price" jdbcType="NUMERIC" property="totalPrice" />
+        <result column="selected_by" jdbcType="VARCHAR" property="selectedBy" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+        <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
+        <result column="qr_reference_id" jdbcType="VARCHAR" property="qrReferenceId" />
+    </resultMap>
+
+    <select id="queryReceiptItemsByReceiptId" parameterType="map" resultMap="BaseResultMap">
+        SELECT item_id, receipt_id, name,
+        quantity, unit_price, total_price,
+        selected_by, status, created_at, updated_at, qr_reference_id
+        FROM receipt_item
+        WHERE receipt_id = #{receiptId}::uuid
+        ORDER BY created_at ASC
+    </select>
+
+    <insert id="insertItemReceipt" parameterType="com.alipay.business.common.dal.auto.dataobject.ReceiptItemDO">
+        insert into receipt_item (item_id, receipt_id, name,
+        quantity, unit_price, total_price,
+        selected_by, status, created_at,
+        updated_at, qr_reference_id)
+        values (#{itemId,jdbcType=OTHER}, #{receiptId,jdbcType=OTHER}, #{name,jdbcType=VARCHAR},
+        #{quantity,jdbcType=INTEGER}, #{unitPrice,jdbcType=NUMERIC}, #{totalPrice,jdbcType=NUMERIC},
+        #{selectedBy,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
+        #{updatedAt,jdbcType=TIMESTAMP}, #{qrReferenceId,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="lockReceiptItemByQrId" parameterType="map" resultMap="BaseResultMap">
+        SELECT item_id, receipt_id, name,
+        quantity, unit_price, total_price,
+        selected_by, status, created_at, updated_at, qr_reference_id
+        FROM receipt_item
+        WHERE receipt_id = #{referenceId}::uuid
+        FOR UPDATE
+    </select>
+
+</mapper>

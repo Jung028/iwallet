@@ -7,16 +7,28 @@ import com.alipay.business.biz.service.impl.qr.QrCodeGeneratorFactory;
 import com.alipay.business.biz.service.impl.qr.QrCodeGeneratorHandler;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
+import com.alipay.business.common.service.facade.enums.ReceiptSessionStatus;
+import com.alipay.business.common.service.facade.item.ReceiptItem;
+import com.alipay.business.common.service.facade.item.ReceiptSession;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
+import com.alipay.business.common.service.facade.request.QueryReceiptsHistoryRequest;
 import com.alipay.business.common.service.facade.request.QueryQrCodesRequest;
 import com.alipay.business.common.service.facade.request.ToggleQrRequest;
+import com.alipay.business.common.service.facade.result.QueryReceiptsHistoryResult;
 import com.alipay.business.common.service.facade.result.QueryQrCodesResult;
+import com.alipay.business.core.model.converter.ItemConverter;
+import com.alipay.business.core.model.domain.Receipt;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
 import com.alipay.business.core.service.QrCodeRepository;
 import com.alipay.sofa.runtime.api.annotation.SofaService;
 import com.alipay.sofa.runtime.api.annotation.SofaServiceBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author adam
@@ -123,6 +135,35 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
                 });
     }
 
+    @Override
+    public BusinessBizResult<QueryReceiptsHistoryResult> queryReceiptsHistory(QueryReceiptsHistoryRequest request) {
+        return businessServiceTemplate.execute(request, BusinessActionEnum.QUERY_GROUP_RECEIPT_SESSION_HISTORY,
+                new BusinessBizCallback<>() {
+
+                    @Override
+                    protected BusinessBizResult<QueryReceiptsHistoryResult> createDefaultResponse() {
+                        return new BusinessBizResult<>();
+                    }
+
+                    @Override
+                    protected void checkParams(QueryReceiptsHistoryRequest request) {
+                        BusinessRequestChecker.checkQueryReceiptsHistoryRequest(request);
+                    }
+
+                    @Override
+                    protected void process(QueryReceiptsHistoryRequest request, BusinessBizResult<QueryReceiptsHistoryResult> response) {
+                        List<Receipt> receipts = receiptRepository.queryReceiptsHistory(request);
+                        //convert receipts list to receipt sessions list.
+                        List<ReceiptItem> receiptItems = ItemConverter.convertToReceipt(receipts);
+                        QueryReceiptsHistoryResult result = new QueryReceiptsHistoryResult();
+                        result.setReceiptItems(receiptItems);
+
+                        ResponseBuilder.success(response, result,
+                                BusinessActionEnum.QUERY_GROUP_RECEIPT_SESSION_HISTORY.getCode(),
+                                BusinessActionEnum.QUERY_GROUP_RECEIPT_SESSION_HISTORY.getDesc());
+                    }
+                });
+    }
 
 
 }

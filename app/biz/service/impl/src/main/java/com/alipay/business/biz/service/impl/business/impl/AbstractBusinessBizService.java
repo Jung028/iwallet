@@ -11,6 +11,7 @@ import com.alipay.business.common.service.integration.user.TopUpServiceClient;
 import com.alipay.business.common.service.integration.user.UserServiceClient;
 import com.alipay.business.core.service.IdempotencyKeysRepository;
 import com.alipay.business.core.service.QrCodeRepository;
+import com.alipay.business.core.service.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -48,4 +49,7 @@ public abstract class AbstractBusinessBizService {
 
     @Autowired
     protected RiskOpsServiceClient riskOpsServiceClient;
+
+    @Autowired
+    protected ReceiptRepository receiptRepository;
 }

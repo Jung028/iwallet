@@ -32,6 +32,7 @@
         <table tableName="idempotency_keys" domainObjectName="IdempotencyKeysDO" />
         <table tableName="qr_code" domainObjectName="QrCodeDO" />
         <table tableName="receipt" domainObjectName="ReceiptDO" />
+        <table tableName="receipt_item" domainObjectName="ReceiptItemDO" />
 
     </context>
 </generatorConfiguration>

@@ -6,10 +6,14 @@ import com.alipay.account_center.common.service.facade.item.TransactionHistoryIt
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.QueryTransactionHistoryResult;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
+import com.alipay.business.common.service.facade.item.ReceiptItem;
+import com.alipay.business.common.service.facade.item.ReceiptSession;
 import com.alipay.business.common.service.facade.result.BusinessBalanceResult;
 import com.alipay.business.common.service.facade.result.BusinessTransactionDetailsResult;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
+import com.alipay.business.core.model.domain.Receipt;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -88,5 +92,22 @@ public class ItemConverter {
         idempotencyKeyItem.setStatus(idempotencyKeys.getStatus());
         idempotencyKeyItem.setRetryCount(idempotencyKeyItem.getRetryCount());
         return idempotencyKeyItem;
+    }
+
+    public static List<ReceiptItem> convertToReceipt(List<Receipt> receipts) {
+        List<ReceiptItem> receiptItems = new ArrayList<>();
+        for (Receipt receipt : receipts) {
+            ReceiptItem receiptItem = new ReceiptItem();
+            receiptItem.setReceiptId(receipt.getReceiptId());
+            receiptItem.setStatus(receipt.getStatus() != null ? receipt.getStatus() : null);
+            receiptItem.setTotalPaid(receipt.getTotalAmountPaid());
+            receiptItem.setTotalUnpaid(
+                    receipt.getTotalAmount().subtract(receipt.getTotalAmountPaid())
+            );
+            receiptItem.setGmtCreate(receipt.getCreatedAt());
+            receiptItem.setReceiptName(receipt.getFileName());
+            receiptItems.add(receiptItem);
+        }
+        return receiptItems;
     }
 }
