@@ -5,10 +5,11 @@ import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.common.service.facade.item.SessionItem;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SessionService {
-    String createSession(String receiptId, String receiptUrl, List<ReceiptSubItem> items);
+    String createSession(String receiptId, String receiptUrl, List<ReceiptSubItem> items, String userId);
     ReceiptSessionData getReceiptSession(String sessionId);
-    void updateSelection(String sessionId, String userId, List<String> itemIds);
+    void updateSelection(String sessionId, String userId, Map<String, Integer> itemQuantities);
     List<SessionItem> commitSelection(String sessionId, String userId);
 }

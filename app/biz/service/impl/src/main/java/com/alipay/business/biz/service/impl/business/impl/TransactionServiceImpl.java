@@ -58,7 +58,8 @@ public class TransactionServiceImpl implements TransactionService {
                 amount,
                 transactionRecord.getResult().getCurrency(),
                 txnEventType,
-                feeActive
+                feeActive,
+                transactionRecord.getResult().getTxnCategory().getCode()
         );
         // use payerAccountId as partition key — guarantees ordering per account
         kafkaTemplate.send("EC_TRANSACTION", event.getPayerAccountNo(), event);

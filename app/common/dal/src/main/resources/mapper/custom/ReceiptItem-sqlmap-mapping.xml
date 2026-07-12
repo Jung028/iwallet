@@ -15,12 +15,13 @@
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
         <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt" />
         <result column="qr_reference_id" jdbcType="VARCHAR" property="qrReferenceId" />
+        <result column="total_tax_amount" jdbcType="NUMERIC" property="totalTaxAmount" />
     </resultMap>
 
     <select id="queryReceiptItemsByReceiptId" parameterType="map" resultMap="BaseResultMap">
         SELECT item_id, receipt_id, name,
         quantity, unit_price, total_price,
-        selected_by, status, created_at, updated_at, qr_reference_id
+        selected_by, status, created_at, updated_at, qr_reference_id, total_tax_amount
         FROM receipt_item
         WHERE receipt_id = #{receiptId}::uuid
         ORDER BY created_at ASC
@@ -30,17 +31,17 @@
         insert into receipt_item (item_id, receipt_id, name,
         quantity, unit_price, total_price,
         selected_by, status, created_at,
-        updated_at, qr_reference_id)
+        updated_at, qr_reference_id, total_tax_amount)
         values (#{itemId,jdbcType=OTHER}, #{receiptId,jdbcType=OTHER}, #{name,jdbcType=VARCHAR},
         #{quantity,jdbcType=INTEGER}, #{unitPrice,jdbcType=NUMERIC}, #{totalPrice,jdbcType=NUMERIC},
         #{selectedBy,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP},
-        #{updatedAt,jdbcType=TIMESTAMP}, #{qrReferenceId,jdbcType=VARCHAR})
+        #{updatedAt,jdbcType=TIMESTAMP}, #{qrReferenceId,jdbcType=VARCHAR}, #{totalTaxAmount,jdbcType=NUMERIC})
     </insert>
 
     <select id="lockReceiptItemByQrId" parameterType="map" resultMap="BaseResultMap">
         SELECT item_id, receipt_id, name,
         quantity, unit_price, total_price,
-        selected_by, status, created_at, updated_at, qr_reference_id
+        selected_by, status, created_at, updated_at, qr_reference_id, total_tax_amount
         FROM receipt_item
         WHERE qr_reference_id = #{referenceId}
         FOR UPDATE

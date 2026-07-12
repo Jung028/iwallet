@@ -27,9 +27,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static com.baomidou.mybatisplus.core.toolkit.SerializationUtils.deserialize;
 
 /**
  * Group payment feature. Allows multiple users to live interact and select the order
@@ -64,14 +68,19 @@ public class ReceiptUploadController {
     public ConfirmUploadResponse confirmUpload(@RequestBody ConfirmUploadRequest request) {
         JwtClaims claims = JwtContextHolder.get();
         String userId = claims.getSubject();
+        // we need to query idempotency keys if it exists.
+
+        // if it exists,return exception that this has already been created
 
         ReceiptUploadResult uploadResult = receiptService.validateAndPersist(request, userId);
 
         String sessionId = sessionService.createSession(
                 uploadResult.getReceiptId(),
                 uploadResult.getReceiptUrl(),
-                uploadResult.getItems());
+                uploadResult.getItems(),
+                userId);
 
+        // only generate the qr token for the display of the QR for joining the session.
         GenerateQrCodeRequest qrRequest = new GenerateQrCodeRequest();
         qrRequest.setUserId(userId);
         qrRequest.setQrIntent(QrIntent.GROUP_RECEIPT.name());
@@ -83,7 +92,7 @@ public class ReceiptUploadController {
         String qrToken = qrCodeService.generateQrCode(qrRequest).getResult();
 
         // store sessionId as referenceId so history page can navigate back to session
-        receiptRepository.updateReceiptReferenceId(sessionId);
+        receiptRepository.updateReceiptReferenceId(uploadResult.getReceiptId(), sessionId);
 
         return new ConfirmUploadResponse(sessionId, qrToken);
     }
@@ -97,7 +106,7 @@ public class ReceiptUploadController {
     public void selectItems(@PathVariable String sessionId,
                             @RequestBody SelectItemsRequest request) {
         JwtClaims claims = JwtContextHolder.get();
-        sessionService.updateSelection(sessionId, claims.getSubject(), request.getItemIds());
+        sessionService.updateSelection(sessionId, claims.getSubject(), request.getItemQuantities());
     }
 
     @PostMapping("/session/{sessionId}/commit")
@@ -107,7 +116,7 @@ public class ReceiptUploadController {
 
         ReceiptSessionData session = sessionService.getReceiptSession(sessionId);
         List<SessionItem> myItems = session.getItems().stream()
-                .filter(item -> userId.equals(item.getSelectedBy()))
+                .filter(item -> item.getClaims().getOrDefault(userId, 0) > 0)
                 .toList();
         if (myItems.isEmpty()) {
             throw new IllegalStateException("No items selected for user " + userId);
@@ -117,13 +126,25 @@ public class ReceiptUploadController {
         // per-user scoped QR reference: enables lockReceiptItemByQrId to identify this user's items
         String qrReferenceId = userId + ":" + sessionId;
 
-        //
         for (SessionItem si : myItems) {
+            int claimedQty = si.getClaims().get(userId);
+            // si.getPrice()/getTaxAmount() are totals for the full line quantity — prorate down
+            // to just the units this user claimed (e.g. claimed 1 of a 2x line = half the total)
+            BigDecimal unitPrice = si.getPrice()
+                    .divide(BigDecimal.valueOf(si.getQuantity()), 2, RoundingMode.HALF_UP);
+            BigDecimal claimedPrice = unitPrice.multiply(BigDecimal.valueOf(claimedQty));
+            BigDecimal claimedTax = si.getTaxAmount()
+                    .multiply(BigDecimal.valueOf(claimedQty))
+                    .divide(BigDecimal.valueOf(si.getQuantity()), 2, RoundingMode.HALF_UP);
+
             ReceiptSubItem item = new ReceiptSubItem();
             item.setItemId(UUID.randomUUID());
             item.setReceiptId(UUID.fromString(receiptId));
             item.setName(si.getName());
-            item.setTotalPrice(si.getPrice());
+            item.setQuantity(claimedQty);
+            item.setUnitPrice(unitPrice);
+            item.setTotalPrice(claimedPrice);
+            item.setTotalTaxAmount(claimedTax);
             item.setSelectedBy(userId);
             item.setStatus("UNPAID");
             item.setQrReferenceId(qrReferenceId);

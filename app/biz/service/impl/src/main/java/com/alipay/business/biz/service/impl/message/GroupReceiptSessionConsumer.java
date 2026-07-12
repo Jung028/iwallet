@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
@@ -36,6 +37,7 @@ import java.util.Objects;
  * @author adam
  * @date 28/6/2026 11:42 PM
  */
+@Service
 public class GroupReceiptSessionConsumer {
 
     @Autowired
@@ -56,13 +58,14 @@ public class GroupReceiptSessionConsumer {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    @KafkaListener(topics = "EC_TRANSACTION_RESULT", groupId = "business-center")
+    @KafkaListener(topics = "EC_TRANSACTION_RESULT", groupId = "business-center-group-receipt")
     public void onMessage(EcTransactionEvent event) {
         // first, check that the category is GROUP_RECEIPT and update because every single group receipt transaction
         // needs to update total paid amount
         // ensure that we only process the transactions that are finished and is a group receipt.
-        if (event.getTxnCategory().equals(TransactionCategory.GROUP_RECEIPT.getCode()) &&
-                event.getTxnStatus().equals(TransactionStatusEnum.FINISH.getCode())) {
+        System.out.println("TXN_CATEGORY" + event.getTxnCategory());
+        if (TransactionCategory.GROUP_RECEIPT.getCode().equals(event.getTxnCategory()) &&
+                TransactionStatusEnum.FINISH.getCode().equals(event.getTxnStatus())) {
             QueryTransactionRecordRequest queryTransactionRecordRequest = new QueryTransactionRecordRequest();
             queryTransactionRecordRequest.setTxnId(event.getTxnId());
             queryTransactionRecordRequest.setAccountId(event.getPayerAccountNo());

@@ -1,5 +1,7 @@
 package com.alipay.business.common.service.integration.agent;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,10 @@ public class IAgentExtractedFields {
     private String currency;
     private String category;
     private String description;
+    @JsonProperty("tax_amount")
+    private Double taxAmount;
+    @JsonProperty("sst_amount")
+    private Double sstAmount;
     private List<IAgentLineItem> items = new ArrayList<>();
 
     public String getVendor() { return vendor; }
@@ -24,6 +30,10 @@ public class IAgentExtractedFields {
     public void setCategory(String category) { this.category = category; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public Double getTaxAmount() { return taxAmount; }
+    public void setTaxAmount(Double taxAmount) { this.taxAmount = taxAmount; }
+    public Double getSstAmount() { return sstAmount; }
+    public void setSstAmount(Double sstAmount) { this.sstAmount = sstAmount; }
     public List<IAgentLineItem> getItems() { return items; }
     public void setItems(List<IAgentLineItem> items) { this.items = items; }
 }

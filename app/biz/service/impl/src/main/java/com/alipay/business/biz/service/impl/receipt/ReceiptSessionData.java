@@ -12,6 +12,7 @@ public class ReceiptSessionData {
     private String receiptUrl;
     private String status;
     private List<SessionItem> items;
+    private String sessionOwnerAccountId;
 
     public String getSessionId() { return sessionId; }
     public void setSessionId(String sessionId) { this.sessionId = sessionId; }
@@ -24,5 +25,11 @@ public class ReceiptSessionData {
     public List<SessionItem> getItems() { return items; }
     public void setItems(List<SessionItem> items) { this.items = items; }
 
+    public String getSessionOwnerAccountId() {
+        return sessionOwnerAccountId;
+    }
 
+    public void setSessionOwnerAccountId(String sessionOwnerAccountId) {
+        this.sessionOwnerAccountId = sessionOwnerAccountId;
+    }
 }

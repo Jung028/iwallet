@@ -19,6 +19,8 @@ public class ReceiptConvertor {
         receiptDO.setTotalAmount(receipt.getTotalAmount());
         receiptDO.setUserId(receipt.getUserId());
         receiptDO.setReferenceId(receipt.getReferenceId());
+        receiptDO.setTotalAmountPaid(receipt.getTotalAmountPaid());
+        receiptDO.setTotalTaxAmount(receipt.getTotalTaxAmount());
         return receiptDO;
     }
 }

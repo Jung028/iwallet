@@ -1,5 +1,6 @@
 package com.alipay.business.biz.service.impl.receipt;
 
+import com.alipay.business.common.service.facade.enums.ReceiptItemStatus;
 import com.alipay.business.common.service.facade.item.ReceiptItem;
 import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.common.service.facade.request.ConfirmUploadRequest;
@@ -11,6 +12,9 @@ import com.alipay.business.core.service.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.alipay.business.common.service.facade.result.UploadUrlResponse;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -69,23 +73,49 @@ public class ReceiptServiceImpl implements ReceiptService {
         receipt.setTotalAmount(ocrResult.getTotalAmount());
         receipt.setFileUrl(receiptUrl);
         receipt.setUpdatedAt(new Date());
+        receipt.setTotalTaxAmount(ocrResult.getTaxAmount().add(ocrResult.getSstAmount()));
+        //TODO: add tax + sst calculation + value, so that each item we insert will contain totalvalue after tax
         receiptRepository.insertReceipt(receipt);
+
+        // compute subtotal from OCR items
+        BigDecimal subtotal = ocrResult.getItems().stream()
+                .map(OcrResult.OcrLineItem::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // total tax (SST + GOV TAX)
+        BigDecimal totalTax = ocrResult.getTaxAmount()
+                .add(ocrResult.getSstAmount());
+
+        // derive tax rate
+        BigDecimal taxRate = BigDecimal.ZERO;
+
+        if (subtotal.compareTo(BigDecimal.ZERO) > 0) {
+            taxRate = totalTax.divide(subtotal, 8, RoundingMode.HALF_UP);
+        }
 
         List<ReceiptSubItem> lineItems = new ArrayList<>();
         if (ocrResult.getItems() != null) {
             for (OcrResult.OcrLineItem ocr : ocrResult.getItems()) {
                 ReceiptSubItem li = new ReceiptSubItem();
+                li.setItemId(UUID.randomUUID());
                 li.setName(ocr.getName());
                 li.setQuantity(ocr.getQuantity());
                 li.setUnitPrice(ocr.getUnitPrice());
+                li.setTotalPrice(ocr.getTotalPrice());
+                //total tax amount is price of the item * total tax,
+                BigDecimal itemTax = ocr.getTotalPrice()
+                        .multiply(taxRate)
+                        .setScale(2, RoundingMode.HALF_UP);
+
+                li.setTotalTaxAmount(itemTax);
+                li.setStatus(ReceiptItemStatus.UNPAID.getCode());
+                li.setCreatedAt(new Date());
+                li.setUpdatedAt(new Date());
+                li.setReceiptId(receiptId);
                 receiptItemRepository.insertReceiptItem(li);
                 lineItems.add(li);
             }
         }
-
-
-
-
         ReceiptUploadResult result = new ReceiptUploadResult();
         result.setReceiptId(receiptId.toString());
         result.setReceiptUrl(receiptUrl);

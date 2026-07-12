@@ -101,9 +101,9 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                     @Override
                     protected void process(TransferRequest request, BusinessBizResult<String> response) {
-
+                        request.setPayeeAccountNo("2db5cc27-3fa0-47c6-93b9-720e15ec7089");
                         QueryAccountInfoRequest queryAccountInfoRequest = new QueryAccountInfoRequest();
-                        BigDecimal amount = null;
+                        BigDecimal amount;
                         //et the qrid and the payload and signature here.
                         if (request.getTransferType().equals(TransferType.QR.getCode())) {
                             AssertUtil.notBlank(request.getQrToken(), BusinessResultCode.PARAM_ILLEGAL,
@@ -134,7 +134,6 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             // else set the Money amount to request amount
                             amount = request.getAmount().getAmount();
                         }
-
                         AssertUtil.isTrue(
                                 !request.getPayeeAccountNo().equals(request.getPayerAccountNo()),
                                 BusinessResultCode.PARAM_ILLEGAL, "Cannot send to same account");
@@ -176,7 +175,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                 request.getPayeeAccountNo(),
                                 amount,
                                 request.getAmount().getCurrency().getCurrencyCode(),
-                                requiresOtp
+                                requiresOtp,
+                                request.getTxnCategory()
                         );
 
                         String msg = requiresOtp
@@ -374,7 +374,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             insertRequest.setStatus(TransactionStatusEnum.PENDING);
 
                             // only if its receipt item, then we set the reference id for transaction for consumer
-                            if (payload.getReferenceType().equals(ReferenceType.RECEIPT_ITEM.name())) {
+                            if (payload.getReferenceType() != null && payload.getReferenceId() != null &&
+                                    payload.getReferenceType().equals(ReferenceType.RECEIPT_ITEM.name())) {
                                 insertRequest.setReferenceType(payload.getReferenceType());
                                 insertRequest.setReferenceId(payload.getReferenceId());
                             }

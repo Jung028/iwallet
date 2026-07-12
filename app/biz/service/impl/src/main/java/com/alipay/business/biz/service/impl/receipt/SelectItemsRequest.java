@@ -1,10 +1,11 @@
 package com.alipay.business.biz.service.impl.receipt;
 
-import java.util.List;
+import java.util.Map;
 
 public class SelectItemsRequest {
-    private List<String> itemIds;
+    // itemId -> desired number of units the requesting user wants to claim of that line's quantity
+    private Map<String, Integer> itemQuantities;
 
-    public List<String> getItemIds() { return itemIds; }
-    public void setItemIds(List<String> itemIds) { this.itemIds = itemIds; }
+    public Map<String, Integer> getItemQuantities() { return itemQuantities; }
+    public void setItemQuantities(Map<String, Integer> itemQuantities) { this.itemQuantities = itemQuantities; }
 }

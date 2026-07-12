@@ -39,6 +39,8 @@ public class AgentServiceClientImpl implements AgentServiceClient {
 
         HttpEntity<ExtractReceiptRequest> entity = new HttpEntity<>(requestBody, headers);
 
+        //TODO: find a way to save the extracted value to cache for specific image so if its reuploaded,
+        // retrieved directly from cache.
         IAgentExtractResponse response = restTemplate.postForObject(
                 iagentEndpoint + "/api/v1/documents/extract",
                 entity,
@@ -57,6 +59,10 @@ public class AgentServiceClientImpl implements AgentServiceClient {
         result.setTotalAmount(extracted.getAmount() != null
                 ? BigDecimal.valueOf(extracted.getAmount()) : BigDecimal.ZERO);
         result.setCurrency(extracted.getCurrency() != null ? extracted.getCurrency() : "SGD");
+        result.setTaxAmount(extracted.getTaxAmount() != null
+                ? BigDecimal.valueOf(extracted.getTaxAmount()) : BigDecimal.ZERO);
+        result.setSstAmount(extracted.getSstAmount() != null
+                ? BigDecimal.valueOf(extracted.getSstAmount()) : BigDecimal.ZERO);
 
         List<OcrResult.OcrLineItem> items = new ArrayList<>();
         if (extracted.getItems() != null) {
@@ -64,7 +70,10 @@ public class AgentServiceClientImpl implements AgentServiceClient {
                 OcrResult.OcrLineItem item = new OcrResult.OcrLineItem();
                 item.setName(i.getName());
                 item.setQuantity(i.getQuantity());
-                item.setUnitPrice(BigDecimal.valueOf(i.getUnitPrice()));
+                BigDecimal unitPrice = BigDecimal.valueOf(i.getUnitPrice());
+                item.setUnitPrice(unitPrice);
+                // iagent does not extract a total per line item, so derive it from unit price * quantity
+                item.setTotalPrice(unitPrice.multiply(BigDecimal.valueOf(i.getQuantity())));
                 items.add(item);
             }
         }

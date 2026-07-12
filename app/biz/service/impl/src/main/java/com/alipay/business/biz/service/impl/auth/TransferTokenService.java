@@ -1,5 +1,6 @@
 package com.alipay.business.biz.service.impl.auth;
 
+import com.alipay.account_center.common.service.facade.enums.TransactionCategory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -30,16 +31,18 @@ public class TransferTokenService {
                         String payeeAccountNo,
                         BigDecimal amount,
                         String currency,
-                        boolean requiresOtp) {
+                        boolean requiresOtp,
+                        String txnCategory) {
         return Jwts.builder()
                 .claim("uid",         uniqueRequestId)
                 .claim("referenceId", referenceId)
-                .claim("referenceTyp",referenceType)
+                .claim("referenceType",referenceType)
                 .claim("payer",       payerAccountNo)
                 .claim("payee",       payeeAccountNo)
                 .claim("amount",      amount.toPlainString())
                 .claim("currency",    currency)
                 .claim("requiresOtp", requiresOtp)
+                .claim("txnCategory", txnCategory)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + TTL_MILLIS))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
@@ -58,11 +61,14 @@ public class TransferTokenService {
             TransferTokenPayload payload = new TransferTokenPayload();
             payload.setUniqueRequestId(claims.get("uid",          String.class));
             payload.setReferenceId(    claims.get("referenceId",  String.class));
-            payload.setReferenceType(  claims.get("referenceType",String.class));
+            payload.setReferenceType(  claims.get("referenceType", String.class));
+            payload.setPayerAccountNo( claims.get("payer",        String.class));
             payload.setPayeeAccountNo( claims.get("payee",        String.class));
             payload.setAmount(         new BigDecimal(claims.get("amount", String.class)));
             payload.setCurrency(       claims.get("currency",     String.class));
             payload.setRequiresOtp(    claims.get("requiresOtp",  Boolean.class));
+            payload.setTransactionCategory(
+                    TransactionCategory.valueOf(claims.get("txnCategory",  String.class)));
             return payload;
 
         } catch (JwtException | IllegalArgumentException e) {

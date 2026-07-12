@@ -70,6 +70,10 @@ public class ReceiptRepositoryImpl implements ReceiptRepository {
     }
 
     @Override
-    public void updateReceiptReferenceId(String qrToken) {
+    public void updateReceiptReferenceId(String receiptId, String referenceId) {
+        int rows = receiptDAO.updateReceiptReferenceId(receiptId, referenceId);
+        if (rows <= 0) {
+            throw new RepositoryException("updateReceiptReferenceId: no rows affected for id " + receiptId);
+        }
     }
 }

@@ -44,6 +44,11 @@ public class TransferRequest extends BusinessBaseRequest {
     private String referenceId;
 
     /**
+     * txn category
+     */
+    private String txnCategory;
+
+    /**
      * get payer account number
      *
      * @return
@@ -163,6 +168,14 @@ public class TransferRequest extends BusinessBaseRequest {
 
     public void setReferenceId(String referenceId) {
         this.referenceId = referenceId;
+    }
+
+    public String getTxnCategory() {
+        return txnCategory;
+    }
+
+    public void setTxnCategory(String txnCategory) {
+        this.txnCategory = txnCategory;
     }
 }
 

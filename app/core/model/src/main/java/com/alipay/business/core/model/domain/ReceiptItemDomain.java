@@ -15,6 +15,7 @@ public class ReceiptItemDomain {
     private String qrReferenceId;
     private Date createdAt;
     private Date updatedAt;
+    private BigDecimal totalTaxAmount;
 
     public Object getItemId() { return itemId; }
     public void setItemId(Object itemId) { this.itemId = itemId; }
@@ -48,4 +49,7 @@ public class ReceiptItemDomain {
 
     public Date getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
+
+    public BigDecimal getTotalTaxAmount() { return totalTaxAmount; }
+    public void setTotalTaxAmount(BigDecimal totalTaxAmount) { this.totalTaxAmount = totalTaxAmount; }
 }

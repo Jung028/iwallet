@@ -44,6 +44,7 @@ public class DomainConverter {
         receipt.setStatus(receiptDO.getStatus());
         receipt.setTotalAmount(receiptDO.getTotalAmount());
         receipt.setTotalAmountPaid(receiptDO.getTotalAmountPaid());
+        receipt.setTotalTaxAmount(receiptDO.getTotalTaxAmount());
         receipt.setCreatedAt(receiptDO.getCreatedAt());
         receipt.setUpdatedAt(receiptDO.getUpdatedAt());
         receipt.setReferenceId(receiptDO.getReferenceId());
@@ -66,6 +67,7 @@ public class DomainConverter {
         receiptItemDO.setQrReferenceId(receiptSubItem.getQrReferenceId());
         receiptItemDO.setCreatedAt(receiptSubItem.getCreatedAt());
         receiptItemDO.setUpdatedAt(receiptSubItem.getUpdatedAt());
+        receiptItemDO.setTotalTaxAmount(receiptSubItem.getTotalTaxAmount());
         return receiptItemDO;
     }
 
@@ -85,6 +87,7 @@ public class DomainConverter {
         domain.setQrReferenceId(receiptItemDO.getQrReferenceId());
         domain.setCreatedAt(receiptItemDO.getCreatedAt());
         domain.setUpdatedAt(receiptItemDO.getUpdatedAt());
+        domain.setTotalTaxAmount(receiptItemDO.getTotalTaxAmount());
         return domain;
     }
 }

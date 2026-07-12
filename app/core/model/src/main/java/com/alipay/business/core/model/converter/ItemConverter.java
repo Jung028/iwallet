@@ -109,6 +109,7 @@ public class ItemConverter {
             BigDecimal totalPaid = receipt.getTotalAmountPaid() != null ? receipt.getTotalAmountPaid() : BigDecimal.ZERO;
             receiptItem.setTotalAmountPaid(totalPaid);
             receiptItem.setTotalAmountUnpaid(totalAmount.subtract(totalPaid));
+            receiptItem.setTotalTaxAmount(receipt.getTotalTaxAmount());
             receiptItem.setCreatedAt(receipt.getCreatedAt());
             receiptItem.setFileName(receipt.getFileName());
             receiptItem.setReferenceId(receipt.getReferenceId());
@@ -132,6 +133,7 @@ public class ItemConverter {
             item.setQrReferenceId(domain.getQrReferenceId());
             item.setCreatedAt(domain.getCreatedAt());
             item.setUpdatedAt(domain.getUpdatedAt());
+            item.setTotalTaxAmount(domain.getTotalTaxAmount());
             items.add(item);
         }
         QueryReceiptItemsResult result = new QueryReceiptItemsResult();

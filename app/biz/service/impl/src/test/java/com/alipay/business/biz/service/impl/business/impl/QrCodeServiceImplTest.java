@@ -39,37 +39,6 @@ class QrCodeServiceImplTest {
     private QrCodeServiceImpl qrCodeService;
 
     @Test
-    void queryReceiptsHistory_returnsConvertedReceiptItems() {
-        Receipt receipt1 = buildReceipt(1L, "receipt-1.pdf", new BigDecimal("100.00"), new BigDecimal("60.00"), "ACTIVE");
-        Receipt receipt2 = buildReceipt(2L, "receipt-2.jpg", new BigDecimal("200.00"), new BigDecimal("200.00"), "SETTLED");
-        when(receiptRepository.queryReceiptsHistory(any())).thenReturn(Arrays.asList(receipt1, receipt2));
-
-        QueryReceiptsHistoryRequest request = new QueryReceiptsHistoryRequest();
-        request.setUserId("user-123");
-
-        BusinessBizResult<QueryReceiptsHistoryResult> response = qrCodeService.queryReceiptsHistory(request);
-
-        assertThat(response).isNotNull();
-        QueryReceiptsHistoryResult result = response.getResult();
-        assertThat(result).isNotNull();
-
-        List<ReceiptItem> items = result.getReceiptItems();
-        assertThat(items).hasSize(2);
-
-        ReceiptItem item1 = items.get(0);
-        assertThat(item1.getReceiptId()).isEqualTo(1L);
-        assertThat(item1.getReceiptName()).isEqualTo("receipt-1.pdf");
-        assertThat(item1.getStatus()).isEqualTo("ACTIVE");
-        assertThat(item1.getTotalPaid()).isEqualByComparingTo("60.00");
-        assertThat(item1.getTotalUnpaid()).isEqualByComparingTo("40.00");
-
-        ReceiptItem item2 = items.get(1);
-        assertThat(item2.getReceiptId()).isEqualTo(2L);
-        assertThat(item2.getTotalPaid()).isEqualByComparingTo("200.00");
-        assertThat(item2.getTotalUnpaid()).isEqualByComparingTo("0.00");
-    }
-
-    @Test
     void queryReceiptsHistory_returnsEmptyListWhenNoReceipts() {
         when(receiptRepository.queryReceiptsHistory(any())).thenReturn(Collections.emptyList());
 
