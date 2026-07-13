@@ -155,7 +155,7 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
                     protected void process(QueryReceiptsHistoryRequest request, BusinessBizResult<QueryReceiptsHistoryResult> response) {
                         List<Receipt> receipts = receiptRepository.queryReceiptsHistory(request);
                         //convert receipts list to receipt sessions list.
-                        List<ReceiptItem> receiptItems = convertToReceipt(receipts);
+                        List<ReceiptItem> receiptItems = ItemConverter.convertToReceipt(receipts);
                         QueryReceiptsHistoryResult result = new QueryReceiptsHistoryResult();
                         result.setReceiptItems(receiptItems);
 
@@ -166,42 +166,6 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
                 });
     }
 
-    public List<ReceiptItem> convertToReceipt(List<Receipt> receipts) {
-        List<ReceiptItem> receiptItems = new ArrayList<>();
-
-        for (Receipt receipt : receipts) {
-
-            ReceiptItem receiptItem = new ReceiptItem();
-
-            BigDecimal totalAmount = Optional.ofNullable(receipt.getTotalAmount())
-                    .orElse(BigDecimal.ZERO);
-
-            BigDecimal totalPaid = Optional.ofNullable(receipt.getTotalAmountPaid())
-                    .orElse(BigDecimal.ZERO);
-
-            BigDecimal totalTax = Optional.ofNullable(receipt.getTotalTaxAmount())
-                    .orElse(BigDecimal.ZERO);
-
-
-            receiptItem.setReceiptId(receipt.getReceiptId());
-            receiptItem.setStatus(receipt.getStatus());
-            receiptItem.setTotalAmount(totalAmount);
-            receiptItem.setTotalAmountPaid(totalPaid);
-
-            receiptItem.setTotalAmountUnpaid(
-                    totalAmount.subtract(totalPaid).max(BigDecimal.ZERO)
-            );
-
-            receiptItem.setTotalTaxAmount(totalTax);
-            receiptItem.setCreatedAt(receipt.getCreatedAt());
-            receiptItem.setFileName(receipt.getFileName());
-            receiptItem.setReferenceId(receipt.getReferenceId());
-
-            receiptItems.add(receiptItem);
-        }
-
-        return receiptItems;
-    }
 
     @Override
     public BusinessBizResult<QueryReceiptItemsResult> queryReceiptItems(QueryReceiptItemsRequest request) {

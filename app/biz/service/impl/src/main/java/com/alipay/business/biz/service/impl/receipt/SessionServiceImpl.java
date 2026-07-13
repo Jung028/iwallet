@@ -158,8 +158,6 @@ public class SessionServiceImpl implements SessionService {
 
             // for each item, check if it contains id, then set status to PAID, remove claims (selection)
             for (SessionItem item : items) {
-                System.out.println("PAYMENT ITEM: " + item.getItemId() + " quantity=" + item.getClaims().get("userId")
-                );
                 // check that item is in the quantity map
                 if (!paidQuantityMap.containsKey(item.getItemId())) {
                     continue;
@@ -167,12 +165,9 @@ public class SessionServiceImpl implements SessionService {
 
                 // get the quantity for the item
                 int paidQuantity = paidQuantityMap.get(item.getItemId());
-                System.out.println("ITEM_ID: " + item.getItemId() + " quantity: " + paidQuantity);
-                System.out.println("PAID_QUANTITY: " + paidQuantityMap.get(item.getItemId()));
                 if (paidQuantity == item.getQuantity()) {
                     item.setStatus(ReceiptItemStatus.PAID.getCode());
                 } else {
-                    System.out.println("PARTIALLY_PAID");
                     item.setStatus(ReceiptItemStatus.PARTIALLY_PAID.getCode());
                     item.setQuantity(item.getQuantity() - paidQuantity);
                 }

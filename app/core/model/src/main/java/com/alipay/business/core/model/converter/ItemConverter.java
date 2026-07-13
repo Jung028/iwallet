@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * reason for this converter is to prevent account item from being exposed to user center
@@ -100,31 +101,41 @@ public class ItemConverter {
         return idempotencyKeyItem;
     }
 
+
     public static List<ReceiptItem> convertToReceipt(List<Receipt> receipts) {
         List<ReceiptItem> receiptItems = new ArrayList<>();
+
         for (Receipt receipt : receipts) {
+
             ReceiptItem receiptItem = new ReceiptItem();
+
+            BigDecimal totalAmount = Optional.ofNullable(receipt.getTotalAmount())
+                    .orElse(BigDecimal.ZERO);
+
+            BigDecimal totalPaid = Optional.ofNullable(receipt.getTotalAmountPaid())
+                    .orElse(BigDecimal.ZERO);
+
+            BigDecimal totalTax = Optional.ofNullable(receipt.getTotalTaxAmount())
+                    .orElse(BigDecimal.ZERO);
+
+
             receiptItem.setReceiptId(receipt.getReceiptId());
-            receiptItem.setStatus(receipt.getStatus() != null ? receipt.getStatus() : null);
-            BigDecimal totalAmount = receipt.getTotalAmount() != null ? receipt.getTotalAmount() : BigDecimal.ZERO;
-            BigDecimal totalPaid = receipt.getTotalAmountPaid() != null ? receipt.getTotalAmountPaid() : BigDecimal.ZERO;
+            receiptItem.setStatus(receipt.getStatus());
             receiptItem.setTotalAmount(totalAmount);
             receiptItem.setTotalAmountPaid(totalPaid);
-            // set the total tax from receipt
-            BigDecimal totalTax = receipt.getTotalTaxAmount() != null
-                    ? receipt.getTotalTaxAmount()
-                    : BigDecimal.ZERO;
-            // unpaid is total amount unpaid = total amount - total tax - total paid.
-            BigDecimal unpaid = totalAmount
-                    .subtract(totalTax)
-                    .subtract(totalPaid);
-            receiptItem.setTotalAmountUnpaid(unpaid.max(BigDecimal.ZERO));
-            receiptItem.setTotalTaxAmount(receipt.getTotalTaxAmount());
+
+            receiptItem.setTotalAmountUnpaid(
+                    totalAmount.subtract(totalPaid).max(BigDecimal.ZERO)
+            );
+
+            receiptItem.setTotalTaxAmount(totalTax);
             receiptItem.setCreatedAt(receipt.getCreatedAt());
             receiptItem.setFileName(receipt.getFileName());
             receiptItem.setReferenceId(receipt.getReferenceId());
+
             receiptItems.add(receiptItem);
         }
+
         return receiptItems;
     }
 
