@@ -34,11 +34,6 @@ public class ReceiptItemRepositoryImpl implements ReceiptItemRepository {
         }
     }
 
-    @Override
-    public ReceiptItemDomain lockReceiptItemByQrId(String referenceId) {
-        ReceiptItemDO receiptItemDO = receiptItemDAO.lockReceiptItemByQrId(referenceId);
-        return DomainConverter.convertToModel(receiptItemDO);
-    }
 
     @Override
     public void updateReceiptItem(UpdateReceiptItemRequest req) {
@@ -59,6 +54,12 @@ public class ReceiptItemRepositoryImpl implements ReceiptItemRepository {
         return items.stream()
                 .map(DomainConverter::convertToModel)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ReceiptItemDomain lockReceiptItemByItemId(String itemId) {
+        ReceiptItemDO receiptItemDO = receiptItemDAO.lockReceiptItemByItemId(itemId);
+        return DomainConverter.convertToModel(receiptItemDO);
     }
 
 }

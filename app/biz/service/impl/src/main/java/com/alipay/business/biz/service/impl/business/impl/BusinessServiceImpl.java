@@ -9,12 +9,14 @@ import com.alipay.business.biz.service.impl.auth.QrTokenPayload;
 import com.alipay.business.biz.service.impl.auth.TransferTokenPayload;
 import com.alipay.business.biz.service.impl.checker.BusinessRequestChecker;
 import com.alipay.business.biz.service.impl.helper.ResponseBuilder;
+import com.alipay.business.biz.service.impl.receipt.ReceiptSessionData;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.api.BusinessService;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
 import com.alipay.business.common.service.facade.enums.*;
 import com.alipay.business.common.service.facade.event.EcAutoReloadEvent;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
+import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.common.service.facade.money.MoneyUtil;
 import com.alipay.business.common.service.facade.request.*;
 import com.alipay.business.common.service.facade.request.TransferRequest;
@@ -22,6 +24,7 @@ import com.alipay.business.common.service.facade.result.*;
 import com.alipay.business.common.util.requesthash.HashUtil;
 import com.alipay.business.core.model.converter.ItemConverter;
 import com.alipay.business.core.model.domain.IdempotencyKeys;
+import com.alipay.business.core.model.domain.TransactionReceiptItemRel;
 import com.alipay.business.core.model.enums.BusinessActionEnum;
 import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.merchant.common.service.facade.baseresult.MerchantBizResult;
@@ -57,9 +60,7 @@ import javax.money.Monetary;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.alipay.business.biz.service.impl.constant.GlobalBizConstants.*;
 
@@ -276,6 +277,28 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                         String referenceId = transactionTemplate.execute(status -> {
 
+                            List<ReceiptSubItem> selectedReceiptItems = null;
+                            // if this transaction category is a group receipt,
+                            if (payload.getTransactionCategory().equals(TransactionCategory.GROUP_RECEIPT)) {
+                                //get the receipt session from cache
+                                ReceiptSessionData receiptSession =
+                                        receiptSessionService.getReceiptSession(payload.getReferenceId());
+                                System.out.println("HERE" +receiptSession.getReceiptId());
+
+                                // get the selected receipt items
+                                selectedReceiptItems =
+                                        receiptSession.getItems()
+                                                .stream()
+                                                .filter(item -> item.getClaims().containsKey(userId))
+                                                .map(item -> {
+                                                    ReceiptSubItem relation = new ReceiptSubItem();
+                                                    relation.setItemId(item.getItemId());
+                                                    relation.setQuantity(item.getQuantity());
+                                                    return relation;
+                                                }).toList();
+
+                            }
+
                             // insert idempotency record of pending status
                             IdempotencyKeys idempotencyKeys = new IdempotencyKeys();
                             idempotencyKeys.setIdempotencyKey(payload.getUniqueRequestId());
@@ -392,6 +415,21 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
 
                             // only after a transaction record is confirmed to insert, we update the reference id for idempotent record
                             String txnId = transactionRecord.getResult().getTxnId();
+
+                            // Then update the transaction_receipt_item_rel table for the items
+                            if (selectedReceiptItems != null) {
+                                for (ReceiptSubItem receiptSubItem : selectedReceiptItems) {
+                                    TransactionReceiptItemRel transactionReceiptItemRel = new TransactionReceiptItemRel();
+                                    System.out.println("receiptSubItem.getItemId().toString()" + receiptSubItem.getItemId().toString());
+                                    transactionReceiptItemRel.setReceiptItemId(UUID.fromString(receiptSubItem.getItemId().toString()));
+                                    transactionReceiptItemRel.setReceiptItemQuantity(Integer.parseInt(String.valueOf(receiptSubItem.getQuantity())));
+                                    transactionReceiptItemRel.setTxnId(txnId);
+                                    transactionReceiptItemRel.setGmtCreate(new Date());
+                                    transactionReceiptItemRel.setGmtModified(new Date());
+
+                                    transactionReceiptItemRepository.insertTransactionReceiptItemRel(transactionReceiptItemRel);
+                                }
+                            }
 
                             idempotencyKeysRepository.updateReferenceId(payload.getUniqueRequestId(), txnId);
 

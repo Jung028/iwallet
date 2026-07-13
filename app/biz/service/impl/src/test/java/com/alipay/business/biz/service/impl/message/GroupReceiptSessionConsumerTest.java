@@ -102,7 +102,7 @@ class GroupReceiptSessionConsumerTest {
         stubAccountInfo("ACC-001", "John Doe");
 
         ReceiptItemDomain unpaidItem = buildReceiptItem(1L, 10L, ReceiptItemStatus.UNPAID, new BigDecimal("50.00"));
-        when(receiptItemRepository.lockReceiptItemByQrId("QR-001")).thenReturn(unpaidItem);
+        when(receiptItemRepository.lockReceiptItemByItemId("QR-001")).thenReturn(unpaidItem);
 
         Receipt receipt = buildReceipt(10L, new BigDecimal("100.00"), new BigDecimal("0.00"));
         when(receiptRepository.queryReceiptByReceiptId(any())).thenReturn(receipt);
@@ -125,7 +125,7 @@ class GroupReceiptSessionConsumerTest {
 
         ArgumentCaptor<ReceiptItemPaidEvent> eventCaptor = ArgumentCaptor.forClass(ReceiptItemPaidEvent.class);
         verify(eventPublisher).publishEvent(eventCaptor.capture());
-        assertThat(eventCaptor.getValue().getReceiptItem()).isSameAs(unpaidItem);
+        assertThat(eventCaptor.getValue().getReceiptItems()).isSameAs(unpaidItem);
     }
 
     @Test
@@ -136,7 +136,7 @@ class GroupReceiptSessionConsumerTest {
         stubAccountInfo("ACC-002", "Jane Doe");
 
         ReceiptItemDomain alreadyPaid = buildReceiptItem(2L, 10L, ReceiptItemStatus.PAID, new BigDecimal("50.00"));
-        when(receiptItemRepository.lockReceiptItemByQrId("QR-002")).thenReturn(alreadyPaid);
+        when(receiptItemRepository.lockReceiptItemByItemId("QR-002")).thenReturn(alreadyPaid);
 
         consumer.onMessage(event);
 
@@ -154,7 +154,7 @@ class GroupReceiptSessionConsumerTest {
         stubAccountInfo("ACC-003", "Alice");
 
         ReceiptItemDomain unpaidItem = buildReceiptItem(3L, 20L, ReceiptItemStatus.UNPAID, new BigDecimal("30.00"));
-        when(receiptItemRepository.lockReceiptItemByQrId("QR-003")).thenReturn(unpaidItem);
+        when(receiptItemRepository.lockReceiptItemByItemId("QR-003")).thenReturn(unpaidItem);
 
         Receipt receipt = buildReceipt(20L, new BigDecimal("100.00"), new BigDecimal("0.00"));
         when(receiptRepository.queryReceiptByReceiptId(any())).thenReturn(receipt);
@@ -179,7 +179,7 @@ class GroupReceiptSessionConsumerTest {
         stubAccountInfo("ACC-004", "Bob");
 
         ReceiptItemDomain unpaidItem = buildReceiptItem(7L, 30L, ReceiptItemStatus.UNPAID, new BigDecimal("25.00"));
-        when(receiptItemRepository.lockReceiptItemByQrId("QR-004")).thenReturn(unpaidItem);
+        when(receiptItemRepository.lockReceiptItemByItemId("QR-004")).thenReturn(unpaidItem);
 
         Receipt receipt = buildReceipt(30L, new BigDecimal("50.00"), new BigDecimal("0.00"));
         when(receiptRepository.queryReceiptByReceiptId(any())).thenReturn(receipt);

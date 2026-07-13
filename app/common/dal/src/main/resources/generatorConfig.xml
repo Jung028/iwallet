@@ -33,6 +33,7 @@
         <table tableName="qr_code" domainObjectName="QrCodeDO" />
         <table tableName="receipt" domainObjectName="ReceiptDO" />
         <table tableName="receipt_item" domainObjectName="ReceiptItemDO" />
+        <table tableName="transaction_receipt_item_rel" domainObjectName="TransactionReceiptItemRelDO" />
 
     </context>
 </generatorConfiguration>

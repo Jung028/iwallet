@@ -11,10 +11,9 @@ public interface ReceiptItemRepository {
 
     void insertReceiptItem(ReceiptSubItem receiptSubItem);
 
-    ReceiptItemDomain lockReceiptItemByQrId(String referenceId);
-
     void updateReceiptItem(UpdateReceiptItemRequest updateReceiptItemRequest);
 
     List<ReceiptItemDomain> queryReceiptItemsByReceiptId(String receiptId);
 
+    ReceiptItemDomain lockReceiptItemByItemId(String itemId);
 }

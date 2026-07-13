@@ -2,15 +2,19 @@ package com.alipay.business.core.model.converter;
 
 import com.alipay.business.common.dal.auto.dataobject.ReceiptDO;
 import com.alipay.business.common.dal.auto.dataobject.ReceiptItemDO;
+import com.alipay.business.common.dal.auto.dataobject.TransactionReceiptItemRelDO;
 import com.alipay.business.common.service.facade.item.ReceiptItem;
 import com.alipay.business.common.service.facade.item.ReceiptSession;
 import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.core.model.domain.Receipt;
 import com.alipay.business.core.model.domain.ReceiptItemDomain;
+import com.alipay.business.core.model.domain.TransactionReceiptItemRel;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -89,5 +93,36 @@ public class DomainConverter {
         domain.setUpdatedAt(receiptItemDO.getUpdatedAt());
         domain.setTotalTaxAmount(receiptItemDO.getTotalTaxAmount());
         return domain;
+    }
+
+    public static TransactionReceiptItemRelDO convertToDO(TransactionReceiptItemRel transactionReceiptItemRel) {
+        if (transactionReceiptItemRel == null) {
+            return null;
+        }
+        TransactionReceiptItemRelDO domain = new TransactionReceiptItemRelDO();
+        domain.setQuantity(transactionReceiptItemRel.getReceiptItemQuantity());
+        domain.setGmtModified(transactionReceiptItemRel.getGmtModified());
+        domain.setTransactionId(transactionReceiptItemRel.getTxnId());
+        domain.setReceiptItemId(transactionReceiptItemRel.getReceiptItemId());
+        domain.setGmtCreated(transactionReceiptItemRel.getGmtCreate());
+        return domain;
+    }
+
+
+    public static List<TransactionReceiptItemRel> convertToModel(List<TransactionReceiptItemRelDO> transactionReceiptItemRelDOs) {
+        if (transactionReceiptItemRelDOs == null) {
+            return null;
+        }
+        List<TransactionReceiptItemRel> transactionReceiptItemRels = new ArrayList<>();
+        for (TransactionReceiptItemRelDO domain : transactionReceiptItemRelDOs) {
+            TransactionReceiptItemRel transactionReceiptItemRel = new TransactionReceiptItemRel();
+            transactionReceiptItemRel.setTxnId(domain.getTransactionId());
+            transactionReceiptItemRel.setGmtCreate(domain.getGmtCreated());
+            transactionReceiptItemRel.setGmtModified(domain.getGmtModified());
+            transactionReceiptItemRel.setReceiptItemQuantity(domain.getQuantity());
+            transactionReceiptItemRel.setReceiptItemId((UUID) domain.getReceiptItemId());
+            transactionReceiptItemRels.add(transactionReceiptItemRel);
+        }
+        return transactionReceiptItemRels;
     }
 }

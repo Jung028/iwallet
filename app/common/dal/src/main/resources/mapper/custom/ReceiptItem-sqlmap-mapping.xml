@@ -38,12 +38,13 @@
         #{updatedAt,jdbcType=TIMESTAMP}, #{qrReferenceId,jdbcType=VARCHAR}, #{totalTaxAmount,jdbcType=NUMERIC})
     </insert>
 
-    <select id="lockReceiptItemByQrId" parameterType="map" resultMap="BaseResultMap">
+    <select id="lockReceiptItemByItemId" parameterType="map" resultMap="BaseResultMap">
         SELECT item_id, receipt_id, name,
         quantity, unit_price, total_price,
         selected_by, status, created_at, updated_at, qr_reference_id, total_tax_amount
         FROM receipt_item
-        WHERE qr_reference_id = #{referenceId}
+        WHERE item_id = #{itemId}::uuid
+        LIMIT 1
         FOR UPDATE
     </select>
 

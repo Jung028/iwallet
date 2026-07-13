@@ -74,7 +74,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         receipt.setFileUrl(receiptUrl);
         receipt.setUpdatedAt(new Date());
         receipt.setTotalTaxAmount(ocrResult.getTaxAmount().add(ocrResult.getSstAmount()));
-        //TODO: add tax + sst calculation + value, so that each item we insert will contain totalvalue after tax
+        System.out.println("RECEIPT : " + receipt.getReceiptId());
         receiptRepository.insertReceipt(receipt);
 
         // compute subtotal from OCR items
@@ -112,6 +112,7 @@ public class ReceiptServiceImpl implements ReceiptService {
                 li.setCreatedAt(new Date());
                 li.setUpdatedAt(new Date());
                 li.setReceiptId(receiptId);
+                System.out.println("ITEM ID : " + li.getItemId());
                 receiptItemRepository.insertReceiptItem(li);
                 lineItems.add(li);
             }

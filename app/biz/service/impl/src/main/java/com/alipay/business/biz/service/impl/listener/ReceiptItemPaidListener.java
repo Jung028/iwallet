@@ -20,9 +20,9 @@ public class ReceiptItemPaidListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onReceiptItemPaid(ReceiptItemPaidEvent event) {
+        System.out.println("receipt item paid event receiptId:" + event.getReceiptId() + "ITEMS_STATUS: " + event.getReceiptItems().get(0).getStatus());
         messagingTemplate.convertAndSend(
-                "/topic/receipt/" + event.getReceiptItem().getItemId(),
-                event.getReceiptItem()
+                "/topic/receipt/" + event.getReceiptId(), event.getReceiptItems()
         );
     }
 }

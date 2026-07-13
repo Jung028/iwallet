@@ -13,7 +13,7 @@ public interface ReceiptItemDAO {
 
     List<ReceiptItemDO> queryReceiptItemsByReceiptId(@Param("receiptId") String receiptId);
 
-    ReceiptItemDO lockReceiptItemByQrId(@Param("referenceId") String referenceId);
+    ReceiptItemDO lockReceiptItemByItemId(@Param("itemId") String itemId);
 
     int updateReceiptItem(@Param("receiptItemId") String receiptItemId,
                           @Param("itemStatus") String itemStatus,

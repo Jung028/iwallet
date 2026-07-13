@@ -122,36 +122,9 @@ public class ReceiptUploadController {
             throw new IllegalStateException("No items selected for user " + userId);
         }
 
-        String receiptId = session.getReceiptId();
         // per-user scoped QR reference: enables lockReceiptItemByQrId to identify this user's items
         String qrReferenceId = userId + ":" + sessionId;
 
-        for (SessionItem si : myItems) {
-            int claimedQty = si.getClaims().get(userId);
-            // si.getPrice()/getTaxAmount() are totals for the full line quantity — prorate down
-            // to just the units this user claimed (e.g. claimed 1 of a 2x line = half the total)
-            BigDecimal unitPrice = si.getPrice()
-                    .divide(BigDecimal.valueOf(si.getQuantity()), 2, RoundingMode.HALF_UP);
-            BigDecimal claimedPrice = unitPrice.multiply(BigDecimal.valueOf(claimedQty));
-            BigDecimal claimedTax = si.getTaxAmount()
-                    .multiply(BigDecimal.valueOf(claimedQty))
-                    .divide(BigDecimal.valueOf(si.getQuantity()), 2, RoundingMode.HALF_UP);
-
-            ReceiptSubItem item = new ReceiptSubItem();
-            item.setItemId(UUID.randomUUID());
-            item.setReceiptId(UUID.fromString(receiptId));
-            item.setName(si.getName());
-            item.setQuantity(claimedQty);
-            item.setUnitPrice(unitPrice);
-            item.setTotalPrice(claimedPrice);
-            item.setTotalTaxAmount(claimedTax);
-            item.setSelectedBy(userId);
-            item.setStatus("UNPAID");
-            item.setQrReferenceId(qrReferenceId);
-            item.setCreatedAt(new Date());
-            item.setUpdatedAt(new Date());
-            receiptItemRepository.insertReceiptItem(item);
-        }
 
         GenerateQrCodeRequest payQrRequest = new GenerateQrCodeRequest();
         payQrRequest.setUserId(userId);

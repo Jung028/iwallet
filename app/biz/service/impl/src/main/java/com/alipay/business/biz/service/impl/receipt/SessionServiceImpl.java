@@ -140,7 +140,7 @@ public class SessionServiceImpl implements SessionService {
         for (int i = 0; i < ocrItems.size(); i++) {
             ReceiptSubItem ocr = ocrItems.get(i);
             SessionItem item = new SessionItem();
-            item.setItemId(String.valueOf(i + 1));
+            item.setItemId(ocr.getItemId().toString());
             item.setName(ocr.getName());
             item.setQuantity(ocr.getQuantity());
             item.setPrice(ocr.getTotalPrice());
