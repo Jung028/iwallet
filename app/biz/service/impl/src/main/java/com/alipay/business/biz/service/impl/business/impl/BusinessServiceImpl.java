@@ -420,7 +420,6 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                             if (selectedReceiptItems != null) {
                                 for (ReceiptSubItem receiptSubItem : selectedReceiptItems) {
                                     TransactionReceiptItemRel transactionReceiptItemRel = new TransactionReceiptItemRel();
-                                    System.out.println("receiptSubItem.getItemId().toString()" + receiptSubItem.getItemId().toString());
                                     transactionReceiptItemRel.setReceiptItemId(UUID.fromString(receiptSubItem.getItemId().toString()));
                                     transactionReceiptItemRel.setReceiptItemQuantity(Integer.parseInt(String.valueOf(receiptSubItem.getQuantity())));
                                     transactionReceiptItemRel.setTxnId(txnId);

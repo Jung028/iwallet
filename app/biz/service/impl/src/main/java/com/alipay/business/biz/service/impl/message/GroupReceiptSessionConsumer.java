@@ -148,9 +148,8 @@ public class GroupReceiptSessionConsumer {
                         );
             });
 
-            // publish event for spring to listen and handle WS post
-            AssertUtil.notNull(receiptItemPaidEvent, BusinessResultCode.SYSTEM_EXCEPTION, "receipt item paid event is null");
-            eventPublisher.publishEvent(receiptItemPaidEvent);
+            // update the cache result as well
+            sessionService.updateReceiptItemStatus(receiptItemPaidEvent.getReceiptId(), receiptItemPaidEvent.getReceiptItems());
         }
 
     }

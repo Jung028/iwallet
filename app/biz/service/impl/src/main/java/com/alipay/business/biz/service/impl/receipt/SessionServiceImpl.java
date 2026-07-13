@@ -4,9 +4,11 @@ import com.alipay.account_center.common.service.facade.baseresult.AccountBizResu
 import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.account_center.common.service.facade.request.QueryAccountInfoRequest;
 import com.alipay.business.common.service.facade.enums.BusinessResultCode;
+import com.alipay.business.common.service.facade.enums.ReceiptItemStatus;
 import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.common.service.facade.item.SessionItem;
 import com.alipay.business.common.service.integration.account.AccountServiceClient;
+import com.alipay.business.core.model.domain.ReceiptItemDomain;
 import com.alipay.business.core.model.util.AssertUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +16,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,12 @@ public class SessionServiceImpl implements SessionService {
         AssertUtil.notNull(accountInfo.getResult(), BusinessResultCode.ACCOUNT_NOT_FOUND, "session owner account not exist");
 
         redisTemplate.opsForHash().put(key, "sessionOwnerAccountId", accountInfo.getResult().getAccountId());
-
+        // add reverse lookup so that we can retrieve session Id from the receipt Id
+        redisTemplate.opsForValue()
+                .set("receipt:session:lookup:" + receiptId,
+                        sessionId,
+                        SESSION_TTL_DAYS,
+                        TimeUnit.DAYS);
         try {
             redisTemplate.opsForHash().put(key, "items",
                     objectMapper.writeValueAsString(toSessionItems(ocrItems)));
@@ -132,6 +136,39 @@ public class SessionServiceImpl implements SessionService {
         return session.getItems().stream()
                 .filter(item -> item.getClaims().getOrDefault(userId, 0) > 0)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateReceiptItemStatus(String receiptId, List<ReceiptItemDomain> paidItems) {
+        // retrieve the session Id from receiptId
+        String sessionId = redisTemplate.opsForValue().get("receipt:session:lookup:" + receiptId);
+        AssertUtil.notNull(sessionId, BusinessResultCode.SYSTEM_EXCEPTION, "session not found for receiptId: " + receiptId);
+
+        // update the receipt item status for each of the items. for this receipt id.
+        String key = SESSION_KEY_PREFIX + sessionId;
+        try {
+            List<SessionItem> items = deserializeItems((String) redisTemplate.opsForHash().get(key, "items"));
+            // create a set to prevent duplicate, retrieve item ids
+            Set<String> paidItemsIds = paidItems.stream()
+                    .map(item -> item.getItemId().toString())
+                    .collect(Collectors.toSet());
+
+            // for each item, check if it contains id, then set status to PAID, remove claims (selection)
+            for (SessionItem item : items) {
+                if (paidItemsIds.contains(item.getItemId())) {
+                    item.setStatus(ReceiptItemStatus.PAID.getCode());
+                    item.getClaims().clear();
+                }
+            }
+
+            // put items
+            redisTemplate.opsForHash().put(key, "items", objectMapper.writeValueAsString(items));
+
+            // set expiry
+            redisTemplate.expire(key, SESSION_TTL_DAYS, TimeUnit.DAYS);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<SessionItem> toSessionItems(List<ReceiptSubItem> ocrItems) {
