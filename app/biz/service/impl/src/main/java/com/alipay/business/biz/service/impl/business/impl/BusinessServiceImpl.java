@@ -293,7 +293,8 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                                 .map(item -> {
                                                     ReceiptSubItem relation = new ReceiptSubItem();
                                                     relation.setItemId(item.getItemId());
-                                                    relation.setQuantity(item.getQuantity());
+                                                    // use the user's selected quantity, not the actually quantity.
+                                                    relation.setQuantity(item.getClaims().get(userId));
                                                     return relation;
                                                 }).toList();
 
@@ -421,6 +422,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                 for (ReceiptSubItem receiptSubItem : selectedReceiptItems) {
                                     TransactionReceiptItemRel transactionReceiptItemRel = new TransactionReceiptItemRel();
                                     transactionReceiptItemRel.setReceiptItemId(UUID.fromString(receiptSubItem.getItemId().toString()));
+                                    // set the quantity to the receupt item quantity
                                     transactionReceiptItemRel.setReceiptItemQuantity(Integer.parseInt(String.valueOf(receiptSubItem.getQuantity())));
                                     transactionReceiptItemRel.setTxnId(txnId);
                                     transactionReceiptItemRel.setGmtCreate(new Date());

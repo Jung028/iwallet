@@ -7,7 +7,9 @@ package com.alipay.business.common.service.facade.enums;
 public enum ReceiptItemStatus {
     UNPAID("UNPAID", "receipt item is not paid yet"),
     PAID("PAID", "receipt item has been paid for"),
-    SETTLED("SETTLED", "receipt item has been settled offline by admin user"); // for admin update
+    SETTLED("SETTLED", "receipt item has been settled offline by admin user"),
+    PARTIALLY_PAID("PARTIALLY_PAID", "receipt item has been partially paid")
+    ; // for admin update
     private String code;
     private String desc;
 

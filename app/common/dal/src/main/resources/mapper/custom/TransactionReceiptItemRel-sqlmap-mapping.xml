@@ -37,4 +37,10 @@
         WHERE transaction_id = #{transactionId}
     </select>
 
+    <select id="queryTotalPaidQuantityByReceiptItemId" parameterType="map" resultType="java.lang.Integer">
+        SELECT COALESCE(SUM(quantity), 0)
+        FROM transaction_receipt_item_rel
+        WHERE receipt_item_id = #{receiptItemId}
+    </select>
+
 </mapper>

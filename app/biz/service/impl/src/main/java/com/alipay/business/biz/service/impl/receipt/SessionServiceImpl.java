@@ -50,6 +50,7 @@ public class SessionServiceImpl implements SessionService {
 
         redisTemplate.opsForHash().put(key, "sessionOwnerAccountId", accountInfo.getResult().getAccountId());
         // add reverse lookup so that we can retrieve session Id from the receipt Id
+        System.out.println("RECEIPT_SESSION: " + receiptId + "," + sessionId);
         redisTemplate.opsForValue()
                 .set("receipt:session:lookup:" + receiptId,
                         sessionId,
@@ -69,6 +70,7 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public ReceiptSessionData getReceiptSession(String sessionId) {
         String key = SESSION_KEY_PREFIX + sessionId;
+        System.out.println("RECEIPT_SESSION: " + sessionId);
         String receiptId = (String) redisTemplate.opsForHash().get(key, "receiptId");
         if (receiptId == null) {
             throw new IllegalArgumentException("Session not found: " + sessionId);
@@ -148,17 +150,35 @@ public class SessionServiceImpl implements SessionService {
         String key = SESSION_KEY_PREFIX + sessionId;
         try {
             List<SessionItem> items = deserializeItems((String) redisTemplate.opsForHash().get(key, "items"));
-            // create a set to prevent duplicate, retrieve item ids
-            Set<String> paidItemsIds = paidItems.stream()
-                    .map(item -> item.getItemId().toString())
-                    .collect(Collectors.toSet());
+
+            Map<String, Integer> paidQuantityMap = paidItems.stream()
+                    .collect(Collectors.toMap(
+                            item -> item.getItemId().toString(),
+                            ReceiptItemDomain::getQuantity));
 
             // for each item, check if it contains id, then set status to PAID, remove claims (selection)
             for (SessionItem item : items) {
-                if (paidItemsIds.contains(item.getItemId())) {
-                    item.setStatus(ReceiptItemStatus.PAID.getCode());
-                    item.getClaims().clear();
+                System.out.println("PAYMENT ITEM: " + item.getItemId() + " quantity=" + item.getClaims().get("userId")
+                );
+                // check that item is in the quantity map
+                if (!paidQuantityMap.containsKey(item.getItemId())) {
+                    continue;
                 }
+
+                // get the quantity for the item
+                int paidQuantity = paidQuantityMap.get(item.getItemId());
+                System.out.println("ITEM_ID: " + item.getItemId() + " quantity: " + paidQuantity);
+                System.out.println("PAID_QUANTITY: " + paidQuantityMap.get(item.getItemId()));
+                if (paidQuantity == item.getQuantity()) {
+                    item.setStatus(ReceiptItemStatus.PAID.getCode());
+                } else {
+                    System.out.println("PARTIALLY_PAID");
+                    item.setStatus(ReceiptItemStatus.PARTIALLY_PAID.getCode());
+                    item.setQuantity(item.getQuantity() - paidQuantity);
+                }
+                //regardless, stop selecting item.
+                item.getClaims().clear();
+
             }
 
             // put items

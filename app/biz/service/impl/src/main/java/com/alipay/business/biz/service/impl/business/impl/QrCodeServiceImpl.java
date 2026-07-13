@@ -7,6 +7,7 @@ import com.alipay.business.biz.service.impl.qr.QrCodeGeneratorFactory;
 import com.alipay.business.biz.service.impl.qr.QrCodeGeneratorHandler;
 import com.alipay.business.biz.service.impl.template.BusinessBizCallback;
 import com.alipay.business.common.service.facade.baseresult.BusinessBizResult;
+import com.alipay.business.common.service.facade.enums.ReceiptItemStatus;
 import com.alipay.business.common.service.facade.enums.ReceiptSessionStatus;
 import com.alipay.business.common.service.facade.item.ReceiptItem;
 import com.alipay.business.common.service.facade.item.ReceiptSession;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -153,7 +155,7 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
                     protected void process(QueryReceiptsHistoryRequest request, BusinessBizResult<QueryReceiptsHistoryResult> response) {
                         List<Receipt> receipts = receiptRepository.queryReceiptsHistory(request);
                         //convert receipts list to receipt sessions list.
-                        List<ReceiptItem> receiptItems = ItemConverter.convertToReceipt(receipts);
+                        List<ReceiptItem> receiptItems = convertToReceipt(receipts);
                         QueryReceiptsHistoryResult result = new QueryReceiptsHistoryResult();
                         result.setReceiptItems(receiptItems);
 
@@ -162,6 +164,43 @@ public class QrCodeServiceImpl extends AbstractBusinessBizService implements QrC
                                 BusinessActionEnum.QUERY_RECEIPT_HISTORY.getDesc());
                     }
                 });
+    }
+
+    public List<ReceiptItem> convertToReceipt(List<Receipt> receipts) {
+        List<ReceiptItem> receiptItems = new ArrayList<>();
+
+        for (Receipt receipt : receipts) {
+
+            ReceiptItem receiptItem = new ReceiptItem();
+
+            BigDecimal totalAmount = Optional.ofNullable(receipt.getTotalAmount())
+                    .orElse(BigDecimal.ZERO);
+
+            BigDecimal totalPaid = Optional.ofNullable(receipt.getTotalAmountPaid())
+                    .orElse(BigDecimal.ZERO);
+
+            BigDecimal totalTax = Optional.ofNullable(receipt.getTotalTaxAmount())
+                    .orElse(BigDecimal.ZERO);
+
+
+            receiptItem.setReceiptId(receipt.getReceiptId());
+            receiptItem.setStatus(receipt.getStatus());
+            receiptItem.setTotalAmount(totalAmount);
+            receiptItem.setTotalAmountPaid(totalPaid);
+
+            receiptItem.setTotalAmountUnpaid(
+                    totalAmount.subtract(totalPaid).max(BigDecimal.ZERO)
+            );
+
+            receiptItem.setTotalTaxAmount(totalTax);
+            receiptItem.setCreatedAt(receipt.getCreatedAt());
+            receiptItem.setFileName(receipt.getFileName());
+            receiptItem.setReferenceId(receipt.getReferenceId());
+
+            receiptItems.add(receiptItem);
+        }
+
+        return receiptItems;
     }
 
     @Override

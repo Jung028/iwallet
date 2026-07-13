@@ -5,6 +5,7 @@ import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.account_center.common.service.facade.item.TransactionHistoryItem;
 import com.alipay.account_center.common.service.facade.item.TransactionRecordItem;
 import com.alipay.account_center.common.service.facade.request.QueryTransactionHistoryResult;
+import com.alipay.business.common.service.facade.enums.ReceiptItemStatus;
 import com.alipay.business.common.service.facade.item.IdempotencyKeysItem;
 import com.alipay.business.common.service.facade.item.QrCodeItem;
 import com.alipay.business.common.service.facade.item.ReceiptItem;
@@ -107,8 +108,17 @@ public class ItemConverter {
             receiptItem.setStatus(receipt.getStatus() != null ? receipt.getStatus() : null);
             BigDecimal totalAmount = receipt.getTotalAmount() != null ? receipt.getTotalAmount() : BigDecimal.ZERO;
             BigDecimal totalPaid = receipt.getTotalAmountPaid() != null ? receipt.getTotalAmountPaid() : BigDecimal.ZERO;
+            receiptItem.setTotalAmount(totalAmount);
             receiptItem.setTotalAmountPaid(totalPaid);
-            receiptItem.setTotalAmountUnpaid(totalAmount.subtract(totalPaid));
+            // set the total tax from receipt
+            BigDecimal totalTax = receipt.getTotalTaxAmount() != null
+                    ? receipt.getTotalTaxAmount()
+                    : BigDecimal.ZERO;
+            // unpaid is total amount unpaid = total amount - total tax - total paid.
+            BigDecimal unpaid = totalAmount
+                    .subtract(totalTax)
+                    .subtract(totalPaid);
+            receiptItem.setTotalAmountUnpaid(unpaid.max(BigDecimal.ZERO));
             receiptItem.setTotalTaxAmount(receipt.getTotalTaxAmount());
             receiptItem.setCreatedAt(receipt.getCreatedAt());
             receiptItem.setFileName(receipt.getFileName());

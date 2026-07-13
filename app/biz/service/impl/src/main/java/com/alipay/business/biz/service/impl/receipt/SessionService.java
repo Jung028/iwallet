@@ -10,8 +10,11 @@ import java.util.Map;
 
 public interface SessionService {
     String createSession(String receiptId, String receiptUrl, List<ReceiptSubItem> items, String userId);
+
     ReceiptSessionData getReceiptSession(String sessionId);
+
     void updateSelection(String sessionId, String userId, Map<String, Integer> itemQuantities);
+
     List<SessionItem> commitSelection(String sessionId, String userId);
 
     void updateReceiptItemStatus(String receiptId, List<ReceiptItemDomain> paidItems);

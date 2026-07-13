@@ -104,42 +104,64 @@ public class GroupReceiptSessionConsumer {
                         String receiptId = null;
                         // for each receipt item,
                         List<ReceiptItemDomain> paidItems = new ArrayList<>();
-                        for (TransactionReceiptItemRel receiptItem: transactionReceiptItemRelList) {
-                            // check that the receipt item exists, retrieve it
-                            //we need to lock item, to prevent race condition update
-                            ReceiptItemDomain lockedReceiptItem = receiptItemRepository.lockReceiptItemByItemId(receiptItem.getReceiptItemId().toString());
-                            AssertUtil.notNull(lockedReceiptItem, BusinessResultCode.SYSTEM_EXCEPTION, "receipt item not found for transaction");
+
+                        for (TransactionReceiptItemRel receiptItemRel : transactionReceiptItemRelList) {
+
+                            ReceiptItemDomain lockedReceiptItem =
+                                    receiptItemRepository.lockReceiptItemByItemId(
+                                            receiptItemRel.getReceiptItemId().toString()
+                                    );
+
+                            AssertUtil.notNull(lockedReceiptItem, BusinessResultCode.SYSTEM_EXCEPTION,
+                                    "receipt item not found for transaction");
 
                             if (receiptId == null) {
                                 receiptId = lockedReceiptItem.getReceiptId().toString();
                             }
 
-                            // add idempotency guard. We set PAID first so we don't get a null exception for receiptItem
-                            if (!ReceiptItemStatus.PAID.getCode().equals(lockedReceiptItem.getStatus())) {
+                            Integer transactionQuantity = receiptItemRel.getReceiptItemQuantity();
+                            System.out.println("TRANSACTION_QUANTITY: " + transactionQuantity);
 
-                                // update the status of item and time completed, name of payer
-                                UpdateReceiptItemRequest updateReceiptItemRequest = new UpdateReceiptItemRequest();
-                                updateReceiptItemRequest.setReceiptItemId(lockedReceiptItem.getItemId().toString());
-                                updateReceiptItemRequest.setItemStatus(ReceiptItemStatus.PAID.name());
-                                updateReceiptItemRequest.setName(payerName);
-                                updateReceiptItemRequest.setGmtUpdatedAt(new Date());
-                                receiptItemRepository.updateReceiptItem(updateReceiptItemRequest);
+                            System.out.println("RECEIPT_ITEM_ID" +  receiptItemRel.getReceiptItemId());
+                            int totalPaidQuantity = transactionReceiptItemRelRepository
+                                            .queryTotalPaidQuantityByReceiptItemId(receiptItemRel.getReceiptItemId());
+
+                            // means there is still same item quantity not paid for yet
+                            if (totalPaidQuantity >= lockedReceiptItem.getQuantity()) {
+                                if (!ReceiptItemStatus.PAID.getCode().equals(lockedReceiptItem.getStatus())) {
+                                    UpdateReceiptItemRequest updateRequest = new UpdateReceiptItemRequest();
+                                    updateRequest.setReceiptItemId(lockedReceiptItem.getItemId().toString());
+                                    updateRequest.setItemStatus(ReceiptItemStatus.PAID.name());
+                                    updateRequest.setName(payerName);
+                                    updateRequest.setGmtUpdatedAt(new Date());
+                                    receiptItemRepository.updateReceiptItem(updateRequest);
+                                }
                             }
 
-                            // add each item to list
-                            paidItems.add(lockedReceiptItem);
+                            ReceiptItemDomain paidItem = new ReceiptItemDomain();
+                            paidItem.setItemId(lockedReceiptItem.getItemId());
+                            paidItem.setReceiptId(lockedReceiptItem.getReceiptId());
+                            paidItem.setName(lockedReceiptItem.getName());
+                            paidItem.setQuantity(transactionQuantity);
+                            paidItem.setStatus(ReceiptItemStatus.PAID.getCode());
+                            paidItems.add(paidItem);
                         }
                         // retrieve the receipt, update the status.
                         AssertUtil.notNull(receiptId, BusinessResultCode.SYSTEM_EXCEPTION, "receipt item not found for transaction");
                         QueryReceiptRequest request = new QueryReceiptRequest();
                         request.setReceiptId(receiptId);
                         Receipt receipt = receiptRepository.queryReceiptByReceiptId(request);
-                        double totalPaid = calculateTotalPaid(receipt);
+                        BigDecimal totalPaid = calculateTotalPaid(receipt).add(
+                                        Optional.ofNullable(receipt.getTotalTaxAmount())
+                                                .orElse(BigDecimal.ZERO));
 
                         // update the total amount paid
                         UpdateReceiptRequest updateReceiptRequest = new UpdateReceiptRequest();
                         updateReceiptRequest.setReceiptId(receiptId);
-                        updateReceiptRequest.setTotalAmountPaid(BigDecimal.valueOf(totalPaid));
+                        updateReceiptRequest.setTotalAmountPaid(totalPaid);
+                        System.out.println("OLD TOTAL PAID FROM DB: " + receipt.getTotalAmountPaid());
+                        System.out.println("CALCULATED TOTAL PAID: " + totalPaid);
+
                         receiptRepository.updateReceipt(updateReceiptRequest);
 
                         return new ReceiptItemPaidEvent(
@@ -159,13 +181,22 @@ public class GroupReceiptSessionConsumer {
      * @param receipt
      * @return
      */
-    private double calculateTotalPaid(Receipt receipt) {
-        List<ReceiptItemDomain> allItems = receiptItemRepository.queryReceiptItemsByReceiptId(receipt.getReceiptId().toString());
+    private BigDecimal calculateTotalPaid(Receipt receipt) {
+
+        List<ReceiptItemDomain> allItems =
+                receiptItemRepository.queryReceiptItemsByReceiptId(
+                        receipt.getReceiptId().toString()
+                );
+
         return allItems.stream()
-                .filter(item -> ReceiptItemStatus.PAID.getCode().equals(item.getStatus()))
-                .map(ReceiptItemDomain::getTotalPrice)
-                .filter(Objects::nonNull)
-                .mapToDouble(BigDecimal::doubleValue)
-                .sum();
+                .filter(item ->
+                        ReceiptItemStatus.PAID.getCode()
+                                .equals(item.getStatus()))
+                .map(item ->
+                        item.getTotalPrice()
+                                .add(Optional.ofNullable(item.getTotalTaxAmount())
+                                        .orElse(BigDecimal.ZERO))
+                )
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

@@ -4,6 +4,7 @@ import com.alipay.business.common.service.facade.request.QueryTransactionReceipt
 import com.alipay.business.core.model.domain.TransactionReceiptItemRel;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author adam
@@ -13,4 +14,6 @@ public interface TransactionReceiptItemRelRepository {
     void insertTransactionReceiptItemRel(TransactionReceiptItemRel transactionReceiptItemRel);
 
     List<TransactionReceiptItemRel> queryTransactionReceiptItemRel(QueryTransactionReceiptItemRelRequest request);
+
+    int queryTotalPaidQuantityByReceiptItemId(UUID receiptItemId);
 }

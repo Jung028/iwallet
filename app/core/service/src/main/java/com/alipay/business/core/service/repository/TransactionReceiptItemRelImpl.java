@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class TransactionReceiptItemRelImpl implements TransactionReceiptItemRelRepository {
@@ -38,6 +39,15 @@ public class TransactionReceiptItemRelImpl implements TransactionReceiptItemRelR
         try {
             List<TransactionReceiptItemRelDO> transactionReceiptItemRelDOs = transactionReceiptItemRelDAO.queryTransactionReceiptItemRel(request.getTxnId());
             return DomainConverter.convertToModel(transactionReceiptItemRelDOs);
+        } catch (RepositoryException e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public int queryTotalPaidQuantityByReceiptItemId(UUID receiptItemId) {
+        try {
+            return transactionReceiptItemRelDAO.queryTotalPaidQuantityByReceiptItemId(receiptItemId);
         } catch (RepositoryException e) {
             throw e;
         }

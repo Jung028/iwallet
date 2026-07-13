@@ -5,7 +5,7 @@ package com.alipay.business.common.service.facade.baseresult;
  * @date 15/3/2026 12:34 AM
  */
 public class BusinessBasePageRequest extends BusinessBaseRequest {
-    private int pageNo = 1;
+    private int pageNo = 0;
     private int pageSize = 10;
 
     public int getPageNo() { return pageNo; }
