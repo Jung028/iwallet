@@ -67,10 +67,16 @@
         WHERE receipt_id = #{receiptId}::uuid
     </select>
 
+
     <update id="updateReceipt" parameterType="map">
         UPDATE receipt
-        SET total_amount_paid = #{totalAmountPaid,jdbcType=NUMERIC},
-            updated_at        = NOW()
+        <set>
+            total_amount_paid = #{totalAmountPaid,jdbcType=NUMERIC},
+            updated_at = NOW(),
+            <if test="status != null">
+                status = #{status,jdbcType=VARCHAR},
+            </if>
+        </set>
         WHERE receipt_id = #{receiptId}::uuid
     </update>
 

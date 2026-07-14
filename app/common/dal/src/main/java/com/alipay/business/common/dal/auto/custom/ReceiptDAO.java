@@ -4,6 +4,7 @@ import com.alipay.business.common.dal.auto.dataobject.ReceiptDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper
@@ -19,7 +20,8 @@ public interface ReceiptDAO {
     ReceiptDO queryReceiptByReceiptId(@Param("receiptId") String receiptId);
 
     int updateReceipt(@Param("receiptId") String receiptId,
-                      @Param("totalAmountPaid") java.math.BigDecimal totalAmountPaid);
+                      @Param("totalAmountPaid") BigDecimal totalAmountPaid,
+                      @Param("status") String status);
 
     int updateReceiptReferenceId(@Param("receiptId") String receiptId,
                                  @Param("referenceId") String referenceId);

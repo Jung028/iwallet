@@ -1,7 +1,8 @@
 package com.alipay.business.core.model.enums;
 
 public enum ReceiptStatus {
-    UPLOADED("UPLOADED", "receipt is successfully uploaded");
+    UPLOADED("UPLOADED", "receipt is successfully uploaded"),
+    COMPLETED("COMPLETED", "receipt is completed and paid for");
 
     private String code;
     private String desc;

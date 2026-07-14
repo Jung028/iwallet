@@ -2,7 +2,6 @@ package com.alipay.business.web;
 
 import com.alipay.business.biz.service.impl.auth.JwtClaims;
 import com.alipay.business.biz.service.impl.auth.JwtContextHolder;
-import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.common.service.facade.result.CommitSessionResponse;
 import com.alipay.business.common.service.facade.result.ConfirmUploadResponse;
 import com.alipay.business.biz.service.impl.receipt.ReceiptSessionData;
@@ -13,7 +12,6 @@ import com.alipay.business.biz.service.impl.receipt.SessionService;
 import com.alipay.business.common.service.facade.result.UploadUrlResponse;
 import com.alipay.business.common.service.facade.api.QrCodeService;
 import com.alipay.business.common.service.facade.enums.QrIntent;
-import com.alipay.business.common.service.facade.item.ReceiptItem;
 import com.alipay.business.common.service.facade.item.SessionItem;
 import com.alipay.business.common.service.facade.request.ConfirmUploadRequest;
 import com.alipay.business.common.service.facade.request.GenerateQrCodeRequest;
@@ -27,13 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-
-import static com.baomidou.mybatisplus.core.toolkit.SerializationUtils.deserialize;
 
 /**
  * Group payment feature. Allows multiple users to live interact and select the order
@@ -71,7 +63,6 @@ public class ReceiptUploadController {
         // we need to query idempotency keys if it exists.
 
         // if it exists,return exception that this has already been created
-
         ReceiptUploadResult uploadResult = receiptService.validateAndPersist(request, userId);
 
         String sessionId = sessionService.createSession(

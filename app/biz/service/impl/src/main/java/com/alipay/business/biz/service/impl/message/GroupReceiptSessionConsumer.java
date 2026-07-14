@@ -22,6 +22,7 @@ import com.alipay.business.common.service.integration.account.AccountServiceClie
 import com.alipay.business.core.model.domain.Receipt;
 import com.alipay.business.core.model.domain.ReceiptItemDomain;
 import com.alipay.business.core.model.domain.TransactionReceiptItemRel;
+import com.alipay.business.core.model.enums.ReceiptStatus;
 import com.alipay.business.core.model.util.AssertUtil;
 import com.alipay.business.core.service.ReceiptItemRepository;
 import com.alipay.business.core.service.ReceiptRepository;
@@ -151,17 +152,17 @@ public class GroupReceiptSessionConsumer {
                         QueryReceiptRequest request = new QueryReceiptRequest();
                         request.setReceiptId(receiptId);
                         Receipt receipt = receiptRepository.queryReceiptByReceiptId(request);
-                        BigDecimal totalPaid = calculateTotalPaid(receipt).add(
-                                        Optional.ofNullable(receipt.getTotalTaxAmount())
-                                                .orElse(BigDecimal.ZERO));
+                        BigDecimal totalPaid = calculateTotalPaid(receipt);
 
                         // update the total amount paid
                         UpdateReceiptRequest updateReceiptRequest = new UpdateReceiptRequest();
+                        // update to completed if the total paid is equal to the total amount of the receipt
+                        System.out.println("TOTAL_AMOUNT" + receipt.getTotalAmount() + ", TOTAL_PAID" + totalPaid);
+                        if (totalPaid.equals(receipt.getTotalAmount())) {
+                            updateReceiptRequest.setStatus(ReceiptStatus.COMPLETED.getCode());
+                        }
                         updateReceiptRequest.setReceiptId(receiptId);
                         updateReceiptRequest.setTotalAmountPaid(totalPaid);
-                        System.out.println("OLD TOTAL PAID FROM DB: " + receipt.getTotalAmountPaid());
-                        System.out.println("CALCULATED TOTAL PAID: " + totalPaid);
-
                         receiptRepository.updateReceipt(updateReceiptRequest);
 
                         return new ReceiptItemPaidEvent(

@@ -63,7 +63,7 @@ public class ReceiptRepositoryImpl implements ReceiptRepository {
     @Override
     public void updateReceipt(UpdateReceiptRequest updateReceiptRequest) {
         int rows = receiptDAO.updateReceipt(updateReceiptRequest.getReceiptId(),
-                updateReceiptRequest.getTotalAmountPaid());
+                updateReceiptRequest.getTotalAmountPaid(), updateReceiptRequest.getStatus());
         if (rows <= 0) {
             throw new RepositoryException("updateReceipt: no rows affected for id " + updateReceiptRequest.getReceiptId());
         }
