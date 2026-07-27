@@ -12,10 +12,8 @@ public class IAgentExtractedFields {
     private String currency;
     private String category;
     private String description;
-    @JsonProperty("tax_amount")
-    private Double taxAmount;
-    @JsonProperty("sst_amount")
-    private Double sstAmount;
+    @JsonProperty("tax_lines")
+    private List<IAgentTaxLine> taxLines = new ArrayList<>();
     private List<IAgentLineItem> items = new ArrayList<>();
 
     public String getVendor() { return vendor; }
@@ -30,10 +28,8 @@ public class IAgentExtractedFields {
     public void setCategory(String category) { this.category = category; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public Double getTaxAmount() { return taxAmount; }
-    public void setTaxAmount(Double taxAmount) { this.taxAmount = taxAmount; }
-    public Double getSstAmount() { return sstAmount; }
-    public void setSstAmount(Double sstAmount) { this.sstAmount = sstAmount; }
+    public List<IAgentTaxLine> getTaxLines() { return taxLines; }
+    public void setTaxLines(List<IAgentTaxLine> taxLines) { this.taxLines = taxLines; }
     public List<IAgentLineItem> getItems() { return items; }
     public void setItems(List<IAgentLineItem> items) { this.items = items; }
 }

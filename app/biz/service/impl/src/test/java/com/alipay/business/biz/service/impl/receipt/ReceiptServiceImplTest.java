@@ -55,8 +55,7 @@ class ReceiptServiceImplTest {
         OcrResult ocrResult = new OcrResult();
         ocrResult.setTotalAmount(new BigDecimal("20.00"));
         ocrResult.setCurrency("MYR");
-        ocrResult.setTaxAmount(new BigDecimal("2.00"));
-        ocrResult.setSstAmount(BigDecimal.ZERO);
+        ocrResult.setTotalTaxAmount(new BigDecimal("2.00"));
         ocrResult.setItems(List.of(
                 lineItem("Burger", 1, "10.00", "10.00"),
                 lineItem("Fries", 2, "5.00", "10.00")

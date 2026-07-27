@@ -73,7 +73,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         receipt.setTotalAmount(ocrResult.getTotalAmount());
         receipt.setFileUrl(receiptUrl);
         receipt.setUpdatedAt(new Date());
-        receipt.setTotalTaxAmount(ocrResult.getTaxAmount().add(ocrResult.getSstAmount()));
+        receipt.setTotalTaxAmount(ocrResult.getTotalTaxAmount());
         System.out.println("RECEIPT : " + receipt.getReceiptId());
         receiptRepository.insertReceipt(receipt);
 
@@ -82,9 +82,8 @@ public class ReceiptServiceImpl implements ReceiptService {
                 .map(OcrResult.OcrLineItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // total tax (SST + GOV TAX)
-        BigDecimal totalTax = ocrResult.getTaxAmount()
-                .add(ocrResult.getSstAmount());
+        // total tax (sum of every tax/charge line extracted from the receipt)
+        BigDecimal totalTax = ocrResult.getTotalTaxAmount();
 
         // derive tax rate
         BigDecimal taxRate = BigDecimal.ZERO;

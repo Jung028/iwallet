@@ -16,6 +16,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -169,7 +171,13 @@ public class SessionServiceImpl implements SessionService {
                     item.setStatus(ReceiptItemStatus.PAID.getCode());
                 } else {
                     item.setStatus(ReceiptItemStatus.PARTIALLY_PAID.getCode());
-                    item.setQuantity(item.getQuantity() - paidQuantity);
+                    int remainingQuantity = item.getQuantity() - paidQuantity;
+                    // price/taxAmount hold the LINE total, and the frontend derives the unit
+                    // price as price / quantity — so they must shrink together with quantity,
+                    // otherwise the remaining units get charged the already-paid share again
+                    item.setPrice(scaleToRemaining(item.getPrice(), remainingQuantity, item.getQuantity()));
+                    item.setTaxAmount(scaleToRemaining(item.getTaxAmount(), remainingQuantity, item.getQuantity()));
+                    item.setQuantity(remainingQuantity);
                 }
                 //regardless, stop selecting item.
                 item.getClaims().clear();
@@ -184,6 +192,14 @@ public class SessionServiceImpl implements SessionService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private BigDecimal scaleToRemaining(BigDecimal lineTotal, int remainingQuantity, int totalQuantity) {
+        if (lineTotal == null) {
+            return null;
+        }
+        return lineTotal.multiply(BigDecimal.valueOf(remainingQuantity))
+                .divide(BigDecimal.valueOf(totalQuantity), 2, RoundingMode.HALF_UP);
     }
 
     private List<SessionItem> toSessionItems(List<ReceiptSubItem> ocrItems) {

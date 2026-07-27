@@ -59,10 +59,14 @@ public class AgentServiceClientImpl implements AgentServiceClient {
         result.setTotalAmount(extracted.getAmount() != null
                 ? BigDecimal.valueOf(extracted.getAmount()) : BigDecimal.ZERO);
         result.setCurrency(extracted.getCurrency() != null ? extracted.getCurrency() : "SGD");
-        result.setTaxAmount(extracted.getTaxAmount() != null
-                ? BigDecimal.valueOf(extracted.getTaxAmount()) : BigDecimal.ZERO);
-        result.setSstAmount(extracted.getSstAmount() != null
-                ? BigDecimal.valueOf(extracted.getSstAmount()) : BigDecimal.ZERO);
+
+        BigDecimal totalTax = BigDecimal.ZERO;
+        if (extracted.getTaxLines() != null) {
+            for (IAgentTaxLine taxLine : extracted.getTaxLines()) {
+                totalTax = totalTax.add(BigDecimal.valueOf(taxLine.getAmount()));
+            }
+        }
+        result.setTotalTaxAmount(totalTax);
 
         List<OcrResult.OcrLineItem> items = new ArrayList<>();
         if (extracted.getItems() != null) {

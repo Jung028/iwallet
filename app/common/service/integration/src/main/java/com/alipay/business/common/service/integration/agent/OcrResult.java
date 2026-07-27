@@ -7,19 +7,16 @@ public class OcrResult {
 
     private BigDecimal totalAmount;
     private String currency;
-    private BigDecimal taxAmount;
-    private BigDecimal sstAmount;
+    // sum of every tax/charge line extracted from the receipt (service charge, SST, GST, etc.)
+    private BigDecimal totalTaxAmount;
     private List<OcrLineItem> items;
 
     public BigDecimal getTotalAmount() { return totalAmount; }
     public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
     public String getCurrency() { return currency; }
     public void setCurrency(String currency) { this.currency = currency; }
-    // any generic tax line on the receipt (GST, service tax, etc.) that isn't specifically SST
-    public BigDecimal getTaxAmount() { return taxAmount; }
-    public void setTaxAmount(BigDecimal taxAmount) { this.taxAmount = taxAmount; }
-    public BigDecimal getSstAmount() { return sstAmount; }
-    public void setSstAmount(BigDecimal sstAmount) { this.sstAmount = sstAmount; }
+    public BigDecimal getTotalTaxAmount() { return totalTaxAmount; }
+    public void setTotalTaxAmount(BigDecimal totalTaxAmount) { this.totalTaxAmount = totalTaxAmount; }
     public List<OcrLineItem> getItems() { return items; }
     public void setItems(List<OcrLineItem> items) { this.items = items; }
 

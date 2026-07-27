@@ -1,7 +1,11 @@
 package com.alipay.business.biz.service.impl.receipt;
 
+import com.alipay.account_center.common.service.facade.baseresult.AccountBizResult;
+import com.alipay.account_center.common.service.facade.item.AccountInfoItem;
 import com.alipay.business.common.service.facade.item.ReceiptSubItem;
 import com.alipay.business.common.service.facade.item.SessionItem;
+import com.alipay.business.common.service.integration.account.AccountServiceClient;
+import com.alipay.business.core.model.domain.ReceiptItemDomain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.math.BigDecimal;
@@ -33,6 +38,8 @@ class SessionServiceImplTest {
 
     @Mock StringRedisTemplate redisTemplate;
     @Mock HashOperations<String, Object, Object> hashOps;
+    @Mock ValueOperations<String, String> valueOps;
+    @Mock AccountServiceClient accountServiceClient;
     @Mock SimpMessagingTemplate messagingTemplate;
     @Spy ObjectMapper objectMapper = new ObjectMapper();
     @InjectMocks SessionServiceImpl service;
@@ -42,11 +49,20 @@ class SessionServiceImplTest {
     @BeforeEach
     void setUp() {
         when(redisTemplate.opsForHash()).thenReturn(hashOps);
+        when(redisTemplate.opsForValue()).thenReturn(valueOps);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void createSession_storesHashFieldsAndReturnsSessionId() {
+        AccountInfoItem accountInfo = mock(AccountInfoItem.class);
+        when(accountInfo.getAccountId()).thenReturn("acc-1");
+        AccountBizResult<AccountInfoItem> accountResult = mock(AccountBizResult.class);
+        when(accountResult.getResult()).thenReturn(accountInfo);
+        when(accountServiceClient.queryAccountInfoByUserId(any())).thenReturn(accountResult);
+
         ReceiptSubItem item = new ReceiptSubItem();
+        item.setItemId("1");
         item.setName("Burger");
         item.setUnitPrice(new BigDecimal("12.50"));
         item.setQuantity(1);
@@ -170,6 +186,39 @@ class SessionServiceImplTest {
 
         assertThat(saved.get(0).getClaims()).doesNotContainKey("user-A");
         assertThat(saved.get(0).getStatus()).isEqualTo("AVAILABLE");
+    }
+
+    @Test
+    void updateReceiptItemStatus_partialPayment_scalesPriceAndTaxToRemainingQuantity() throws Exception {
+        // "2x Fried Chicken" line: total price 20.00, total tax 2.00 (unit = 10.00 + 1.00 tax)
+        SessionItem item = new SessionItem();
+        item.setItemId("1"); item.setStatus("SELECTED"); item.setName("Fried Chicken");
+        item.setQuantity(2); item.setPrice(new BigDecimal("20.00"));
+        item.setTaxAmount(new BigDecimal("2.00"));
+        item.getClaims().put("user-A", 1);
+
+        String itemsJson = mapper.writeValueAsString(List.of(item));
+        when(valueOps.get("receipt:session:lookup:receipt-1")).thenReturn("sess-1");
+        when(hashOps.get(anyString(), eq("items"))).thenReturn(itemsJson);
+
+        ReceiptItemDomain paid = new ReceiptItemDomain();
+        paid.setItemId("1");
+        paid.setQuantity(1);
+
+        service.updateReceiptItemStatus("receipt-1", List.of(paid));
+
+        ArgumentCaptor<String> savedJson = ArgumentCaptor.forClass(String.class);
+        verify(hashOps).put(contains("sess-1"), eq("items"), savedJson.capture());
+        List<SessionItem> saved = mapper.readValue(savedJson.getValue(),
+                mapper.getTypeFactory().constructCollectionType(List.class, SessionItem.class));
+
+        SessionItem remaining = saved.get(0);
+        assertThat(remaining.getStatus()).isEqualTo("PARTIALLY_PAID");
+        assertThat(remaining.getQuantity()).isEqualTo(1);
+        // price/tax must shrink with quantity, or the remaining unit doubles in price
+        assertThat(remaining.getPrice()).isEqualByComparingTo("10.00");
+        assertThat(remaining.getTaxAmount()).isEqualByComparingTo("1.00");
+        assertThat(remaining.getClaims()).isEmpty();
     }
 
     @Test
