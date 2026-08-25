@@ -761,6 +761,7 @@ public class BusinessServiceImpl extends AbstractBusinessBizService implements B
                                     new InsertTransactionRecordRequest();
                             insertRequest.setPayerAccountNo(STRIPE_CLEARING_ACCOUNT);
                             insertRequest.setPayeeAccountNo(accountInfo.getResult().getAccountId());
+                            insertRequest.setCategory(TransactionCategory.TOP_UP);
                             insertRequest.setAmount(request.getAmount());
                             insertRequest.setCurrency(request.getCurrency());
                             insertRequest.setTxnType(TransactionType.TOP_UP);
